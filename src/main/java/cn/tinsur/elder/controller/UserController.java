@@ -1,9 +1,13 @@
 package cn.tinsur.elder.controller;
 
 
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import cn.tinsur.elder.pojo.entity.User;
+import cn.tinsur.elder.pojo.query.UserQuery;
+import cn.tinsur.elder.service.IUserService;
+import cn.tinsur.elder.util.Result;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -14,8 +18,70 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2026-08-24
  */
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
 
+    @Autowired
+    private IUserService userService;
+
+    /**
+     * 分页查询用户列表
+     * GET /users?page=1&limit=10&name=xxx&phone=xxx
+     */
+    @GetMapping
+    public Result<IPage<User>> list(UserQuery userQuery) {
+        IPage<User> page = userService.list(userQuery);
+        return Result.ok(page);
+    }
+
+    /**
+     * 根据ID查询用户
+     * GET /users/1
+     */
+    @GetMapping("/{id}")
+    public Result getById(@PathVariable Long id) {
+        return Result.ok(userService.getById(id));
+    }
+
+    /**
+     * 新增用户
+     * POST /users
+     */
+    @PostMapping
+    public Result add(@RequestBody User user) {
+        userService.save(user);
+        return Result.ok("新增成功");
+    }
+
+    /**
+     * 修改用户
+     * PUT /users/1
+     */
+    @PutMapping
+    public Result update(@PathVariable Long id, @RequestBody User user) {
+        user.setId(id);
+        userService.updateById(user);
+        return Result.ok("修改成功");
+    }
+
+    /**
+     * 根据ID删除用户（逻辑删除）
+     * DELETE /users/1
+     */
+    @DeleteMapping("/{id}")
+    public Result delete(@PathVariable Long id) {
+        userService.removeById(id);
+        return Result.ok("删除成功");
+    }
+
+    /**
+     * 批量删除用户
+     * DELETE /users
+     */
+    @DeleteMapping
+    public Result deleteBatch(@RequestBody Long[] ids) {
+        userService.removeByIds(java.util.Arrays.asList(ids));
+        return Result.ok("批量删除成功");
+    }
 }
 

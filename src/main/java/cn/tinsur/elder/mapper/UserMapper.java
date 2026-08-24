@@ -1,6 +1,6 @@
 package cn.tinsur.elder.mapper;
 
-import cn.tinsur.elder.pojo.User;
+import cn.tinsur.elder.pojo.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

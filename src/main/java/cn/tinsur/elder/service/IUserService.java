@@ -1,6 +1,8 @@
 package cn.tinsur.elder.service;
 
-import cn.tinsur.elder.pojo.User;
+import cn.tinsur.elder.pojo.entity.User;
+import cn.tinsur.elder.pojo.query.UserQuery;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -13,4 +15,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IUserService extends IService<User> {
 
+    IPage<User> list(UserQuery userQuery);
 }

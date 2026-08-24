@@ -1,0 +1,237 @@
+<script setup>
+  import userApi from '@/api/user.js'
+  import {ref} from 'vue'
+  import {ElMessage, ElMessageBox} from 'element-plus'
+
+  //表格数据
+  const list = ref([])
+  const total = ref(0)
+  //分页信息和搜索条件
+  const userQuery = ref({
+    name: '',
+    email: '',
+    page: 1,
+    limit: 10
+  })
+
+  /*function loadData() {
+      userApi.list(userQuery.value).then(result => {
+          list.value = result.data.records
+          total.value = result.data.total
+      })
+  }*/
+  const loadData = () => {
+    userApi.list(userQuery.value).then(result => {
+      list.value = result.data.records
+      total.value = result.data.total
+    })
+  }
+
+  loadData()
+
+  const onSearch = () => {
+    userQuery.value.page = 1
+    loadData()
+  }
+
+  //根据id更新状态（0：停用，1：正常）
+  const handleSwitchChange = (row) => {
+    userApi.update(row.id, row).then(result => {
+      if (result.code === 1) {
+        ElMessage.success('状态已更新')
+      } else {
+        ElMessage.error(result.msg)
+        loadData() //失败则重新加载还原
+      }
+    })
+  }
+
+  //根据id删除
+  const deleteById = (id) => {
+    ElMessageBox.confirm(
+        '您确认要删除么?',
+        '警告',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'warning',
+          lockScroll: false //防止抖动
+        }
+    ).then(() => {
+      userApi.deleteById(id).then(result => {
+        if (result.code === 1) {
+          ElMessage.success(result.msg)
+          loadData()
+        } else {
+          ElMessage.error(result.msg)
+        }
+      })
+    })
+  }
+
+  let ids = []
+  const handleSelectionChange = (rows) => {
+    //console.log('多选', rows)
+    ids = rows.map(row => row.id)
+    console.log(ids)
+  }
+
+  const deleteAll = () => {
+    ElMessageBox.confirm(
+        '您确认要删除么?',
+        '警告',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'warning',
+          lockScroll: false //防止抖动
+        }
+    ).then(() => {
+      userApi.deleteAll(ids).then(result => {
+        if (result.code === 1) {
+          ElMessage.success(result.msg)
+          loadData()
+        } else {
+          ElMessage.error(result.msg)
+        }
+      })
+    })
+  }
+
+
+  //添加、编辑
+  const dialogFormVisible = ref(false)
+  const user = ref({})
+  const title = ref()
+
+  const showAddDialog = () => {
+    dialogFormVisible.value = true
+    title.value = '添加'
+    user.value = {}
+  }
+
+  const showUpdateDialog = (id) => {
+    dialogFormVisible.value = true
+    title.value = '编辑'
+    user.value = {}
+    userApi.selectById(id).then(result => {
+      user.value = result.data
+    })
+  }
+
+  const addOrUpdate = () => {
+    if (user.value.id) {//编辑
+      userApi.update(user.value.id, user.value).then(result => {
+        if (result.code === 1) {
+          ElMessage.success(result.msg)
+          dialogFormVisible.value = false
+          loadData()
+        } else {
+          ElMessage.error(result.msg)
+        }
+      })
+    } else {//添加
+      userApi.add(user.value).then(result => {
+        if (result.code === 1) {
+          ElMessage.success(result.msg)
+          dialogFormVisible.value = false
+          loadData()
+        } else {
+          ElMessage.error(result.msg)
+        }
+      })
+    }
+  }
+</script>
+
+<template>
+  <el-card class="">
+    <template #header>
+      <div class="header">
+        <el-button type="primary" @click="showAddDialog">添加</el-button>
+        <el-button type="danger" @click="deleteAll">批量删除</el-button>
+      </div>
+    </template>
+    <el-form :inline="true">
+      <el-form-item label="名字">
+        <el-input v-model="userQuery.name" placeholder="请输入名字" clearable style="width: 200px"/>
+      </el-form-item>
+      <el-form-item label="邮箱">
+        <el-input v-model="userQuery.email" placeholder="请输入邮箱" clearable style="width: 200px"/>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onSearch">搜索</el-button>
+      </el-form-item>
+    </el-form>
+    <el-table :data="list" border style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" />
+      <el-table-column fixed prop="id" label="ID"/>
+      <el-table-column prop="name" label="名字"/>
+      <el-table-column prop="password" label="密码"/>
+      <el-table-column prop="phone" label="电话"/>
+      <el-table-column prop="email" label="邮箱"/>
+      <!-- <el-table-column prop="avatar" label="头像"/> -->
+      <el-table-column prop="status" label="状态">
+        <template #default="{row}">
+        <el-switch
+            v-model="row.status"
+            :active-value="1"
+            :inactive-value="0"
+            inline-prompt
+            style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
+            active-text="已启用"
+            inactive-text="已禁用"
+            @change="handleSwitchChange(row)"
+        />
+        </template>
+      </el-table-column>
+      <el-table-column prop="createTime" label="创建时间"/>
+      <el-table-column align="center" width="200px" fixed="right" label="操作">
+        <template #default="{ row }">
+          <el-button size="small" type="primary" @click="showUpdateDialog(row.id)">编辑</el-button>
+          <el-button size="small" type="danger" @click="deleteById(row.id)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+        v-model:current-page="userQuery.page"
+        v-model:page-size="userQuery.limit"
+        :page-sizes="[10, 20, 30, 40]"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+        @change="loadData"
+        style="margin-top: 20px; justify-content: flex-end"
+    />
+  </el-card>
+
+
+  <!--添加、编辑弹出框-->
+  <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false">
+    <el-form :model="user">
+      <el-form-item label="名字" :label-width="60">
+        <el-input v-model="user.name" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="密码" :label-width="60">
+        <el-input v-model="user.password" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="邮箱" :label-width="60">
+        <el-input v-model="user.email" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="手机号" :label-width="60">
+        <el-input v-model="user.phone" autocomplete="off" />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="addOrUpdate">
+          确认
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
+</template>
+
+<style scoped>
+
+</style>

@@ -57,7 +57,7 @@ public class UserController {
      * 修改用户
      * PUT /users/1
      */
-    @PutMapping
+    @PutMapping("/{id}")
     public Result update(@PathVariable Long id, @RequestBody User user) {
         user.setId(id);
         userService.updateById(user);

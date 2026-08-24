@@ -31,6 +31,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.like(!ObjectUtils.isEmpty(userQuery.getName()),User::getName,userQuery.getName())
                 .like(!ObjectUtils.isEmpty(userQuery.getEmail()), User::getEmail, userQuery.getEmail())
+                .between(!ObjectUtils.isEmpty(userQuery.getBeginCreateTime())
+                        && !ObjectUtils.isEmpty(userQuery.getEndCreateTime()),
+                        User::getCreateTime, userQuery.getBeginCreateTime(),
+                        userQuery.getEndCreateTime())
                 .orderByDesc(User::getCreateTime);
         return userMapper.selectPage(page, lambdaQueryWrapper);
     }

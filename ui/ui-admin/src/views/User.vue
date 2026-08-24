@@ -20,7 +20,12 @@
           total.value = result.data.total
       })
   }*/
+  //根据条件查找
+  const createTimeRange = ref([])
   const loadData = () => {
+    userQuery.value.beginCreateTime = createTimeRange.value?.[0]
+    userQuery.value.endCreateTime = createTimeRange.value?.[1]
+
     userApi.list(userQuery.value).then(result => {
       list.value = result.data.records
       total.value = result.data.total
@@ -77,6 +82,10 @@
   }
 
   const deleteAll = () => {
+    if(ids.length === 0){
+      ElMessage.error('请选择要删除的记录')
+      return
+    }
     ElMessageBox.confirm(
         '您确认要删除么?',
         '警告',
@@ -152,6 +161,7 @@
         <el-button type="danger" @click="deleteAll">批量删除</el-button>
       </div>
     </template>
+    <!--模糊查找-->
     <el-form :inline="true">
       <el-form-item label="名字">
         <el-input v-model="userQuery.name" placeholder="请输入名字" clearable style="width: 200px"/>
@@ -159,12 +169,22 @@
       <el-form-item label="邮箱">
         <el-input v-model="userQuery.email" placeholder="请输入邮箱" clearable style="width: 200px"/>
       </el-form-item>
+      <el-form-item label="创建时间">
+      <el-date-picker
+          v-model="createTimeRange"
+          type="daterange"
+          value-format="YYYY-MM-DD HH:mm:ss"
+          range-separator="至"
+          start-placeholder="开始时间"
+          end-placeholder="结束时间"
+      />
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSearch">搜索</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="list" border style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" />
+      <el-table-column type="selection" width="55"/>
       <el-table-column fixed prop="id" label="ID"/>
       <el-table-column prop="name" label="名字"/>
       <el-table-column prop="password" label="密码"/>
@@ -173,16 +193,16 @@
       <!-- <el-table-column prop="avatar" label="头像"/> -->
       <el-table-column prop="status" label="状态">
         <template #default="{row}">
-        <el-switch
-            v-model="row.status"
-            :active-value="1"
-            :inactive-value="0"
-            inline-prompt
-            style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
-            active-text="已启用"
-            inactive-text="已禁用"
-            @change="handleSwitchChange(row)"
-        />
+          <el-switch
+              v-model="row.status"
+              :active-value="1"
+              :inactive-value="0"
+              inline-prompt
+              style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
+              active-text="已启用"
+              inactive-text="已禁用"
+              @change="handleSwitchChange(row)"
+          />
         </template>
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间"/>
@@ -209,16 +229,16 @@
   <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false">
     <el-form :model="user">
       <el-form-item label="名字" :label-width="60">
-        <el-input v-model="user.name" autocomplete="off" />
+        <el-input v-model="user.name" autocomplete="off"/>
       </el-form-item>
       <el-form-item label="密码" :label-width="60">
-        <el-input v-model="user.password" autocomplete="off" />
+        <el-input v-model="user.password" autocomplete="off"/>
       </el-form-item>
       <el-form-item label="邮箱" :label-width="60">
-        <el-input v-model="user.email" autocomplete="off" />
+        <el-input v-model="user.email" autocomplete="off"/>
       </el-form-item>
       <el-form-item label="手机号" :label-width="60">
-        <el-input v-model="user.phone" autocomplete="off" />
+        <el-input v-model="user.phone" autocomplete="off"/>
       </el-form-item>
     </el-form>
     <template #footer>

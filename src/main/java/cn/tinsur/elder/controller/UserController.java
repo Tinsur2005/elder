@@ -41,7 +41,7 @@ public class UserController {
         }
         //账号密码正确时，判断用户状态
         if (dbUser.getStatus() == 0) {
-            return Result.error("用户已禁用");
+            return Result.error("该用户已被禁用，无法登录");
         }
         //登录校验成功，生成Token
         Map<String, Object> map = new HashMap<>();
@@ -76,6 +76,9 @@ public class UserController {
      */
     @PostMapping
     public Result add(@RequestBody User user) {
+        if(isExists(user.getName())) {
+            return Result.error("已有同名用户存在，请修改姓名后重试");
+        }
         userService.save(user);
         return Result.ok("新增成功");
     }
@@ -109,6 +112,29 @@ public class UserController {
     public Result deleteBatch(@RequestBody Long[] ids) {
         userService.removeByIds(java.util.Arrays.asList(ids));
         return Result.ok("批量删除成功");
+    }
+
+    /**
+     * 判断用户是否存在
+     */
+    @GetMapping("/isExists")
+    public Boolean isExists(@RequestParam String name) {
+        User user = userService.getOne(new QueryWrapper<User>().eq("name", name));
+        return user != null;
+    }
+
+    /**
+     * 根据Token查询用户信息
+     * @param token
+     * @return
+     */
+    @GetMapping("/userInfo")
+    public Result userInfo(@RequestHeader(name = "Authorization") String token) {
+        Map<String, Object> map = JwtUtil.parseToken(token);
+        Integer id = (Integer) map.get("id");
+        User user = userService.getById(id);
+        user.setPassword("");
+        return Result.ok(user);
     }
 }
 

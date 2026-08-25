@@ -47,7 +47,7 @@
     <!-- 登录表单 -->
     <el-form class="form-login" ref="form" size="large" autocomplete="off" :model="user" :rules="rules">
       <el-form-item>
-        <h1>登录</h1>
+        <h1 style="width: 100%; text-align: center">登录到后台</h1>
       </el-form-item>
       <el-form-item prop="name">
         <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="user.name"></el-input>
@@ -74,7 +74,8 @@
 <style scoped>
 
   .login-bg {
-    height: 100%;
+    height: 100vh;
+    background-image: url('@/assets/login-background.png');
     background-repeat: no-repeat;
     background-position: center;
     background-attachment: fixed;
@@ -85,8 +86,9 @@
     width: 280px;
     padding: 20px;
     position: absolute;
-    top: 20%;
-    left: calc(50% - 150px);
+    top: 50%;
+    right: 10%;
+    transform: translateY(-50%);
     background-color: #FFF;
     box-shadow: 10px 10px 30px #000;
   }

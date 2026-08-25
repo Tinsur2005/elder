@@ -1,0 +1,14 @@
+package cn.tinsur.elder.pojo.query;
+
+import lombok.Data;
+
+import java.util.Date;
+
+@Data
+public class ElderQuery {
+    private String name;
+    private Date beginCreateTime;
+    private Date endCreateTime;
+    private Integer page;
+    private Integer limit;
+}

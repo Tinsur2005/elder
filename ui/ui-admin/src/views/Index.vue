@@ -14,8 +14,19 @@
   import {useRouter} from 'vue-router'
   import {useTokenStore} from "@/store/token.js";
   import {ElMessage, ElMessageBox} from "element-plus";
+  import {useAdminInfoStore} from "@/store/userInfo.js";
+  import userApi from "@/api/user.js";
+
+  const userInfoStore = useAdminInfoStore()
   const tokenStore = useTokenStore()
   const router = useRouter();
+
+  userApi.userInfo().then(result => {
+    if(result.code === 1) {
+      userInfoStore.setUserInfo(result.data)
+    }
+  })
+
   const handleCommand = (command) => {
     //判断指令
     if (command === 'logout') {
@@ -98,7 +109,7 @@
         <!-- command: 条目被点击后会触发,在事件函数上可以声明一个参数,接收条目对应的指令 -->
         <el-dropdown placement="bottom-end" @command="handleCommand">
                     <span class="el-dropdown__box">
-                        <el-avatar :src="avatar"/>
+                        <el-avatar :src="userInfoStore.user.avatar?userInfoStore.user.avatar:avatar"/>
                         <el-icon>
                             <CaretBottom/>
                         </el-icon>

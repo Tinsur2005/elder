@@ -23,6 +23,9 @@ const userApi = {
     deleteAll(ids) {
         // axios 的 delete 第2个参数是 config，请求体必须放在 data 字段里
         return request.delete("/users", {data: ids});
+    },
+    userInfo() {
+        return request.get(`/users/userInfo`)
     }
 }
 

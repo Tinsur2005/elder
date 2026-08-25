@@ -148,6 +148,10 @@
   }
 
   const addOrUpdate = () => {
+    if(!user.value.name || !user.value.password) {
+      ElMessage.error('姓名和密码不允许为空');
+      return
+    }
     if (user.value.id) {//编辑
       userApi.update(user.value.id, user.value).then(result => {
         if (result.code === 1) {

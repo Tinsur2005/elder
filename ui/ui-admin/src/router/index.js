@@ -11,7 +11,9 @@ import Elder from '@/views/Elder.vue'
 const router = createRouter({
     history: createWebHistory(),
     routes: [
-        {path: '/login', component: Login},
+        {
+            path: '/login', component: Login
+        },
         {
             path: '/', component: Index, children: [
                 {path: '/user', component: User},

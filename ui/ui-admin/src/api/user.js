@@ -1,6 +1,9 @@
 import request from "@/utils/request.js";
 
 const userApi = {
+    login(user) {
+        return request.post("/users/login", user)
+    },
     list(userQuery) {
         return request.get("/users", {params: userQuery});
     },

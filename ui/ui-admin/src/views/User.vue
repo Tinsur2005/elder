@@ -169,6 +169,18 @@
   const handleAvatarSuccess = (result) => {
     user.value.avatar = result.data;
   }
+  //上传时校验头像的文件格式
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+  const beforeAvatarUpload = (rawFile) => {
+    if (!allowedTypes.includes(rawFile.type)) {
+      ElMessage.error('不支持的文件格式')
+      return false
+    } else if (rawFile.size / 1024 / 1024 > 2) {
+      ElMessage.error('上传的文件大小不允许超过2MB')
+      return false
+    }
+    return true
+  }
 </script>
 
 <template>
@@ -181,8 +193,8 @@
     </template>
     <!--模糊查找-->
     <el-form :inline="true">
-      <el-form-item label="名字">
-        <el-input v-model="userQuery.name" placeholder="请输入名字" clearable style="width: 200px"/>
+      <el-form-item label="姓名">
+        <el-input v-model="userQuery.name" placeholder="请输入姓名" clearable style="width: 200px"/>
       </el-form-item>
       <el-form-item label="邮箱">
         <el-input v-model="userQuery.email" placeholder="请输入邮箱" clearable style="width: 200px"/>
@@ -204,17 +216,17 @@
     </el-form>
     <el-table :data="list" border style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column fixed prop="id" label="ID"/>
-      <el-table-column prop="avatar" label="头像">
+      <!--<el-table-column fixed prop="id" label="ID"/>-->
+      <el-table-column prop="avatar" label="头像" width="70">
         <template #default="{row}">
           <img :src="row.avatar" style="max-height: 40px; max-width: 40px;"/>
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="姓名"/>
-      <el-table-column prop="password" label="密码"/>
+      <el-table-column prop="name" label="姓名" width="100"/>
+      <!--<el-table-column prop="password" label="密码"/>-->
       <el-table-column prop="phone" label="电话"/>
       <el-table-column prop="email" label="邮箱"/>
-      <el-table-column prop="status" label="状态">
+      <el-table-column prop="status" label="状态" width="100">
         <template #default="{row}">
           <el-switch
               v-model="row.status"
@@ -257,14 +269,18 @@
             action="/api/upload"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
         >
           <img v-if="user.avatar" :src="user.avatar" class="avatar"/>
           <el-icon v-else class="avatar-uploader-icon">
             <Plus/>
           </el-icon>
         </el-upload>
+        <div class="avatar-uploader-tips">
+          头像图片建议尺寸150x150，文件大小不超过2MB，支持jpg/png/webp格式
+        </div>
       </el-form-item>
-      <el-form-item label="名字" :label-width="60">
+      <el-form-item label="姓名" :label-width="60">
         <el-input v-model="user.name" autocomplete="off"/>
       </el-form-item>
       <el-form-item label="密码" :label-width="60">
@@ -318,4 +334,10 @@
     height: 178px;
     text-align: center;
   }
+
+  .avatar-uploader-tips {
+    font-size: 12px;      /* 小字 */
+    color: #999;          /* 灰色 */
+  }
+
 </style>

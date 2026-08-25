@@ -27,16 +27,26 @@ const router = createRouter({
 //路由守卫
 //全局前置守卫
 import {useTokenStore} from '@/store/token.js'
+import {ElMessage} from "element-plus";
 
 let whiteList = ['/login']; // 白名单
 router.beforeEach((to, from, next) => {
+
     const tokenStore = useTokenStore()
     const token = tokenStore.token;
+
+    // 访问登录页，并且已经登录则跳转首页
+    if (to.path === '/login' && token) {
+        ElMessage.success('已登录，欢迎回来')
+        next('/')
+        return
+    }
+    // 访问的不是白名单路径且没有token则跳转登录页
     if (!whiteList.includes(to.path) && !token) {
         next('/login')
-    } else {
-        next()
+        return
     }
+    next()
 })
 
 // 暴露出去router

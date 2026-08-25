@@ -12,11 +12,27 @@
   import avatar from '@/assets/default.png'
   //条目被点击后,调用的函数
   import {useRouter} from 'vue-router'
+  import {useTokenStore} from "@/store/token.js";
+  import {ElMessage, ElMessageBox} from "element-plus";
+  const tokenStore = useTokenStore()
   const router = useRouter();
   const handleCommand = (command) => {
     //判断指令
     if (command === 'logout') {
-      //退出登录
+        ElMessageBox.confirm(
+            '确认退出吗？',
+            '提示',
+            {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning',
+            }
+        ).then(() => {
+            //退出登录
+            tokenStore.removeToken()
+            ElMessage.success('退出登录成功')
+            router.push('/login')
+        })
     } else {
       //路由
       router.push('/user/' + command)

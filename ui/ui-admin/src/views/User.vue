@@ -292,10 +292,10 @@
         </div>
       </el-form-item>
       <el-form-item label="姓名" :label-width="60">
-        <el-input v-model="user.name" autocomplete="off"/>
+        <el-input v-model="user.name" autocomplete="off" :disabled="user.id"/>
       </el-form-item>
       <el-form-item label="密码" :label-width="60">
-        <el-input v-model="user.password" autocomplete="off"/>
+        <el-input v-model="user.password" autocomplete="off" show-password="true" type="password"/>
       </el-form-item>
       <el-form-item label="邮箱" :label-width="60">
         <el-input v-model="user.email" autocomplete="off"/>

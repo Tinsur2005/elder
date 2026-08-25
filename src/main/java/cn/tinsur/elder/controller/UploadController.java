@@ -2,6 +2,7 @@ package cn.tinsur.elder.controller;
 
 import cn.tinsur.elder.util.AliOSSUtil;
 import cn.tinsur.elder.util.Result;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +13,9 @@ import java.util.UUID;
 @RestController
 public class UploadController {
 
+    @Autowired
+    private AliOSSUtil aliOSSUtil;
+
     @PostMapping("/upload")
     public Result<String> update (MultipartFile file){
         String uuid = UUID.randomUUID().toString().replace("-","");
@@ -20,7 +24,7 @@ public class UploadController {
         fileName = uuid + extension;
         String url = "";
         try {
-            url = AliOSSUtil.uploadFile(fileName, file.getInputStream());
+            url = aliOSSUtil.uploadFile(fileName, file.getInputStream());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -29,7 +33,7 @@ public class UploadController {
 
     @DeleteMapping("/deleteAvatar")
     public Result<String> delete (String url){
-        AliOSSUtil.deleteFile(url);
+        aliOSSUtil.deleteFile(url);
         return Result.ok("删除成功");
     }
 

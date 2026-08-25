@@ -20,9 +20,3 @@ mybatis-plus:
       logic-delete-field: deleted
       logic-delete-value: 1 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
-aliyun:
-  oss:
-    endpoint: https://oss-cn-qingdao.aliyuncs.com
-    access-key-id: LTAI5tAVVWmnTJ2qwJYQ7bSz
-    access-key-secret: fUEQpO4Ph5ad1gK8sI5pe20dN7qZC3
-    bucket-name: elder-oss

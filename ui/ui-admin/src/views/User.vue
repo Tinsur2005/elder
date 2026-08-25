@@ -222,10 +222,10 @@
           <img :src="row.avatar" style="max-height: 40px; max-width: 40px;"/>
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="姓名" width="100"/>
+      <el-table-column prop="name" label="姓名" width="100" :show-overflow-tooltip="true"/>
       <!--<el-table-column prop="password" label="密码"/>-->
-      <el-table-column prop="phone" label="电话"/>
-      <el-table-column prop="email" label="邮箱"/>
+      <el-table-column prop="phone" label="电话" :show-overflow-tooltip="true"/>
+      <el-table-column prop="email" label="邮箱" :show-overflow-tooltip="true"/>
       <el-table-column prop="status" label="状态" width="100">
         <template #default="{row}">
           <el-switch
@@ -241,7 +241,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间"/>
-      <el-table-column align="center" width="200px" fixed="right" label="操作">
+      <el-table-column align="center" width="150px" fixed="right" label="操作">
         <template #default="{ row }">
           <el-button size="small" type="primary" @click="showUpdateDialog(row.id)">编辑</el-button>
           <el-button size="small" type="danger" @click="deleteById(row.id)">删除</el-button>

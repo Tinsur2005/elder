@@ -3,6 +3,8 @@
   import {ref} from 'vue'
   import {ElMessage, ElMessageBox} from 'element-plus'
   import {Plus} from '@element-plus/icons-vue'
+  import {useTokenStore} from '@/store/token.js'
+  const tokenStore = useTokenStore()
 
   //表格数据
   const list = ref([])
@@ -270,6 +272,7 @@
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
+            :headers="{Authorization: tokenStore.token}"
         >
           <img v-if="user.avatar" :src="user.avatar" class="avatar"/>
           <el-icon v-else class="avatar-uploader-icon">

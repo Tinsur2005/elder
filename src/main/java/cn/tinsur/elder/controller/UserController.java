@@ -39,6 +39,10 @@ public class UserController {
         if(!dbUser.getPassword().equals(user.getPassword())) {
             return Result.error("密码错误");
         }
+        //账号密码正确时，判断用户状态
+        if (dbUser.getStatus() == 0) {
+            return Result.error("用户已禁用");
+        }
         //登录校验成功，生成Token
         Map<String, Object> map = new HashMap<>();
         map.put("id",dbUser.getId());

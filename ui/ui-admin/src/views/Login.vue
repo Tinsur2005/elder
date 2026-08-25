@@ -4,8 +4,22 @@
   import {ElMessage} from "element-plus";
   import {useRouter} from "vue-router";
   import userApi from "@/api/user.js";
+  import {useTokenStore} from "@/store/token.js";
 
+  const tokenStore = useTokenStore();
   const router = useRouter()
+
+  //表单校验模型
+  const rules = {
+    name: [
+      {required: true, message: '请输入用户名', trigger: 'blur'},
+      {min: 4, max: 16, message: '长度在 4 到 16 个字符', trigger: 'blur'}
+    ],
+    password: [
+      {required: true, message: '请输入密码', trigger: 'blur'},
+      {min: 6, max: 16, message: '长度在 6 到 16 个字符', trigger: 'blur'}
+    ]
+  }
 
   //定义数据模型
   const user = ref({
@@ -14,13 +28,11 @@
   })
 
   const login = () => {
-    if(!user.value.name || !user.value.password) {
-      return ElMessage.error('用户名或密码不能为空')
-    }
 
     userApi.login(user.value).then(result => {
       if(result.code == 1) {
         ElMessage.success(result.msg)
+        tokenStore.setToken(result.data)
         router.push('/')
       } else {
         ElMessage.error(result.msg)

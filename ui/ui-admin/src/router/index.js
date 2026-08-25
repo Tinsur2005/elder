@@ -23,5 +23,21 @@ const router = createRouter({
     ]
 })
 
+
+//路由守卫
+//全局前置守卫
+import {useTokenStore} from '@/store/token.js'
+
+let whiteList = ['/login']; // 白名单
+router.beforeEach((to, from, next) => {
+    const tokenStore = useTokenStore()
+    const token = tokenStore.token;
+    if (!whiteList.includes(to.path) && !token) {
+        next('/login')
+    } else {
+        next()
+    }
+})
+
 // 暴露出去router
 export default router

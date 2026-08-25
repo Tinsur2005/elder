@@ -58,7 +58,11 @@
   const handleSwitchChange = (row) => {
     userApi.update(row.id, row).then(result => {
       if (result.code === 1) {
-        ElMessage.success('状态已更新')
+        if(row.status === 1) {
+          ElMessage.success("已启用")
+        } else {
+          ElMessage.primary("已禁用")
+        }
       } else {
         ElMessage.error(result.msg)
         loadData() //失败则重新加载还原

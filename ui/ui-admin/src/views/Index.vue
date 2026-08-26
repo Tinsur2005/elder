@@ -42,11 +42,15 @@
 
   // ============ 方法  ============
   //获取用户信息
-  userApi.userInfo().then(result => {
-    if(result.code === 1) {
-      userInfoStore.setUserInfo(result.data)
-    }
-  })
+  const getUserInfo = () => {
+    userApi.userInfo().then(result => {
+      if(result.code === 1) {
+        userInfoStore.setUserInfo(result.data)
+      }
+    })
+  }
+  getUserInfo()
+
 
   //上传图片
   const handleAvatarSuccess = (result) => {
@@ -81,6 +85,17 @@
         })
       } else {
         ElMessage.error('表单验证失败');
+      }
+    })
+  }
+
+  //修改当前登录的用户信息
+  const updateUserInfo = () => {
+    userApi.update(user.value.id, user.value).then(result => {
+      if (result.code == 1) {
+        ElMessage.success(result.msg)
+        dialogFormVisible.value = false
+        getUserInfo()
       }
     })
   }
@@ -284,7 +299,7 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="addOrUpdate">
+        <el-button type="primary" @click="updateUserInfo">
           确认
         </el-button>
       </div>

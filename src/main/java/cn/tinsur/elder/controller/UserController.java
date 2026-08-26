@@ -139,7 +139,7 @@ public class UserController {
         Map<String, Object> map = JwtUtil.parseToken(token);
         Integer id = (Integer) map.get("id");
         User user = userService.getById(id);
-        user.setPassword("");
+        user.setPassword(null);
         return Result.ok(user);
     }
 

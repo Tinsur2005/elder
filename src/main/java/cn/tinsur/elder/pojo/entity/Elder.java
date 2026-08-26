@@ -1,14 +1,13 @@
 package cn.tinsur.elder.pojo.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
 public class Elder {
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
     private String name;
     private String password;

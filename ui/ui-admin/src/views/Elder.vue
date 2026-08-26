@@ -191,6 +191,30 @@
     }
     return true
   }
+  //dialog对话框状态选项
+  const statusOptions = [
+    {
+      value: 0,
+      label: '禁用',
+    },
+    {
+      value: 1,
+      label: '启用',
+    },
+    {
+      value: 2,
+      label: '请假',
+    },
+    {
+      value: 3,
+      label: '退住中',
+    },
+    {
+      value: 4,
+      label: '入住中',
+    },
+  ]
+
 </script>
 
 <template>
@@ -239,6 +263,16 @@
           {{ formatDate(row.birthday) }}
         </template>
       </el-table-column>
+      <el-table-column prop="status" label="状态" :show-overflow-tooltip="true">
+        <template #default="{row}">
+            <el-tag type="danger" v-if="row.status === 0">禁用</el-tag>
+            <el-tag type="success" v-else-if="row.status === 1">启用</el-tag>
+            <el-tag type="primary" v-else-if="row.status === 2">请假</el-tag>
+            <el-tag type="info" v-else-if="row.status === 3">退住中</el-tag>
+            <el-tag type="info" v-else-if="row.status === 4">入住中</el-tag>
+            <el-tag type="danger" v-else-if="row.status === 5">已退住</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="createTime" label="创建时间" :show-overflow-tooltip="true"/>
       <el-table-column align="center" width="150px" fixed="right" label="操作">
         <template #default="{ row }">
@@ -260,7 +294,7 @@
 
 
   <!--添加、编辑弹出框-->
-  <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false">
+  <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false" :close-on-click-modal="false">
     <el-form :model="elder">
       <el-form-item label="头像" :label-width="60">
         <el-upload
@@ -294,6 +328,16 @@
       </el-form-item>
       <el-form-item label="生日" :label-width="80">
         <el-date-picker v-model="elder.birthday" type="date" value-format="YYYY-MM-DD HH:mm:ss" placeholder="选择生日"/>
+      </el-form-item>
+      <el-form-item label="状态" :label-width="80">
+        <el-select v-model="elder.status" placeholder="Select" style="width: 100px">
+          <el-option
+              v-for="item in statusOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+          />
+        </el-select>
       </el-form-item>
     </el-form>
     <template #footer>

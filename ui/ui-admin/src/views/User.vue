@@ -271,7 +271,7 @@
 
 
   <!--添加、编辑弹出框-->
-  <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false">
+  <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false" :close-on-click-modal="false">
     <el-form :model="user">
       <el-form-item label="头像" :label-width="60">
         <el-upload

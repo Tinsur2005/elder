@@ -104,12 +104,13 @@
     <el-container>
       <!-- 头部区域 -->
       <el-header>
-        <div><strong>智慧社区养老后台管理系统{{ zhansgan }}</strong></div>
+        <div><strong>智慧社区养老平台后台管理系统</strong></div>
         <!-- 下拉菜单 -->
         <!-- command: 条目被点击后会触发,在事件函数上可以声明一个参数,接收条目对应的指令 -->
         <el-dropdown placement="bottom-end" @command="handleCommand">
                     <span class="el-dropdown__box">
                         <el-avatar :src="userInfoStore.user.avatar?userInfoStore.user.avatar:avatar"/>
+                        <strong style="margin-left: 8px;">欢迎您：{{ userInfoStore.user.name }}</strong>
                         <el-icon>
                             <CaretBottom/>
                         </el-icon>

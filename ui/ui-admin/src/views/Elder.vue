@@ -48,22 +48,6 @@
     loadData()
   }
 
-  //根据id更新状态（0：停用，1：正常）
-  const handleSwitchChange = (row) => {
-    elderApi.update(row.id, row).then(result => {
-      if (result.code === 1) {
-        if(row.status === 1) {
-          ElMessage.success("已启用")
-        } else {
-          ElMessage.primary("已禁用")
-        }
-      } else {
-        ElMessage.error(result.msg)
-        loadData() //失败则重新加载还原
-      }
-    })
-  }
-
   //根据id删除
   const deleteById = (id) => {
     ElMessageBox.confirm(
@@ -177,7 +161,7 @@
         })
   }
 
-  //把日期格式化为 YYYY-MM-DD
+  //把日期格式化为 YYYY-MM-DD ，给生日字段用
   const formatDate = (value) => {
     if (!value) return ''
     return String(value).slice(0, 10)
@@ -203,7 +187,7 @@
   const statusOptions = [
     {
       value: 0,
-      label: '禁用',
+      label: '已停用',
     },
     {
       value: 1,
@@ -293,7 +277,7 @@
       </el-table-column>
       <el-table-column prop="status" label="状态" min-width="30" :resizable="false">
         <template #default="{row}">
-            <el-tag type="danger" v-if="row.status === 0">禁用</el-tag>
+            <el-tag type="danger" v-if="row.status === 0">已停用</el-tag>
             <el-tag type="success" v-else-if="row.status === 1">正常</el-tag>
             <el-tag type="primary" v-else-if="row.status === 2">请假</el-tag>
             <el-tag type="info" v-else-if="row.status === 3">退住中</el-tag>

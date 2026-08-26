@@ -205,6 +205,10 @@
       value: 4,
       label: '入住中',
     },
+    {
+      value: 5,
+      label: '已退住',
+    },
   ]
 
   //对话框dialog输入规则校验
@@ -275,17 +279,18 @@
           {{ formatDate(row.birthday) }}
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="状态" min-width="30" :resizable="false">
+      <el-table-column prop="status" label="状态" min-width="100" :resizable="false">
         <template #default="{row}">
-            <el-tag type="danger" v-if="row.status === 0">已停用</el-tag>
+            <el-tag type="info" v-if="row.status === 0">已停用</el-tag>
             <el-tag type="success" v-else-if="row.status === 1">正常</el-tag>
             <el-tag type="primary" v-else-if="row.status === 2">请假</el-tag>
-            <el-tag type="info" v-else-if="row.status === 3">退住中</el-tag>
-            <el-tag type="info" v-else-if="row.status === 4">入住中</el-tag>
-            <el-tag type="danger" v-else-if="row.status === 5">已退住</el-tag>
+            <el-tag type="danger" v-else-if="row.status === 3">退住中</el-tag>
+            <el-tag type="warning" v-else-if="row.status === 4">入住中</el-tag>
+            <el-tag type="info" v-else-if="row.status === 5">已退住</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="创建时间" :show-overflow-tooltip="true"/>
+      <el-table-column prop="remark" label="备注" :show-overflow-tooltip="true" width="125"/>
+      <el-table-column prop="createTime" label="创建时间" :show-overflow-tooltip="true" width="160"/>
       <el-table-column align="center" width="150px" fixed="right" label="操作">
         <template #default="{ row }">
           <el-button size="small" type="primary" @click="showUpdateDialog(row.id)">编辑</el-button>

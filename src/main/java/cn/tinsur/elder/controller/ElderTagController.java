@@ -1,0 +1,21 @@
+package cn.tinsur.elder.controller;
+
+
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * <p>
+ * 老人-标签关联表 前端控制器
+ * </p>
+ *
+ * @author Tinsur
+ * @since 2026-08-26
+ */
+@RestController
+@RequestMapping("/elder-tag")
+public class ElderTagController {
+
+}
+

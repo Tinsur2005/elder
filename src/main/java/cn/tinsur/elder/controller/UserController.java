@@ -1,6 +1,7 @@
 package cn.tinsur.elder.controller;
 
 
+import cn.tinsur.elder.pojo.dto.UserPasswordDTO;
 import cn.tinsur.elder.pojo.entity.User;
 import cn.tinsur.elder.pojo.query.UserQuery;
 import cn.tinsur.elder.service.IUserService;
@@ -29,6 +30,11 @@ public class UserController {
     @Autowired
     private IUserService userService;
 
+    /**
+     * 登录
+     * @param user
+     * @return Result<String>
+     */
     @PostMapping("/login")
     public Result<String> login(@RequestBody User user) {
         //根据用户名查找这个用户
@@ -135,6 +141,28 @@ public class UserController {
         User user = userService.getById(id);
         user.setPassword("");
         return Result.ok(user);
+    }
+
+    /**
+     * 重置密码
+     */
+    @PutMapping("/resetPassword")
+    public Result resetPassword(@RequestHeader String Authorization,
+                                @RequestBody UserPasswordDTO userPasswordDTO) {
+        Map<String, Object> map = JwtUtil.parseToken(Authorization);
+        Integer id = (Integer) map.get("id");
+        User user = userService.getById(id);
+        if (!user.getPassword().equals(userPasswordDTO.getOldPassword())){
+            return Result.error("原密码错误");
+        }
+        if (user.getPassword().equals(userPasswordDTO.getNewPassword())) {
+            return Result.error("新密码不能与原密码相同");
+        }
+        User updateUser = new User();
+        updateUser.setId(user.getId());
+        updateUser.setPassword(userPasswordDTO.getNewPassword());
+        userService.updateById(updateUser);
+        return Result.ok("密码重置成功");
     }
 }
 

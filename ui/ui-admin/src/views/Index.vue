@@ -16,38 +16,76 @@
   import {ElMessage, ElMessageBox} from "element-plus";
   import {useUserInfoStore} from "@/store/userInfo.js";
   import userApi from "@/api/user.js";
-  import {ref} from "vue";
+  import {nextTick, ref} from "vue";
 
+  // ============ 对象  ============
+
+  // 用户对象：当前登录的用户封装成的对象
+  const user = ref({})
+  // 修改密码DTO对象：用于修改密码时存储老密码和新密码
+  const userPasswordDTO = ref({
+    oldPassword: '',
+    newPassword: ''
+  })
+
+  // ============ 存储  ============
   const userInfoStore = useUserInfoStore()
   const tokenStore = useTokenStore()
-  const router = useRouter();
+  const router = useRouter()
+  const resetForm = ref()
 
+  // ============ 对话框控制  ============
+  //控制用户信息对话框
+  const dialogFormVisible = ref(false)
+  //控制重置密码对话框
+  const dialogResetPasswordDialog = ref(false)
+
+  // ============ 方法  ============
+  //获取用户信息
   userApi.userInfo().then(result => {
     if(result.code === 1) {
       userInfoStore.setUserInfo(result.data)
     }
   })
 
-  //控制用户信息对话框
-  const dialogFormVisible = ref(false)
-  const user = ref({})
   //上传图片
   const handleAvatarSuccess = (result) => {
     user.value.avatar = result.data;
   }
-  //上传时校验头像的文件格式
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
-  const beforeAvatarUpload = (rawFile) => {
-    if (!allowedTypes.includes(rawFile.type)) {
-      ElMessage.error('不支持的文件格式')
-      return false
-    } else if (rawFile.size / 1024 / 1024 > 2) {
-      ElMessage.error('上传的文件大小不允许超过2MB')
-      return false
-    }
-    return true
+
+  //重置密码
+  const resetPassword = async (formEl) => {
+    if (!formEl) return
+    await formEl.validate((valid, fields) => {
+      if (valid) {
+        ElMessageBox.confirm(
+            '确定修改密码？修改后需要重新登录',
+            '提示',
+            {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning',
+            }
+        ).then(() => {
+          userApi.resetPassword(userPasswordDTO.value).then(result => {
+            if (result.code === 1) {
+              ElMessage.success(result.msg)
+              dialogResetPasswordDialog.value = false
+              tokenStore.removeToken();
+              userInfoStore.removeUserInfo();
+              router.push('/login')
+            } else {
+              ElMessage.error(result.msg)
+            }
+          })
+        })
+      } else {
+        ElMessage.error('表单验证失败');
+      }
+    })
   }
 
+  //左上角下拉菜单点击功能
   const handleCommand = (command) => {
     //判断指令
     if (command === 'logout') {
@@ -72,11 +110,58 @@
       //如果用户点击取消没有修改，就会造成adminInfoStore.admin里面数据修改了
       //admin.value = adminInfoStore.admin
       Object.assign(user.value, userInfoStore.user) //不把两个数据绑定在一起
+    } else if (command === 'resetPassword') {
+      dialogResetPasswordDialog.value = true
+      userPasswordDTO.value = {}
+      nextTick(()=>{
+        resetForm.value.resetFields()
+      })
     } else {
       //路由
       router.push('/user/' + command)
     }
   }
+
+  // ============ 规则校验  ============
+  //上传时校验头像的文件格式
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+  const beforeAvatarUpload = (rawFile) => {
+    if (!allowedTypes.includes(rawFile.type)) {
+      ElMessage.error('不支持的文件格式')
+      return false
+    } else if (rawFile.size / 1024 / 1024 > 2) {
+      ElMessage.error('上传的文件大小不允许超过2MB')
+      return false
+    }
+    return true
+  }
+
+  //自定义确认密码校验函数
+  const rePasswordValid = (rule, value, callback) => {
+    if (value == null || value == ''){
+      return callback(new Error('请再次确认密码'))
+    }
+    if(userPasswordDTO.value.newPassword !== value) {
+      return callback(new Error('两次输入的密码不一致'))
+    }
+    callback()
+  }
+
+  //表单校验规则
+  const rules = ref({
+    oldPassword: [
+      {required: true, message: '请输入密码', trigger: 'blur'},
+      {min: 3, max: 16, message: '密码长度必须为3~16位', trigger: 'blur'}
+    ],
+    newPassword: [
+      {required: true, message: '请输入密码', trigger: 'blur'},
+      {min: 3, max: 16, message: '密码长度必须为3~16位', trigger: 'blur'}
+    ],
+    reNewPassword: [
+      {required: true, message: '请输入密码', trigger: 'blur'},
+      {validator: rePasswordValid, trigger: 'blur' }
+    ]
+  })
 </script>
 
 <template>
@@ -167,7 +252,7 @@
   </el-container>
 
   <!-- 修改个人信息的对话框 -->
-  <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false" :close-on-click-modal="false">
+  <el-dialog v-model="dialogFormVisible" :title="'个人信息'" width="500" :lock-scroll="false" :close-on-click-modal="false">
     <el-form :model="user">
       <el-form-item label="头像" :label-width="60">
         <el-upload
@@ -176,8 +261,7 @@
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
-            :headers="{Authorization: tokenStore.token}"
-        >
+            :headers="{Authorization: tokenStore.token}">
           <img v-if="user.avatar" :src="user.avatar" class="avatar"/>
           <el-icon v-else class="avatar-uploader-icon">
             <Plus/>
@@ -201,6 +285,29 @@
       <div class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
         <el-button type="primary" @click="addOrUpdate">
+          确认
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
+
+  <!-- 重置密码的对话框 -->
+  <el-dialog  v-model="dialogResetPasswordDialog" title="重置密码" width="500" :lock-scroll="false">
+    <el-form ref="resetForm" :rules="rules" :model="userPasswordDTO">
+      <el-form-item prop="oldPassword" label="原密码" :label-width="100">
+        <el-input v-model="userPasswordDTO.oldPassword" autocomplete="off"/>
+      </el-form-item>
+      <el-form-item prop="newPassword" label="新密码" :label-width="100">
+        <el-input v-model="userPasswordDTO.newPassword" autocomplete="off"/>
+      </el-form-item>
+      <el-form-item prop="reNewPassword" label="重复新密码" :label-width="100">
+        <el-input v-model="userPasswordDTO.reNewPassword" autocomplete="off"/>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogResetPasswordDialog = false">取消</el-button>
+        <el-button type="primary" @click="resetPassword(resetForm)">
           确认
         </el-button>
       </div>

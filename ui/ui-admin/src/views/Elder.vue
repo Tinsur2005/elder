@@ -38,7 +38,7 @@
 
   //获取标签列表
   const getTagsList = () => {
-    tagsApi.list().then(result => {
+    tagsApi.listAll().then(result => {
       tagsList.value = result.data
     })
   }

@@ -6,6 +6,7 @@ import Index from '@/views/Index.vue'
 import Login from '@/views/Login.vue'
 import User from '@/views/User.vue'
 import Elder from '@/views/Elder.vue'
+import Tag from '@/views/Tag.vue'
 
 //创建路由器
 const router = createRouter({
@@ -17,7 +18,8 @@ const router = createRouter({
         {
             path: '/', component: Index, children: [
                 {path: '/user', component: User},
-                {path: '/elder', component: Elder}
+                {path: '/elder', component: Elder},
+                {path: '/tag', component: Tag}
             ]
         }
     ]

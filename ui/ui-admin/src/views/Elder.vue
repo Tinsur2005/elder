@@ -142,8 +142,8 @@
   }
 
   const addOrUpdate = () => {
-    if(!elder.value.name || !elder.value.password) {
-      ElMessage.error('姓名和密码不允许为空');
+    if(!elder.value.name || !elder.value.password || !elder.value.phone || !elder.value.start) {
+      ElMessage.error('姓名、密码、手机号和状态不允许为空');
       return
     }
     if (elder.value.id) {//编辑
@@ -199,7 +199,7 @@
     },
     {
       value: 1,
-      label: '启用',
+      label: '正常',
     },
     {
       value: 2,
@@ -214,6 +214,25 @@
       label: '入住中',
     },
   ]
+
+  //对话框dialog输入规则校验
+  const dialogRules = {
+    name: [
+      {required: true, message: '请输入用户名', trigger: 'blur'},
+      {min: 4, max: 16, message: '长度在 4 到 16 个字符', trigger: 'blur'}
+    ],
+    password: [
+      {required: true, message: '请输入密码', trigger: 'blur'},
+      {min: 6, max: 16, message: '长度在 6 到 16 个字符', trigger: 'blur'}
+    ],
+    status: [
+      {required: true, message: '请选择状态', trigger: 'blur'}
+    ],
+    phone: [
+      {required: true, message: '请输入手机号', trigger: 'blur'},
+      {min: 11, max: 11, message: '手机号格式错误', trigger: 'blur'}
+    ]
+  }
 
 </script>
 
@@ -263,10 +282,10 @@
           {{ formatDate(row.birthday) }}
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="状态" :show-overflow-tooltip="true">
+      <el-table-column prop="status" label="状态" min-width="30" :resizable="false">
         <template #default="{row}">
             <el-tag type="danger" v-if="row.status === 0">禁用</el-tag>
-            <el-tag type="success" v-else-if="row.status === 1">启用</el-tag>
+            <el-tag type="success" v-else-if="row.status === 1">正常</el-tag>
             <el-tag type="primary" v-else-if="row.status === 2">请假</el-tag>
             <el-tag type="info" v-else-if="row.status === 3">退住中</el-tag>
             <el-tag type="info" v-else-if="row.status === 4">入住中</el-tag>
@@ -295,7 +314,7 @@
 
   <!--添加、编辑弹出框-->
   <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false" :close-on-click-modal="false">
-    <el-form :model="elder">
+    <el-form :model="elder" :rules="dialogRules">
       <el-form-item label="头像" :label-width="60">
         <el-upload
             class="avatar-uploader"
@@ -314,13 +333,13 @@
           头像图片建议尺寸150x150，文件大小不超过2MB，支持jpg/png/webp格式
         </div>
       </el-form-item>
-      <el-form-item label="姓名" :label-width="80">
+      <el-form-item prop="name" label="姓名" :label-width="80">
         <el-input v-model="elder.name" autocomplete="off" :disabled="elder.id"/>
       </el-form-item>
-      <el-form-item label="密码" :label-width="80">
+      <el-form-item prop="password" label="密码" :label-width="80">
         <el-input v-model="elder.password" autocomplete="off" show-password="true" type="password"/>
       </el-form-item>
-      <el-form-item label="手机号" :label-width="80">
+      <el-form-item prop="phone" label="手机号" :label-width="80">
         <el-input v-model="elder.phone" autocomplete="off"/>
       </el-form-item>
       <el-form-item label="身份证号" :label-width="80">
@@ -329,8 +348,8 @@
       <el-form-item label="生日" :label-width="80">
         <el-date-picker v-model="elder.birthday" type="date" value-format="YYYY-MM-DD HH:mm:ss" placeholder="选择生日"/>
       </el-form-item>
-      <el-form-item label="状态" :label-width="80">
-        <el-select v-model="elder.status" placeholder="Select" style="width: 100px">
+      <el-form-item prop="status" label="状态" :label-width="80">
+        <el-select v-model="elder.status" placeholder="请选择状态" style="width: 220px">
           <el-option
               v-for="item in statusOptions"
               :key="item.value"

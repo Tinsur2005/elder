@@ -110,7 +110,8 @@
         <el-dropdown placement="bottom-end" @command="handleCommand">
                     <span class="el-dropdown__box">
                         <el-avatar :src="userInfoStore.user.avatar?userInfoStore.user.avatar:avatar"/>
-                        <strong style="margin-left: 8px;">欢迎您：{{ userInfoStore.user.name }}</strong>
+                        <span style="margin-left: 8px;">欢迎您：</span>
+                        <strong>{{ userInfoStore.user.name }}</strong>
                         <el-icon>
                             <CaretBottom/>
                         </el-icon>

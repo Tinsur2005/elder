@@ -27,7 +27,7 @@ public class ElderController {
 
     /**
      * 分页查询老人列表
-     * GET /users?page=1&limit=10&name=xxx&phone=xxx
+     * GET /elders?page=1&limit=10&name=xxx&phone=xxx
      */
     @GetMapping
     public Result<IPage<Elder>> list(ElderQuery elderQuery) {
@@ -37,7 +37,7 @@ public class ElderController {
 
     /**
      * 根据ID查询老人
-     * GET /users/1
+     * GET /elders/1
      */
     @GetMapping("/{id}")
     public Result getById(@PathVariable Long id) {
@@ -46,7 +46,7 @@ public class ElderController {
 
     /**
      * 新增老人
-     * POST /users
+     * POST /elders
      */
     @PostMapping
     public Result add(@RequestBody Elder elder) {
@@ -59,7 +59,7 @@ public class ElderController {
 
     /**
      * 修改老人
-     * PUT /users/1
+     * PUT /elders/1
      */
     @PutMapping("/{id}")
     public Result update(@PathVariable Long id, @RequestBody Elder elder) {
@@ -70,7 +70,7 @@ public class ElderController {
 
     /**
      * 根据ID删除老人（逻辑删除）
-     * DELETE /users/1
+      * DELETE /elders/1
      */
     @DeleteMapping("/{id}")
     public Result delete(@PathVariable Long id) {
@@ -80,7 +80,7 @@ public class ElderController {
 
     /**
      * 批量删除老人
-     * DELETE /users
+      * DELETE /elders
      */
     @DeleteMapping
     public Result deleteBatch(@RequestBody Long[] ids) {

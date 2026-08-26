@@ -30,7 +30,7 @@ import {useTokenStore} from '@/store/token.js'
 import {ElMessage} from "element-plus";
 
 let whiteList = ['/login']; // 白名单
-router.beforeEach((to, from, next) => {
+router.beforeEach((to) => {
 
     const tokenStore = useTokenStore()
     const token = tokenStore.token;
@@ -38,15 +38,13 @@ router.beforeEach((to, from, next) => {
     // 访问登录页，并且已经登录则跳转首页
     if (to.path === '/login' && token) {
         ElMessage.success('已登录，欢迎回来')
-        next('/')
-        return
+        return '/'
     }
     // 访问的不是白名单路径且没有token则跳转登录页
     if (!whiteList.includes(to.path) && !token) {
-        next('/login')
-        return
+        return '/login'
     }
-    next()
+    // 其余情况放行
 })
 
 // 暴露出去router

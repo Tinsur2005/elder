@@ -345,6 +345,9 @@
       <el-form-item label="身份证号" :label-width="80">
         <el-input v-model="elder.idCardNo" autocomplete="off"/>
       </el-form-item>
+      <el-form-item label="地址" :label-width="80">
+        <el-input v-model="elder.address" autocomplete="off"/>
+      </el-form-item>
       <el-form-item label="生日" :label-width="80">
         <el-date-picker v-model="elder.birthday" type="date" value-format="YYYY-MM-DD HH:mm:ss" placeholder="选择生日"/>
       </el-form-item>

@@ -41,6 +41,7 @@
         ).then(() => {
             //退出登录
             tokenStore.removeToken()
+            userInfoStore.removeUserInfo()
             ElMessage.success('退出登录成功')
             router.push('/login')
         })
@@ -72,7 +73,7 @@
           </el-icon>
           <span>老人管理</span>
         </el-menu-item>
-        <el-sub-menu>
+        <el-sub-menu index="1">
           <template #title>
             <el-icon>
               <UserFilled/>

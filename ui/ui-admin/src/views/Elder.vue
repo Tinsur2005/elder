@@ -141,32 +141,40 @@
     })
   }
 
+  const formRef = ref()
   const addOrUpdate = () => {
-    if(!elder.value.name || !elder.value.password || !elder.value.phone || !elder.value.start) {
-      ElMessage.error('姓名、密码、手机号和状态不允许为空');
-      return
-    }
-    if (elder.value.id) {//编辑
-      elderApi.update(elder.value.id, elder.value).then(result => {
-        if (result.code === 1) {
-          ElMessage.success(result.msg)
-          dialogFormVisible.value = false
-          loadData()
-        } else {
-          ElMessage.error(result.msg)
-        }
-      })
-    } else {//添加
-      elderApi.add(elder.value).then(result => {
-        if (result.code === 1) {
-          ElMessage.success(result.msg)
-          dialogFormVisible.value = false
-          loadData()
-        } else {
-          ElMessage.error(result.msg)
-        }
-      })
-    }
+    // 执行表单整体校验，校验不通过则不提交
+    formRef.value.validate()
+        .then(() => {
+          //校验通过，执行新增/编辑接口
+          if (elder.value.id) {
+            // 编辑
+            elderApi.update(elder.value.id, elder.value).then(result => {
+              if (result.code === 1) {
+                ElMessage.success(result.msg)
+                dialogFormVisible.value = false
+                loadData()
+              } else {
+                ElMessage.error(result.msg)
+              }
+            })
+          } else {
+            // 添加
+            elderApi.add(elder.value).then(result => {
+              if (result.code === 1) {
+                ElMessage.success(result.msg)
+                dialogFormVisible.value = false
+                loadData()
+              } else {
+                ElMessage.error(result.msg)
+              }
+            })
+          }
+        })
+        .catch(() => {
+          //校验失败
+          ElMessage.error('请检查表单填写是否正确')
+        })
   }
 
   //把日期格式化为 YYYY-MM-DD
@@ -219,7 +227,7 @@
   const dialogRules = {
     name: [
       {required: true, message: '请输入用户名', trigger: 'blur'},
-      {min: 4, max: 16, message: '长度在 4 到 16 个字符', trigger: 'blur'}
+      {min: 2, max: 16, message: '长度在 2 到 16 个字符', trigger: 'blur'}
     ],
     password: [
       {required: true, message: '请输入密码', trigger: 'blur'},
@@ -275,9 +283,10 @@
         </template>
       </el-table-column>
       <el-table-column prop="name" label="姓名" width="100" :show-overflow-tooltip="true"/>
-      <el-table-column prop="phone" label="电话" :show-overflow-tooltip="true"/>
-      <el-table-column prop="idCardNo" label="身份证号" :show-overflow-tooltip="true"/>
-      <el-table-column prop="birthday" label="生日" :show-overflow-tooltip="true">
+      <el-table-column prop="phone" label="电话" :show-overflow-tooltip="true" width="115"/>
+      <el-table-column prop="idCardNo" label="身份证号" :show-overflow-tooltip="true" width="175"/>
+      <el-table-column prop="address" label="地址" :show-overflow-tooltip="true" width="300"/>
+      <el-table-column prop="birthday" label="生日" :show-overflow-tooltip="true" width="125">
         <template #default="{row}">
           {{ formatDate(row.birthday) }}
         </template>
@@ -314,7 +323,7 @@
 
   <!--添加、编辑弹出框-->
   <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false" :close-on-click-modal="false">
-    <el-form :model="elder" :rules="dialogRules">
+    <el-form ref="formRef" :model="elder" :rules="dialogRules">
       <el-form-item label="头像" :label-width="60">
         <el-upload
             class="avatar-uploader"
@@ -334,10 +343,10 @@
         </div>
       </el-form-item>
       <el-form-item prop="name" label="姓名" :label-width="80">
-        <el-input v-model="elder.name" autocomplete="off" :disabled="elder.id"/>
+        <el-input v-model="elder.name" autocomplete="off" :disabled="!!elder.id"/>
       </el-form-item>
       <el-form-item prop="password" label="密码" :label-width="80">
-        <el-input v-model="elder.password" autocomplete="off" show-password="true" type="password"/>
+        <el-input v-model="elder.password" autocomplete="off" show-password type="password"/>
       </el-form-item>
       <el-form-item prop="phone" label="手机号" :label-width="80">
         <el-input v-model="elder.phone" autocomplete="off"/>

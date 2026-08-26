@@ -1,7 +1,9 @@
 package cn.tinsur.elder.controller;
 
 
+import cn.tinsur.elder.mapper.ElderMapper;
 import cn.tinsur.elder.pojo.entity.Elder;
+import cn.tinsur.elder.pojo.entity.Tag;
 import cn.tinsur.elder.pojo.query.ElderQuery;
 import cn.tinsur.elder.service.IElderService;
 import cn.tinsur.elder.util.Result;
@@ -9,6 +11,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * <p>
@@ -24,6 +28,8 @@ public class ElderController {
 
     @Autowired
     private IElderService elderService;
+    @Autowired
+    private ElderMapper elderMapper;
 
     /**
      * 分页查询老人列表
@@ -95,6 +101,23 @@ public class ElderController {
     public Boolean isExists(@RequestParam String name) {
         Elder elder = elderService.getOne(new QueryWrapper<Elder>().eq("name", name));
         return elder != null;
+    }
+
+    /**
+     * 获取指定老人Tags标注列表，
+     * result.dat中存放老人所有的Tag组成的List列表
+     */
+    @GetMapping("/getTagsById/{id}")
+    public Result<List<Tag>> getTagsById(@PathVariable Long id) {
+        return elderService.getTagsById(id);
+    }
+
+    /**
+     * 修改更新老人的Tags标注列表
+     */
+    @PutMapping("/updateTags/{id}")
+    public Result updateTags (@PathVariable Long id, @RequestBody Long[] tags) {
+        return elderService.updateTags(id, tags);
     }
 }
 

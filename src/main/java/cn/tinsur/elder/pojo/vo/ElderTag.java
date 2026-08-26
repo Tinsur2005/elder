@@ -1,4 +1,4 @@
-package cn.tinsur.elder.pojo.entity;
+package cn.tinsur.elder.pojo.vo;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;

@@ -1,10 +1,62 @@
 <script setup>
   import elderApi from '@/api/elder.js'
+  import tagsApi from '@/api/tags.js'
   import {ref} from 'vue'
   import {ElMessage, ElMessageBox} from 'element-plus'
   import {Plus} from '@element-plus/icons-vue'
   import {useTokenStore} from '@/store/token.js'
+  import eldersApi from "@/api/elder.js";
   const tokenStore = useTokenStore()
+
+  // ========== 对象 ==========
+
+  // ========== 变量 ==========
+  //当前已经存在的所有标签组成的列表，初始化置为空List
+  // 这个变量将在 getTagsList 方法中被赋值
+  const tagsList = ref([])
+
+  //某个老人的标签存到这个List，供弹出对话框使用，初始化置为空List
+  // 这个变量将在 showAssignedTagDialog 方法中被赋值
+  const elderTagsList = ref([])
+
+  // ========== 对话框dalog弹出控制 ==========
+  const dialogTagsVisible = ref(false)  //弹出标注对话框dialog
+  const dialogFormVisible = ref(false)  //弹出新增/编辑对话框dialog
+
+
+  // ========== 方法 ==========
+  // 显示已分配的标签对话框
+  const showAssignedTagDialog = (raw) => {
+    tagsList.value = [] //先把tagsList清空，防止网络慢的时候遗漏旧数据在对话框中
+    getTagsList()   // 执行getTagsList方法来初始化tagsList,确保tagsList正确读取到数据库中全部的标签
+    elder.value = raw
+    eldersApi.getTagsById(raw.id).then(result => {
+      elderTagsList.value = result.data
+    })
+    dialogTagsVisible.value = true
+  }
+
+  //获取标签列表
+  const getTagsList = () => {
+    tagsApi.list().then(result => {
+      tagsList.value = result.data
+    })
+  }
+
+  // 保存标签列表，当标注标签对话框点击保存按钮时调用此方法
+  const tagsSave = () => {
+    elderApi.updateTagsById(elder.value.id, elderTagsList.value).then(result => {
+      if (result.code === 1) {
+        ElMessage.success(result.msg)
+        dialogTagsVisible.value = false
+        loadData()
+      } else {
+        ElMessage.error(result.msg)
+      }
+    })
+
+  }
+
 
   //表格数据
   const list = ref([])
@@ -106,7 +158,6 @@
 
 
   //添加、编辑
-  const dialogFormVisible = ref(false)
   const elder = ref({})
   const title = ref()
 
@@ -291,9 +342,10 @@
       </el-table-column>
       <el-table-column prop="remark" label="备注" :show-overflow-tooltip="true" width="125"/>
       <el-table-column prop="createTime" label="创建时间" :show-overflow-tooltip="true" width="160"/>
-      <el-table-column align="center" width="150px" fixed="right" label="操作">
+      <el-table-column align="center" width="200px" fixed="right" label="操作">
         <template #default="{ row }">
           <el-button size="small" type="primary" @click="showUpdateDialog(row.id)">编辑</el-button>
+          <el-button size="small" type="success" @click="showAssignedTagDialog(row)">标注</el-button>
           <el-button size="small" type="danger" @click="deleteById(row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -308,7 +360,6 @@
         style="margin-top: 20px; justify-content: flex-end"
     />
   </el-card>
-
 
   <!--添加、编辑弹出框-->
   <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false" :close-on-click-modal="false">
@@ -369,7 +420,25 @@
       </div>
     </template>
   </el-dialog>
-</template>
+
+  <!-- 标注标签弹出对话框dialog -->
+  <el-dialog title="标注标签" v-model="dialogTagsVisible" width="40%">
+    <el-form ref="form" :model="elder" label-width="80px">
+      <el-form-item label="用户名">
+        <el-input v-model="elder.name" disabled></el-input>
+      </el-form-item>
+      <el-form-item label="标注列表">
+        <el-checkbox-group v-model="elderTagsList">
+          <el-checkbox v-for="tag in tagsList" :key="tag.id" :label="tag.id">{{tag.name}}</el-checkbox>
+        </el-checkbox-group>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="tagsSave">保存</el-button>
+        <el-button  @click="dialogTagsVisible = false">取消</el-button>
+      </el-form-item>
+    </el-form>
+  </el-dialog>
+  </template>
 
 
 <style scoped>

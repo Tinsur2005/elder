@@ -26,6 +26,15 @@ const elderApi = {
     updateTagsById(id, tags) {
         // 根据老人id来修改标注标签（修改的是elder-tags中间表的数据）
         return request.put(`/elders/updateTags/${id}`, tags)
+    },
+    exportExcel() {
+        return request({
+            url: `/elders/exportExcel`,
+            method: 'get',
+            //XMLHttpRequest 属性 responseType 是一个枚举字符串值，用于指定响应中包含的数据类型。
+            //"blob": response 是一个包含二进制数据的 Blob 对象。
+            responseType: 'blob'
+        })
     }
 }
 

@@ -3,7 +3,7 @@
   import tagsApi from '@/api/tags.js'
   import {ref} from 'vue'
   import {ElMessage, ElMessageBox} from 'element-plus'
-  import {Plus} from '@element-plus/icons-vue'
+  import {Plus, Download, Upload} from '@element-plus/icons-vue'
   import {useTokenStore} from '@/store/token.js'
   import eldersApi from "@/api/elder.js";
   const tokenStore = useTokenStore()
@@ -270,6 +270,45 @@
     return true
   }
 
+  //Excel导出
+  const exportExcel = () => {
+    ElMessageBox.confirm(
+        '您确认要导出吗Excel吗？',
+        '提示',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'info',
+          lockScroll: false //防止抖动
+        }
+    ).then(() => {
+      elderApi.exportExcel().then((response) => {
+        //从响应头 Content-Disposition 解析后端返回的文件名,后端做过 URLEncoder.encode,需要解码
+        const disposition = response.headers['content-disposition'];
+        let fileName = '老人信息.xlsx'; //兜底名
+        if (disposition) {
+          fileName = decodeURIComponent(disposition.split('filename=')[1]);
+        }
+        //responseType 为 blob 时 result.data 本身就是 Blob,直接用即可
+        //封装的Axios类里面针对responseType 设置为 blob 的响应数据直接返回全部的response，不再返回response.data，这里直接使用 response.data
+        let url = window.URL.createObjectURL(response.data);
+        const link = document.createElement("a"); // 创建a标签
+        link.href = url;
+        link.download = fileName; // 使用后端返回的文件名
+        link.click();
+        URL.revokeObjectURL(url);
+      });
+    })
+  }
+
+  //导入Excel成功后调用此处
+  const importExcelSuccess = (result) => {
+    if (result.code ==1) {
+      ElMessage.success(result.msg)
+      loadData()
+    }
+  }
+
   //对话框dialog输入规则校验
   const dialogRules = {
     name: [
@@ -296,6 +335,21 @@
       <div class="header">
         <el-button type="primary" @click="showAddDialog">添加</el-button>
         <el-button type="danger" @click="deleteAll">批量删除</el-button>
+        <el-button type="primary" :icon="Download" @click="exportExcel">导出Excel</el-button>
+        <el-upload
+            :icon="Upload"
+            class="inline-block"
+            multiple=""
+            method="post"
+            action="/api/elders/importExcel"
+            style="display:inline-block;margin-left: 12px"
+            accept=".xlsx,.xls"
+            :show-file-list="false"
+            :on-success="importExcelSuccess"
+            :headers="{Authorization: tokenStore.token}"
+            name="file">
+          <el-button type="primary" :icon="Upload">导入Excel</el-button>
+        </el-upload>
       </div>
     </template>
     <!--模糊查找-->
@@ -449,6 +503,11 @@
 
 
 <style scoped>
+  .header {
+    display: flex;
+    align-items: center;
+  }
+
   .avatar-uploader .avatar {
     width: 178px;
     height: 178px;

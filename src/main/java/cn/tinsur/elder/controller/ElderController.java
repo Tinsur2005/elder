@@ -9,8 +9,10 @@ import cn.tinsur.elder.service.IElderService;
 import cn.tinsur.elder.util.Result;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -118,5 +120,18 @@ public class ElderController {
     @PutMapping("/updateTags/{id}")
     public Result updateTags (@PathVariable Long id, @RequestBody Long[] tags) {
         return elderService.updateTags(id, tags);
+    }
+
+    //导出Excel
+    @GetMapping("/exportExcel")
+    public void exportExcel (HttpServletResponse response) {
+        elderService.exportExcel(response);
+    }
+
+    //导入Excel
+    @PostMapping("/importExcel")
+    public Result importExcel (MultipartFile file) {
+        elderService.importExcel(file);
+        return Result.ok("导入成功");
     }
 }

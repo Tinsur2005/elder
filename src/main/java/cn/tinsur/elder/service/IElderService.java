@@ -8,6 +8,8 @@ import cn.tinsur.elder.pojo.query.UserQuery;
 import cn.tinsur.elder.util.Result;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -44,4 +46,8 @@ public interface IElderService extends IService<Elder> {
     void addTagById(Long id, Long[] tagId);
 
     Result updateTags(Long id, Long[] tags);
+
+    void exportExcel(HttpServletResponse response);
+
+    void importExcel(MultipartFile file);
 }

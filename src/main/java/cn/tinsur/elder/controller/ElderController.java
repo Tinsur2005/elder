@@ -5,6 +5,7 @@ import cn.tinsur.elder.mapper.ElderMapper;
 import cn.tinsur.elder.pojo.entity.Elder;
 import cn.tinsur.elder.pojo.entity.Tag;
 import cn.tinsur.elder.pojo.query.ElderQuery;
+import cn.tinsur.elder.pojo.vo.ElderVO;
 import cn.tinsur.elder.service.IElderService;
 import cn.tinsur.elder.util.Result;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -38,8 +39,8 @@ public class ElderController {
      * GET /elders?page=1&limit=10&name=xxx&phone=xxx
      */
     @GetMapping
-    public Result<IPage<Elder>> list(ElderQuery elderQuery) {
-        IPage<Elder> page = elderService.list(elderQuery);
+    public Result<IPage<ElderVO>> list(ElderQuery elderQuery) {
+        IPage<ElderVO> page = elderService.list(elderQuery);
         return Result.ok(page);
     }
 

@@ -5,6 +5,7 @@ import cn.tinsur.elder.pojo.entity.Tag;
 import cn.tinsur.elder.pojo.entity.User;
 import cn.tinsur.elder.pojo.query.ElderQuery;
 import cn.tinsur.elder.pojo.query.UserQuery;
+import cn.tinsur.elder.pojo.vo.ElderVO;
 import cn.tinsur.elder.util.Result;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -23,7 +24,7 @@ import java.util.List;
  */
 public interface IElderService extends IService<Elder> {
 
-    IPage<Elder> list(ElderQuery elderrQuery);
+    IPage<ElderVO> list(ElderQuery elderrQuery);
 
     /**
      * 根据老人id获取这个老人所有的标签，返回一个由Tag对象组成的List列表

@@ -201,11 +201,9 @@
       {required: true, message: '请输入姓名', trigger: 'blur'}
     ],
     email: [
-      {required: true, message: '请输入邮箱', trigger: 'blur'},
       {type: 'email', message: '邮箱格式错误', trigger: 'blur'}
     ],
     phone: [
-      {required: true, message: '请输入手机号', trigger: 'blur'},
       {min: 11, max: 11, message: '手机号格式错误', trigger: 'blur'}
     ]
   }

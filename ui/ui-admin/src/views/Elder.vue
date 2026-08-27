@@ -388,21 +388,29 @@
       </el-table-column>
       <el-table-column prop="realName" label="姓名" width="100" :show-overflow-tooltip="true"/>
       <el-table-column prop="phone" label="电话" :show-overflow-tooltip="true" width="115"/>
+      <el-table-column prop="status" label="状态" min-width="100" :resizable="false">
+        <template #default="{row}">
+          <el-tag type="info" v-if="row.status === 0">已停用</el-tag>
+          <el-tag type="success" v-else-if="row.status === 1">正常</el-tag>
+          <el-tag type="primary" v-else-if="row.status === 2">请假</el-tag>
+          <el-tag type="danger" v-else-if="row.status === 3">退住中</el-tag>
+          <el-tag type="warning" v-else-if="row.status === 4">入住中</el-tag>
+          <el-tag type="info" v-else-if="row.status === 5">已退住</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="标签" min-width="300">
+        <template #default="{row}">
+          <el-tag v-for="tag in row.tags" :key="tag.id" type="primary"
+                  style="margin-right: 4px">
+            {{ tag.name }}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="idCardNo" label="身份证号" :show-overflow-tooltip="true" width="175"/>
       <el-table-column prop="address" label="地址" :show-overflow-tooltip="true" width="300"/>
       <el-table-column prop="birthday" label="生日" :show-overflow-tooltip="true" width="125">
         <template #default="{row}">
           {{ formatDate(row.birthday) }}
-        </template>
-      </el-table-column>
-      <el-table-column prop="status" label="状态" min-width="100" :resizable="false">
-        <template #default="{row}">
-            <el-tag type="info" v-if="row.status === 0">已停用</el-tag>
-            <el-tag type="success" v-else-if="row.status === 1">正常</el-tag>
-            <el-tag type="primary" v-else-if="row.status === 2">请假</el-tag>
-            <el-tag type="danger" v-else-if="row.status === 3">退住中</el-tag>
-            <el-tag type="warning" v-else-if="row.status === 4">入住中</el-tag>
-            <el-tag type="info" v-else-if="row.status === 5">已退住</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="remark" label="备注" :show-overflow-tooltip="true" width="125"/>

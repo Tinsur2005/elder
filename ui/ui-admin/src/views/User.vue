@@ -155,7 +155,7 @@
 
   const addOrUpdate = () => {
     if(!user.value.name || !user.value.password) {
-      ElMessage.error('姓名和密码不允许为空');
+      ElMessage.error('用户名和密码不允许为空');
       return
     }
     if (user.value.id) {//编辑
@@ -242,8 +242,8 @@
   <el-card class="">
     <template #header>
       <div class="header">
-        <el-button type="primary" @click="showAddDialog">添加</el-button>
-        <el-button type="danger" @click="deleteAll">批量删除</el-button>
+        <el-button type="primary" :icon="Plus" @click="showAddDialog">添加</el-button>
+        <el-button type="danger" :icon="Delete" @click="deleteAll">批量删除</el-button>
         <el-button type="primary" :icon="Download" @click="exportExcel">导出Excel</el-button>
         <el-upload
             :icon="Upload"
@@ -263,8 +263,8 @@
     </template>
     <!--模糊查找-->
     <el-form :inline="true">
-      <el-form-item label="姓名">
-        <el-input v-model="userQuery.name" placeholder="请输入姓名" clearable style="width: 200px"/>
+      <el-form-item label="用户名">
+        <el-input v-model="userQuery.name" placeholder="请输入用户名" clearable style="width: 200px"/>
       </el-form-item>
       <el-form-item label="邮箱">
         <el-input v-model="userQuery.email" placeholder="请输入邮箱" clearable style="width: 200px"/>
@@ -292,7 +292,7 @@
           <img :src="row.avatar" style="max-height: 40px; max-width: 40px;"/>
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="姓名" width="100" :show-overflow-tooltip="true"/>
+      <el-table-column prop="name" label="用户名" width="100" :show-overflow-tooltip="true"/>
       <!--<el-table-column prop="password" label="密码"/>-->
       <el-table-column prop="phone" label="电话" :show-overflow-tooltip="true"/>
       <el-table-column prop="email" label="邮箱" :show-overflow-tooltip="true"/>
@@ -351,7 +351,7 @@
           头像图片建议尺寸150x150，文件大小不超过2MB，支持jpg/png/webp格式
         </div>
       </el-form-item>
-      <el-form-item label="姓名" :label-width="60">
+      <el-form-item label="用户名" :label-width="60">
         <el-input v-model="user.name" autocomplete="off" :disabled="user.id"/>
       </el-form-item>
       <el-form-item label="密码" :label-width="60">

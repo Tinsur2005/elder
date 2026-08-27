@@ -293,7 +293,7 @@
           头像图片建议尺寸150x150，文件大小不超过2MB，支持jpg/png/webp格式
         </div>
       </el-form-item>
-      <el-form-item label="姓名" :label-width="60">
+      <el-form-item label="用户名" :label-width="60">
         <el-input v-model="user.name" autocomplete="off" :disabled="user.id"/>
       </el-form-item>
       <el-form-item label="邮箱" :label-width="60">

@@ -3,7 +3,7 @@
   import tagsApi from '@/api/tags.js'
   import {ref} from 'vue'
   import {ElMessage, ElMessageBox} from 'element-plus'
-  import {Plus, Download, Upload} from '@element-plus/icons-vue'
+  import {Plus, Download, Upload, Delete} from '@element-plus/icons-vue'
   import {useTokenStore} from '@/store/token.js'
   import eldersApi from "@/api/elder.js";
   const tokenStore = useTokenStore()
@@ -333,8 +333,8 @@
   <el-card class="">
     <template #header>
       <div class="header">
-        <el-button type="primary" @click="showAddDialog">添加</el-button>
-        <el-button type="danger" @click="deleteAll">批量删除</el-button>
+        <el-button type="primary" :icon="Plus" @click="showAddDialog">添加</el-button>
+        <el-button type="danger" :icon="Delete" @click="deleteAll">批量删除</el-button>
         <el-button type="primary" :icon="Download" @click="exportExcel">导出Excel</el-button>
         <el-upload
             :icon="Upload"
@@ -354,8 +354,8 @@
     </template>
     <!--模糊查找-->
     <el-form :inline="true">
-      <el-form-item label="姓名">
-        <el-input v-model="elderQuery.name" placeholder="请输入姓名" clearable style="width: 200px"/>
+      <el-form-item label="用户名">
+        <el-input v-model="elderQuery.name" placeholder="请输入用户名" clearable style="width: 200px"/>
       </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker
@@ -382,7 +382,7 @@
           <img :src="row.avatar" style="max-height: 40px; max-width: 40px;"/>
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="姓名" width="100" :show-overflow-tooltip="true"/>
+      <el-table-column prop="name" label="用户名" width="100" :show-overflow-tooltip="true"/>
       <el-table-column prop="phone" label="电话" :show-overflow-tooltip="true" width="115"/>
       <el-table-column prop="idCardNo" label="身份证号" :show-overflow-tooltip="true" width="175"/>
       <el-table-column prop="address" label="地址" :show-overflow-tooltip="true" width="300"/>
@@ -443,7 +443,7 @@
           头像图片建议尺寸150x150，文件大小不超过2MB，支持jpg/png/webp格式
         </div>
       </el-form-item>
-      <el-form-item prop="name" label="姓名" :label-width="80">
+      <el-form-item prop="name" label="用户名" :label-width="80">
         <el-input v-model="elder.name" autocomplete="off" :disabled="!!elder.id"/>
       </el-form-item>
       <el-form-item prop="password" label="密码" :label-width="80">
@@ -485,7 +485,7 @@
   <!-- 标注标签弹出对话框dialog -->
   <el-dialog title="标签标注" v-model="dialogTagsVisible" width="40%">
     <el-form ref="form" :model="elder" label-width="80px">
-      <el-form-item label="姓名">
+      <el-form-item label="用户名">
         <el-input v-model="elder.name" disabled></el-input>
       </el-form-item>
       <el-form-item label="标注列表">

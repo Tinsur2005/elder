@@ -2,6 +2,7 @@
   import tagsApi from '@/api/tags.js'
   import {ref} from 'vue'
   import {ElMessage, ElMessageBox} from 'element-plus'
+  import {Delete, Plus} from "@element-plus/icons-vue";
 
   //表格数据
   const list = ref([])
@@ -156,8 +157,8 @@
   <el-card class="">
     <template #header>
       <div class="header">
-        <el-button type="primary" @click="showAddDialog">添加</el-button>
-        <el-button type="danger" @click="deleteAll">批量删除</el-button>
+        <el-button type="primary" :icon="Plus" @click="showAddDialog">添加</el-button>
+        <el-button type="danger" :icon="Delete" @click="deleteAll">批量删除</el-button>
       </div>
     </template>
     <!--模糊查找-->

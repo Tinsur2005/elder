@@ -377,6 +377,11 @@
 
 
 <style scoped>
+  .header {
+    display: flex;
+    align-items: center;
+  }
+
   .avatar-uploader .avatar {
     width: 178px;
     height: 178px;

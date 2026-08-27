@@ -153,32 +153,61 @@
     })
   }
 
+  const formRef = ref()
   const addOrUpdate = () => {
-    if(!user.value.name || !user.value.password) {
-      ElMessage.error('用户名和密码不允许为空');
-      return
-    }
-    if (user.value.id) {//编辑
-      userApi.update(user.value.id, user.value).then(result => {
-        if (result.code === 1) {
-          ElMessage.success(result.msg)
-          dialogFormVisible.value = false
-          loadData()
-        } else {
-          ElMessage.error(result.msg)
-        }
-      })
-    } else {//添加
-      userApi.add(user.value).then(result => {
-        if (result.code === 1) {
-          ElMessage.success(result.msg)
-          dialogFormVisible.value = false
-          loadData()
-        } else {
-          ElMessage.error(result.msg)
-        }
-      })
-    }
+    // 执行表单整体校验，校验不通过则不提交
+    formRef.value.validate()
+        .then(() => {
+          //校验通过，执行新增/编辑接口
+          if (user.value.id) {//编辑
+            userApi.update(user.value.id, user.value).then(result => {
+              if (result.code === 1) {
+                ElMessage.success(result.msg)
+                dialogFormVisible.value = false
+                loadData()
+              } else {
+                ElMessage.error(result.msg)
+              }
+            })
+          } else {//添加
+            userApi.add(user.value).then(result => {
+              if (result.code === 1) {
+                ElMessage.success(result.msg)
+                dialogFormVisible.value = false
+                loadData()
+              } else {
+                ElMessage.error(result.msg)
+              }
+            })
+          }
+        })
+        .catch(() => {
+          //校验失败
+          ElMessage.error('请检查表单填写是否正确')
+        })
+  }
+
+  //对话框dialog输入规则校验
+  const dialogRules = {
+    name: [
+      {required: true, message: '请输入用户名', trigger: 'blur'},
+      {min: 2, max: 16, message: '长度在 2 到 16 个字符', trigger: 'blur'}
+    ],
+    password: [
+      {required: true, message: '请输入密码', trigger: 'blur'},
+      {min: 6, max: 16, message: '长度在 6 到 16 个字符', trigger: 'blur'}
+    ],
+    realName: [
+      {required: true, message: '请输入姓名', trigger: 'blur'}
+    ],
+    email: [
+      {required: true, message: '请输入邮箱', trigger: 'blur'},
+      {type: 'email', message: '邮箱格式错误', trigger: 'blur'}
+    ],
+    phone: [
+      {required: true, message: '请输入手机号', trigger: 'blur'},
+      {min: 11, max: 11, message: '手机号格式错误', trigger: 'blur'}
+    ]
   }
 
   //上传图片
@@ -333,7 +362,7 @@
 
   <!--添加、编辑弹出框-->
   <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false" :close-on-click-modal="false">
-    <el-form :model="user">
+    <el-form ref="formRef" :model="user" :rules="dialogRules">
       <el-form-item label="头像" :label-width="60">
         <el-upload
             class="avatar-uploader"
@@ -352,19 +381,19 @@
           头像图片建议尺寸150x150，文件大小不超过2MB，支持jpg/png/webp格式
         </div>
       </el-form-item>
-      <el-form-item label="用户名" :label-width="60">
+      <el-form-item prop="name" label="用户名" :label-width="80">
         <el-input v-model="user.name" autocomplete="off" :disabled="user.id"/>
       </el-form-item>
-      <el-form-item label="密码" :label-width="60">
+      <el-form-item prop="password" label="密码" :label-width="80">
         <el-input v-model="user.password" autocomplete="off" show-password="true" type="password"/>
       </el-form-item>
-      <el-form-item label="姓名" :label-width="60">
+      <el-form-item prop="realName" label="姓名" :label-width="80">
         <el-input v-model="user.realName" autocomplete="off"/>
       </el-form-item>
-      <el-form-item label="邮箱" :label-width="60">
+      <el-form-item prop="email" label="邮箱" :label-width="80">
         <el-input v-model="user.email" autocomplete="off"/>
       </el-form-item>
-      <el-form-item label="手机号" :label-width="60">
+      <el-form-item prop="phone" label="手机号" :label-width="80">
         <el-input v-model="user.phone" autocomplete="off"/>
       </el-form-item>
     </el-form>

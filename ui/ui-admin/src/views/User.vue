@@ -7,9 +7,10 @@
     Edit,
     Upload,
     Download,
-    Plus
+    Plus, EditPen, User
   } from '@element-plus/icons-vue'
   import {useTokenStore} from '@/store/token.js'
+  import rolesApi from "@/api/roles.js";
   const tokenStore = useTokenStore()
 
   //表格数据
@@ -265,6 +266,36 @@
       ElMessage.error(result.msg)
     }
   }
+
+  //角色设置
+  const dialogRolesVisible = ref(false)
+  const userRolesList = ref([]) // 选中的用户的角色列表
+  const rolesList = ref([]) // 所有角色列表
+  const showRolesDialog = (id) => {
+    dialogRolesVisible.value = true
+    user.value = {}
+    userApi.selectById(id).then(result => {
+      user.value = result.data
+    })
+    rolesApi.listAll().then(result => {
+      rolesList.value = result.data
+    })
+    userApi.getRolesById(id).then(result => {
+      userRolesList.value = result.data
+    })
+  }
+  // 保存角色列表，当角色设置对话框点击保存按钮时调用此方法
+  const rolesSave = () => {
+    userApi.updateRolesById(user.value.id, userRolesList.value).then(result => {
+      if (result.code === 1) {
+        ElMessage.success(result.msg)
+        dialogRolesVisible.value = false
+        loadData()
+      } else {
+        ElMessage.error(result.msg)
+      }
+    })
+  }
 </script>
 
 <template>
@@ -345,10 +376,11 @@
         </template>
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间"/>
-      <el-table-column align="center" width="150px" fixed="right" label="操作">
+      <el-table-column align="center" width="250px" fixed="right" label="操作">
         <template #default="{ row }">
-          <el-button size="small" type="primary" @click="showUpdateDialog(row.id)">编辑</el-button>
-          <el-button size="small" type="danger" @click="deleteById(row.id)">删除</el-button>
+          <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)">编辑</el-button>
+          <el-button size="small" type="success" :icon="User" @click="showRolesDialog(row.id)">角色</el-button>
+          <el-button size="small" type="danger" :icon="Delete" @click="deleteById(row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -409,6 +441,25 @@
         </el-button>
       </div>
     </template>
+  </el-dialog>
+
+
+  <!-- 标角色编辑弹出对话框dialog -->
+  <el-dialog title="角色设置" v-model="dialogRolesVisible" width="40%" :show-close="false">
+    <el-form ref="form" :model="user" label-width="80px">
+      <el-form-item label="用户名">
+        <el-input v-model="user.name" disabled></el-input>
+      </el-form-item>
+      <el-form-item label="角色列表">
+        <el-checkbox-group v-model="userRolesList">
+          <el-checkbox v-for="role in rolesList" :key="role.id" :label="role.id">{{role.name}}</el-checkbox>
+        </el-checkbox-group>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="rolesSave">保存</el-button>
+        <el-button  @click="dialogRolesVisible = false">取消</el-button>
+      </el-form-item>
+    </el-form>
   </el-dialog>
 </template>
 

@@ -3,7 +3,7 @@
   import tagsApi from '@/api/tags.js'
   import {ref} from 'vue'
   import {ElMessage, ElMessageBox} from 'element-plus'
-  import {Plus, Download, Upload, Delete} from '@element-plus/icons-vue'
+  import {Plus, Download, Upload, Delete, EditPen, PriceTag} from '@element-plus/icons-vue'
   import {useTokenStore} from '@/store/token.js'
   import eldersApi from "@/api/elder.js";
   const tokenStore = useTokenStore()
@@ -421,11 +421,11 @@
       </el-table-column>
       <el-table-column prop="remark" label="备注" :show-overflow-tooltip="true" width="125"/>
       <el-table-column prop="createTime" label="创建时间" :show-overflow-tooltip="true" width="160"/>
-      <el-table-column align="center" width="200px" fixed="right" label="操作">
+      <el-table-column align="center" width="250px" fixed="right" label="操作">
         <template #default="{ row }">
-          <el-button size="small" type="primary" @click="showUpdateDialog(row.id)">编辑</el-button>
-          <el-button size="small" type="success" @click="showAssignedTagDialog(row)">标注</el-button>
-          <el-button size="small" type="danger" @click="deleteById(row.id)">删除</el-button>
+          <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)">编辑</el-button>
+          <el-button size="small" type="success" :icon="PriceTag" @click="showAssignedTagDialog(row)">标注</el-button>
+          <el-button size="small" type="danger" :icon="Delete" @click="deleteById(row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -504,7 +504,7 @@
   </el-dialog>
 
   <!-- 标注标签弹出对话框dialog -->
-  <el-dialog title="标签标注" v-model="dialogTagsVisible" width="40%">
+  <el-dialog title="标签标注" v-model="dialogTagsVisible" width="40%" :show-close="false">
     <el-form ref="form" :model="elder" label-width="80px">
       <el-form-item label="用户名">
         <el-input v-model="elder.name" disabled></el-input>

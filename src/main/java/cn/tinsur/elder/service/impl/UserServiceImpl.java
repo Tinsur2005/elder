@@ -2,10 +2,14 @@ package cn.tinsur.elder.service.impl;
 
 import cn.tinsur.elder.exception.ServiceException;
 import cn.tinsur.elder.listener.UserExcelListener;
+import cn.tinsur.elder.mapper.UserRoleMapper;
+import cn.tinsur.elder.pojo.entity.Role;
 import cn.tinsur.elder.pojo.entity.User;
 import cn.tinsur.elder.mapper.UserMapper;
 import cn.tinsur.elder.pojo.query.UserQuery;
+import cn.tinsur.elder.pojo.vo.ElderTag;
 import cn.tinsur.elder.pojo.vo.UserExcelVO;
+import cn.tinsur.elder.pojo.vo.UserRole;
 import cn.tinsur.elder.service.IUserService;
 import cn.tinsur.elder.util.ExcelUtil;
 import cn.tinsur.elder.util.Result;
@@ -39,6 +43,9 @@ import java.util.List;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private UserRoleMapper userRoleMapper;
 
     @Override
     public IPage<User> list(UserQuery userQuery) {
@@ -104,5 +111,57 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
         userMapper.insert(user);
         return Result.ok("新增成功");
+    }
+
+    @Override
+    public Result<List<Role>> getRolesById(Long id) {
+        LambdaQueryWrapper<UserRole> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(UserRole :: getUserId, id);
+        List<Long> list =
+                userRoleMapper.selectList(lambdaQueryWrapper)
+                        .stream()
+                        .map(UserRole :: getRoleId)
+                        .toList();
+        return Result.ok(list);
+    }
+
+    /**
+     * 根据用户id删除这个用户的所有角色
+     * @param id
+     */
+    @Override
+    public void deleteAllRolesById(Long id) {
+        LambdaQueryWrapper<UserRole> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(UserRole :: getUserId, id);
+        userRoleMapper.delete(lambdaQueryWrapper);
+    }
+
+    /**
+     * 根据id添加角色，传入的第二个参数应该是角色ID组成的Long数组
+     * @param id
+     * @param roleId
+     */
+    @Override
+    public void addRoleById(Long id, Long[] roleId) {
+        for (Long role : roleId) {
+            UserRole userRole = new UserRole();
+            userRole.setUserId(id);
+            userRole.setRoleId(role);
+            userRoleMapper.insert(userRole);
+        }
+    }
+
+    /**
+     * 根据id更新角色，传入的第二个参数应该是角色ID组成的Long数组
+     * 这个方法的实现方法是，先根据id删除user-role中间表中有关这个用户的所有数据，再根据id和roleId数组插入新的数据
+     * @param id
+     * @param roles
+     * @return
+     */
+    @Override
+    public Result updateRoles(Long id, Long[] roles) {
+        deleteAllRolesById(id);
+        addRoleById(id, roles);
+        return Result.ok("更新成功");
     }
 }

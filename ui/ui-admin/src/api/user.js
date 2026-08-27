@@ -38,7 +38,13 @@ const userApi = {
             //"blob": response 是一个包含二进制数据的 Blob 对象。
             responseType: 'blob'
         })
-    }
+    },getRolesById(id) {
+        // 根据id获取用户的角色ID
+        return request.get(`/users/getRolesById/${id}`);
+    },updateRolesById(id, roles) {
+        // 根据用户id来修改角色（修改的是user_roles中间表的数据）
+        return request.put(`/users/updateRoles/${id}`, roles)
+    },
 }
 
 export default  userApi

@@ -1,6 +1,7 @@
 package cn.tinsur.elder.controller;
 
 
+import cn.tinsur.elder.pojo.entity.Role;
 import cn.tinsur.elder.pojo.dto.UserPasswordDTO;
 import cn.tinsur.elder.pojo.entity.User;
 import cn.tinsur.elder.pojo.query.UserQuery;
@@ -10,12 +11,12 @@ import cn.tinsur.elder.util.Result;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.collections4.Get;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -166,5 +167,23 @@ public class UserController {
     public Result importExcel (MultipartFile file) {
         userService.importExcel(file);
         return Result.ok("导入成功");
+    }
+
+    /**
+     * 获取指定用户所有的角色
+     * result.data中存放用户所有的角色组成的List列表
+     */
+    @GetMapping("/getRolesById/{id}")
+    public Result<List<Role>> getRolesById(@PathVariable Long id) {
+        return userService.getRolesById(id);
+    }
+
+
+    /**
+     * 修改更新用户的Roles角色列表
+     */
+    @PutMapping("/updateRoles/{id}")
+    public Result updateRoles (@PathVariable Long id, @RequestBody Long[] roles) {
+        return userService.updateRoles(id, roles);
     }
 }

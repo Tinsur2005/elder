@@ -105,7 +105,7 @@ public class ElderController {
 
     /**
      * 获取指定老人Tags标注列表，
-     * result.dat中存放老人所有的Tag组成的List列表
+     * result.data中存放老人所有的Tag组成的List列表
      */
     @GetMapping("/getTagsById/{id}")
     public Result<List<Tag>> getTagsById(@PathVariable Long id) {
@@ -120,4 +120,3 @@ public class ElderController {
         return elderService.updateTags(id, tags);
     }
 }
-

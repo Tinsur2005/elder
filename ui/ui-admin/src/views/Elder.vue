@@ -10,7 +10,29 @@
 
   // ========== 对象 ==========
 
-  // ========== 变量 ==========
+  //分页信息和搜索条件
+  const elderQuery = ref({
+    name: '',
+    email: '',
+    page: 1,
+    limit: 10
+  })
+
+  // 单个对象，用于存储当前操作的老人数据，在添加老人时用来临时保存填写的数据
+  const elder = ref({})
+
+  // ============== 变量 ==============
+
+  // 标题，用于显示添加/修改了老人对话框的标题，例如“添加老人”、“编辑老人”
+  const title = ref()
+
+  //表格数据
+  const list = ref([]) //表格List原始置为空
+  const total = ref(0)
+
+  // 创建时间范围，用于模糊搜索用，初始化置为空，在日期选择框选择后被赋值
+  const createTimeRange = ref([])
+
   //当前已经存在的所有标签组成的列表，初始化置为空List
   // 这个变量将在 getTagsList 方法中被赋值
   const tagsList = ref([])
@@ -19,12 +41,40 @@
   // 这个变量将在 showAssignedTagDialog 方法中被赋值
   const elderTagsList = ref([])
 
+  // 状态选项，用于新增/修改老人对话框中选择对应的状态
+  const statusOptions = [
+    {
+      value: 0,
+      label: '已停用',
+    },
+    {
+      value: 1,
+      label: '正常',
+    },
+    {
+      value: 2,
+      label: '请假',
+    },
+    {
+      value: 3,
+      label: '退住中',
+    },
+    {
+      value: 4,
+      label: '入住中',
+    },
+    {
+      value: 5,
+      label: '已退住',
+    },
+  ]
+
   // ========== 对话框dalog弹出控制 ==========
   const dialogTagsVisible = ref(false)  //弹出标注对话框dialog
   const dialogFormVisible = ref(false)  //弹出新增/编辑对话框dialog
 
 
-  // ========== 方法 ==========
+  // ============== 方法 ==============
   // 显示已分配的标签对话框
   const showAssignedTagDialog = (raw) => {
     tagsList.value = [] //先把tagsList清空，防止网络慢的时候遗漏旧数据在对话框中
@@ -58,19 +108,7 @@
   }
 
 
-  //表格数据
-  const list = ref([])
-  const total = ref(0)
-  //分页信息和搜索条件
-  const elderQuery = ref({
-    name: '',
-    email: '',
-    page: 1,
-    limit: 10
-  })
-
   //加载数据
-  const createTimeRange = ref([])
   const loadData = () => {
     elderQuery.value.beginCreateTime = createTimeRange.value?.[0]
     elderQuery.value.endCreateTime = createTimeRange.value?.[1]
@@ -158,9 +196,6 @@
 
 
   //添加、编辑
-  const elder = ref({})
-  const title = ref()
-
   const showAddDialog = () => {
     dialogFormVisible.value = true
     title.value = '添加'
@@ -234,33 +269,6 @@
     }
     return true
   }
-  //dialog对话框状态选项
-  const statusOptions = [
-    {
-      value: 0,
-      label: '已停用',
-    },
-    {
-      value: 1,
-      label: '正常',
-    },
-    {
-      value: 2,
-      label: '请假',
-    },
-    {
-      value: 3,
-      label: '退住中',
-    },
-    {
-      value: 4,
-      label: '入住中',
-    },
-    {
-      value: 5,
-      label: '已退住',
-    },
-  ]
 
   //对话框dialog输入规则校验
   const dialogRules = {
@@ -280,7 +288,6 @@
       {min: 11, max: 11, message: '手机号格式错误', trigger: 'blur'}
     ]
   }
-
 </script>
 
 <template>
@@ -422,9 +429,9 @@
   </el-dialog>
 
   <!-- 标注标签弹出对话框dialog -->
-  <el-dialog title="标注标签" v-model="dialogTagsVisible" width="40%">
+  <el-dialog title="标签标注" v-model="dialogTagsVisible" width="40%">
     <el-form ref="form" :model="elder" label-width="80px">
-      <el-form-item label="用户名">
+      <el-form-item label="姓名">
         <el-input v-model="elder.name" disabled></el-input>
       </el-form-item>
       <el-form-item label="标注列表">
@@ -475,5 +482,4 @@
     font-size: 12px;      /* 小字 */
     color: #999;          /* 灰色 */
   }
-
 </style>

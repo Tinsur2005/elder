@@ -337,23 +337,27 @@
   <el-card class="">
     <template #header>
       <div class="header">
-        <el-button type="primary" :icon="Plus" @click="showAddDialog">添加</el-button>
-        <el-button type="danger" :icon="Delete" @click="deleteAll">批量删除</el-button>
-        <el-button type="primary" :icon="Download" @click="exportExcel">导出Excel</el-button>
-        <el-upload
-            :icon="Upload"
-            class="inline-block"
-            multiple=""
-            method="post"
-            action="/api/elders/importExcel"
-            style="display:inline-block;margin-left: 12px"
-            accept=".xlsx,.xls"
-            :show-file-list="false"
-            :on-success="importExcelSuccess"
-            :headers="{Authorization: tokenStore.token}"
-            name="file">
-          <el-button type="primary" :icon="Upload">导入Excel</el-button>
-        </el-upload>
+        <div class="header-left">
+          <el-button type="primary" :icon="Plus" @click="showAddDialog">添加</el-button>
+          <el-button type="danger" :icon="Delete" @click="deleteAll">批量删除</el-button>
+        </div>
+        <div class="header-right">
+          <el-button type="primary" :icon="Download" @click="exportExcel">导出Excel</el-button>
+          <el-upload
+              :icon="Upload"
+              class="inline-block"
+              multiple=""
+              method="post"
+              action="/api/elders/importExcel"
+              style="display:inline-block;margin-left: 12px"
+              accept=".xlsx,.xls"
+              :show-file-list="false"
+              :on-success="importExcelSuccess"
+              :headers="{Authorization: tokenStore.token}"
+              name="file">
+            <el-button type="primary" :icon="Upload">导入Excel</el-button>
+          </el-upload>
+        </div>
       </div>
     </template>
     <!--模糊查找-->
@@ -519,6 +523,13 @@
 
 <style scoped>
   .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .header-left,
+  .header-right {
     display: flex;
     align-items: center;
   }

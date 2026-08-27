@@ -17,7 +17,7 @@ public class UserExcelVO {
     /**
      * 姓名
      */
-    @ExcelProperty(value = "姓名")
+    @ExcelProperty(value = "用户名")
     private String name;
 
     /**
@@ -25,6 +25,12 @@ public class UserExcelVO {
      */
     @ExcelProperty(value = "密码哈希")
     private String password;
+
+    /**
+     * 真实姓名
+     */
+    @ExcelProperty(value = "姓名")
+    private String realName;
 
     /**
      * 手机号

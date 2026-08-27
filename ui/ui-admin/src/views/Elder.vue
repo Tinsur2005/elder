@@ -325,7 +325,11 @@
     phone: [
       {required: true, message: '请输入手机号', trigger: 'blur'},
       {min: 11, max: 11, message: '手机号格式错误', trigger: 'blur'}
-    ]
+    ],
+    realName: [
+      {required: true, message: '请输入姓名', trigger: 'blur'},
+      {min: 2, max: 16, message: '长度在 2 到 16 个字符', trigger: 'blur'}
+    ],
   }
 </script>
 
@@ -382,7 +386,7 @@
           <img :src="row.avatar" style="max-height: 40px; max-width: 40px;"/>
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="用户名" width="100" :show-overflow-tooltip="true"/>
+      <el-table-column prop="realName" label="姓名" width="100" :show-overflow-tooltip="true"/>
       <el-table-column prop="phone" label="电话" :show-overflow-tooltip="true" width="115"/>
       <el-table-column prop="idCardNo" label="身份证号" :show-overflow-tooltip="true" width="175"/>
       <el-table-column prop="address" label="地址" :show-overflow-tooltip="true" width="300"/>
@@ -448,6 +452,9 @@
       </el-form-item>
       <el-form-item prop="password" label="密码" :label-width="80">
         <el-input v-model="elder.password" autocomplete="off" show-password type="password"/>
+      </el-form-item>
+      <el-form-item prop="realName" label="姓名" :label-width="80">
+        <el-input v-model="elder.realName" autocomplete="off"/>
       </el-form-item>
       <el-form-item prop="phone" label="手机号" :label-width="80">
         <el-input v-model="elder.phone" autocomplete="off"/>

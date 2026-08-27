@@ -85,11 +85,7 @@ public class UserController {
      */
     @PostMapping
     public Result add(@RequestBody User user) {
-        if(isExists(user.getName())) {
-            return Result.error("已有同名用户存在，请修改姓名后重试");
-        }
-        userService.save(user);
-        return Result.ok("新增成功");
+        return userService.add(user);
     }
 
     /**
@@ -121,15 +117,6 @@ public class UserController {
     public Result deleteBatch(@RequestBody Long[] ids) {
         userService.removeByIds(java.util.Arrays.asList(ids));
         return Result.ok("批量删除成功");
-    }
-
-    /**
-     * 判断用户是否存在
-     */
-    @GetMapping("/isExists")
-    public Boolean isExists(@RequestParam String name) {
-        User user = userService.getOne(new QueryWrapper<User>().eq("name", name));
-        return user != null;
     }
 
     /**
@@ -181,4 +168,3 @@ public class UserController {
         return Result.ok("导入成功");
     }
 }
-

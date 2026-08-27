@@ -293,6 +293,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="name" label="用户名" width="100" :show-overflow-tooltip="true"/>
+      <el-table-column prop="realName" label="姓名" width="100" :show-overflow-tooltip="true"/>
       <!--<el-table-column prop="password" label="密码"/>-->
       <el-table-column prop="phone" label="电话" :show-overflow-tooltip="true"/>
       <el-table-column prop="email" label="邮箱" :show-overflow-tooltip="true"/>
@@ -356,6 +357,9 @@
       </el-form-item>
       <el-form-item label="密码" :label-width="60">
         <el-input v-model="user.password" autocomplete="off" show-password="true" type="password"/>
+      </el-form-item>
+      <el-form-item label="姓名" :label-width="60">
+        <el-input v-model="user.realName" autocomplete="off"/>
       </el-form-item>
       <el-form-item label="邮箱" :label-width="60">
         <el-input v-model="user.email" autocomplete="off"/>

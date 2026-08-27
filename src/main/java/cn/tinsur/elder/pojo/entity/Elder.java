@@ -11,6 +11,7 @@ public class Elder {
     private Long id;
     private String name;
     private String password;
+    private String realName;
     private String avatar;
     private String idCardNo;
     private int status;

@@ -17,7 +17,7 @@ public class ElderExcelVO {
     /**
      * 姓名
      */
-    @ExcelProperty(value = "姓名")
+    @ExcelProperty(value = "用户名")
     private String name;
 
     /**
@@ -26,6 +26,8 @@ public class ElderExcelVO {
     @ExcelProperty(value = "密码哈希")
     private String password;
 
+    @ExcelProperty(value = "姓名")
+    private String realName;
     /**
      * 头像URL
      */

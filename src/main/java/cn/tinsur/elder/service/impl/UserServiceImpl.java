@@ -1,5 +1,6 @@
 package cn.tinsur.elder.service.impl;
 
+import cn.tinsur.elder.exception.ServiceException;
 import cn.tinsur.elder.listener.UserExcelListener;
 import cn.tinsur.elder.pojo.entity.User;
 import cn.tinsur.elder.mapper.UserMapper;
@@ -7,8 +8,10 @@ import cn.tinsur.elder.pojo.query.UserQuery;
 import cn.tinsur.elder.pojo.vo.UserExcelVO;
 import cn.tinsur.elder.service.IUserService;
 import cn.tinsur.elder.util.ExcelUtil;
+import cn.tinsur.elder.util.Result;
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -17,6 +20,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -68,5 +73,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             throw new RuntimeException(e);
         }
 
+    }
+
+    /**
+     * 判断用户是否存在
+     */
+    public Boolean isExists(@RequestParam String name) {
+        User user = userMapper.selectOne(new QueryWrapper<User>().eq("name", name));
+        return user != null;
+    }
+
+    @Override
+    public Result add(User user) {
+        if(isExists(user.getName())) {
+            throw new ServiceException("用户名已存在，换一个用户名试试吧");
+        }
+        userMapper.insert(user);
+        return Result.ok("新增成功");
     }
 }

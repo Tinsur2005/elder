@@ -10,6 +10,7 @@ import cn.tinsur.elder.service.IUserService;
 import cn.tinsur.elder.util.ExcelUtil;
 import cn.tinsur.elder.util.Result;
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.exception.ExcelDataConvertException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -18,13 +19,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -54,6 +54,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return userMapper.selectPage(page, lambdaQueryWrapper);
     }
 
+    /**
+     * 导出用户信息
+     * @param response
+     */
     @Override
     public void exportExcel(HttpServletResponse response) {
         List<User> list = userMapper.selectList(null); //写null则查出所有用户
@@ -65,12 +69,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         ExcelUtil.exportExcel(response, userExcelVOList, UserExcelVO.class, "用户信息表");
     }
 
+    /**
+     * 导入用户信息
+     * @param file
+     */
     @Override
     public void importExcel(MultipartFile file) {
         try {
             EasyExcel.read(file.getInputStream(), UserExcelVO.class, new UserExcelListener(userMapper)).sheet().doRead();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (ExcelDataConvertException e) {
+            //单元格类型解析失败，属于格式问题
+            throw new ServiceException("导入失败：Excel格式有误，请使用导出的模板文件");
+        } catch (DataIntegrityViolationException e) {
+            //数据写入数据库时发生约束冲突，属于数据冲突
+            throw new ServiceException("导入失败：数据冲突，存在重复或不符合字段要求的数据");
+        } catch (Exception e) {
+            throw new ServiceException("导入失败，请检查文件内容后重试");
         }
 
     }

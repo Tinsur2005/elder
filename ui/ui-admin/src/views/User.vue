@@ -261,6 +261,8 @@
     if (result.code ==1) {
       ElMessage.success(result.msg)
       loadData()
+    } else {
+      ElMessage.error(result.msg)
     }
   }
 </script>

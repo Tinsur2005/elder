@@ -329,6 +329,7 @@
     />
   </el-card>
 
+
   <!--添加、编辑弹出框-->
   <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false" :close-on-click-modal="false">
     <el-form :model="user">
@@ -336,7 +337,6 @@
         <el-upload
             class="avatar-uploader"
             action="/api/upload"
-            accept=".jpg,.jpeg,.png,.webp"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
@@ -377,11 +377,6 @@
 
 
 <style scoped>
-  .header {
-    display: flex;
-    align-items: center;
-  }
-
   .avatar-uploader .avatar {
     width: 178px;
     height: 178px;

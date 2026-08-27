@@ -4,6 +4,8 @@ import cn.tinsur.elder.pojo.entity.User;
 import cn.tinsur.elder.pojo.query.UserQuery;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * <p>
@@ -16,4 +18,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface IUserService extends IService<User> {
 
     IPage<User> list(UserQuery userQuery);
+
+    void exportExcel(HttpServletResponse response);
+
+    void importExcel(MultipartFile file);
 }

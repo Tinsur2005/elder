@@ -30,6 +30,15 @@ const userApi = {
     resetPassword(userPasswordDTO) {
         return request.put(`/users/resetPassword`, userPasswordDTO)
     },
+    exportExcel() {
+        return request({
+            url: `/users/exportExcel`,
+            method: 'get',
+            //XMLHttpRequest 属性 responseType 是一个枚举字符串值，用于指定响应中包含的数据类型。
+            //"blob": response 是一个包含二进制数据的 Blob 对象。
+            responseType: 'blob'
+        })
+    }
 }
 
 export default  userApi

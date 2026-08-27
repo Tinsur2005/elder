@@ -26,6 +26,10 @@ request.interceptors.request.use(
 //添加响应的拦截器
 request.interceptors.response.use(
     response => {
+        //blob 响应(如 excel 导出)需要读取响应头里的文件名,返回完整 response ，而不是解析成json
+        if (response.config.responseType === 'blob') {
+            return response;
+        }
         //返回result
         return response.data
     },

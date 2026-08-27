@@ -1,16 +1,26 @@
 package cn.tinsur.elder.service.impl;
 
+import cn.tinsur.elder.listener.UserExcelListener;
 import cn.tinsur.elder.pojo.entity.User;
 import cn.tinsur.elder.mapper.UserMapper;
 import cn.tinsur.elder.pojo.query.UserQuery;
+import cn.tinsur.elder.pojo.vo.UserExcelVO;
 import cn.tinsur.elder.service.IUserService;
+import cn.tinsur.elder.util.ExcelUtil;
+import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * <p>
@@ -37,5 +47,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         userQuery.getEndCreateTime())
                 .orderByDesc(User::getCreateTime);
         return userMapper.selectPage(page, lambdaQueryWrapper);
+    }
+
+    @Override
+    public void exportExcel(HttpServletResponse response) {
+        List<User> list = userMapper.selectList(null); //写null则查出所有用户
+        List<UserExcelVO> userExcelVOList = list.stream().map(user -> {
+            UserExcelVO userExcelVO = new UserExcelVO();
+            BeanUtils.copyProperties(user, userExcelVO);
+            return userExcelVO;
+        }).toList();
+        ExcelUtil.exportExcel(response, userExcelVOList, UserExcelVO.class, "用户信息表");
+    }
+
+    @Override
+    public void importExcel(MultipartFile file) {
+        try {
+            EasyExcel.read(file.getInputStream(), UserExcelVO.class, new UserExcelListener(userMapper)).sheet().doRead();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }

@@ -3,6 +3,7 @@
   import {ref} from "vue"
   import {ElMessage, ElMessageBox} from "element-plus"
   import {Plus, EditPen, Delete} from '@element-plus/icons-vue'
+  import IconPicker from "@/components/IconPicker.vue";
 
   // ========== 变量 ==========
   //保存返回树形结构数据，List<PermissionVO>
@@ -54,7 +55,7 @@
   //根据行数据打开添加子菜单对话框（传row为添加下级，不传为添加顶级菜单）
   const showAddDialog = (row) => {
     dialogFormVisible.value = true
-    permission.value = {}
+    permission.value = {sort: 0} //排序默认0
     title.value = '添加下级菜单'
 
     if (row) {//点击右侧添加按钮
@@ -127,11 +128,9 @@
     </template>
     <el-table :data="list" style="width: 100%; margin-bottom: 20px" row-key="id" border>
     <el-table-column prop="name" label="名称"/>
-    <el-table-column prop="icon" width="80px" label="图标">
-      <template #default="{row}">
+      <el-table-column prop="icon" width="80px" label="图标" #default="{row}">
         <el-icon><component :is="row.icon" /></el-icon>
-      </template>
-    </el-table-column>
+      </el-table-column>
     <el-table-column prop="type" label="权限类型">
       <template #default="{row}">
         <el-tag v-if="row.type == 0">目录权限</el-tag>
@@ -154,28 +153,31 @@
   <!-- 添加、修改的dialog -->
   <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false">
     <el-form :model="permission" label-width="80px">
-      <el-form-item label="上级权限">
+      <el-form-item label="上级权限" v-if="!permission.id">
         <el-input v-model="permission.parentName" :disabled="true"></el-input>
       </el-form-item>
       <el-form-item label="权限类型">
-        <el-radio-group v-model="permission.type" :disabled="typeDisabled">
+        <el-radio-group v-model="permission.type" :disabled="typeDisabled || !!permission.id">
           <el-radio :label="0" :disabled="type0Disabled">目录</el-radio>
           <el-radio :label="1" :disabled="type1Disabled">菜单</el-radio>
           <el-radio :label="2" :disabled="type2Disabled">按钮</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="权限名字">
+      <el-form-item label="权限名称">
         <el-input v-model="permission.name"></el-input>
       </el-form-item>
       <el-form-item label="图标" v-if="permission.type == 0 || permission.type === 1">
-        <el-input v-model="permission.icon"></el-input>
+        <IconPicker width="100px" v-model="permission.icon"></IconPicker>
       </el-form-item>
       <el-form-item label="排序">
-        <el-input-number
-            v-model="permission.sort"
-            controls-position="right"
-            :min="0"
-        />
+        <div class="sort-field">
+          <el-input-number
+              v-model="permission.sort"
+              controls-position="right"
+              :min="0"
+          />
+          <div class="sort-tips">数字越小越靠前</div>
+        </div>
       </el-form-item>
       <el-form-item label="路由地址" v-if="permission.type === 1">
         <el-input v-model="permission.path"/>
@@ -210,5 +212,16 @@
   .header-right {
     display: flex;
     align-items: center;
+  }
+
+  .sort-field {
+    display: flex;
+    align-items: center;
+  }
+
+  .sort-tips {
+    font-size: 12px;      /* 小字 */
+    color: #999;          /* 灰色 */
+    margin-left: 10px;    /* 与输入框保持间距 */
   }
 </style>

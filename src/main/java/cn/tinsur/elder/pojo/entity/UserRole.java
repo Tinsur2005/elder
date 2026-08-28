@@ -1,9 +1,10 @@
-package cn.tinsur.elder.pojo.vo;
+package cn.tinsur.elder.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
@@ -11,34 +12,34 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 老人-标签关联表
+ * 员工-角色关联表
  * </p>
  *
  * @author Tinsur
- * @since 2026-08-26
+ * @since 2026-08-27
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ElderTag implements Serializable {
+public class UserRole implements Serializable {
 
 
     /**
-     * 主键
+     * 主键id
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 老人ID
+     * 角色id
      */
-    @TableField("elder_id")
-    private Long elderId;
+    @TableField("role_id")
+    private Long roleId;
 
     /**
-     * 标签ID
+     * 用户id
      */
-    @TableField("tag_id")
-    private Long tagId;
+    @TableField("user_id")
+    private Long userId;
 
     /**
      * 创建时间

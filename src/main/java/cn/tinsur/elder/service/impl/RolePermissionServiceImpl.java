@@ -1,6 +1,6 @@
 package cn.tinsur.elder.service.impl;
 
-import cn.tinsur.elder.pojo.vo.RolePermission;
+import cn.tinsur.elder.pojo.entity.RolePermission;
 import cn.tinsur.elder.mapper.RolePermissionMapper;
 import cn.tinsur.elder.service.IRolePermissionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;

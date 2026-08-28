@@ -1,6 +1,6 @@
 package cn.tinsur.elder.mapper;
 
-import cn.tinsur.elder.pojo.vo.ElderTag;
+import cn.tinsur.elder.pojo.entity.ElderTag;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

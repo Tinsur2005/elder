@@ -1,4 +1,4 @@
-package cn.tinsur.elder.pojo.vo;
+package cn.tinsur.elder.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -12,34 +12,31 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 员工-角色关联表
+ * 角色权限表
  * </p>
  *
  * @author Tinsur
- * @since 2026-08-27
+ * @since 2026-08-28
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class UserRole implements Serializable {
+public class RolePermission implements Serializable {
 
 
-    /**
-     * 主键id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    /**
-     * 角色id
-     */
     @TableField("role_id")
     private Long roleId;
 
+    @TableField("permission_id")
+    private Long permissionId;
+
     /**
-     * 用户id
+     * 逻辑删除 0（true）未删除， 1（false）已删除
      */
-    @TableField("user_id")
-    private Long userId;
+    @TableLogic
+    private Integer deleted;
 
     /**
      * 创建时间

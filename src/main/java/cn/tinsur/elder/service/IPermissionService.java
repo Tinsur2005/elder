@@ -1,7 +1,11 @@
 package cn.tinsur.elder.service;
 
 import cn.tinsur.elder.pojo.entity.Permission;
+import cn.tinsur.elder.pojo.vo.PermissionVO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 /**
  * <p>
@@ -12,5 +16,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2026-08-28
  */
 public interface IPermissionService extends IService<Permission> {
-
+    List<PermissionVO> selectPermissionTree();
 }

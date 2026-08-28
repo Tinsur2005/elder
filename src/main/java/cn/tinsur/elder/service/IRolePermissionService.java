@@ -1,6 +1,6 @@
 package cn.tinsur.elder.service;
 
-import cn.tinsur.elder.pojo.vo.RolePermission;
+import cn.tinsur.elder.pojo.entity.RolePermission;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

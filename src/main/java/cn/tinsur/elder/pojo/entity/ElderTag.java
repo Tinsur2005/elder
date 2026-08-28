@@ -1,10 +1,9 @@
-package cn.tinsur.elder.pojo.vo;
+package cn.tinsur.elder.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
@@ -12,31 +11,34 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 角色权限表
+ * 老人-标签关联表
  * </p>
  *
  * @author Tinsur
- * @since 2026-08-28
+ * @since 2026-08-26
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class RolePermission implements Serializable {
+public class ElderTag implements Serializable {
 
 
+    /**
+     * 主键
+     */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @TableField("role_id")
-    private Long roleId;
-
-    @TableField("permission_id")
-    private Long permissionId;
+    /**
+     * 老人ID
+     */
+    @TableField("elder_id")
+    private Long elderId;
 
     /**
-     * 逻辑删除 0（true）未删除， 1（false）已删除
+     * 标签ID
      */
-    @TableLogic
-    private Integer deleted;
+    @TableField("tag_id")
+    private Long tagId;
 
     /**
      * 创建时间

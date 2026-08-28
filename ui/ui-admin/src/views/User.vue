@@ -445,10 +445,10 @@
 
 
   <!-- 标角色编辑弹出对话框dialog -->
-  <el-dialog title="角色设置" v-model="dialogRolesVisible" width="40%" :show-close="false">
+  <el-dialog title="角色设置" v-model="dialogRolesVisible" width="40%" :close-on-click-modal="false">
     <el-form ref="form" :model="user" label-width="80px">
-      <el-form-item label="用户名">
-        <el-input v-model="user.name" disabled></el-input>
+      <el-form-item label="姓名">
+        <el-input v-model="user.realName" disabled></el-input>
       </el-form-item>
       <el-form-item label="角色列表">
         <el-checkbox-group v-model="userRolesList">

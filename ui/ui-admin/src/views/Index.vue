@@ -296,6 +296,9 @@
       <el-form-item label="用户名" :label-width="60">
         <el-input v-model="user.name" autocomplete="off" :disabled="user.id"/>
       </el-form-item>
+      <el-form-item label="姓名" :label-width="60">
+        <el-input v-model="user.realName" autocomplete="off"/>
+      </el-form-item>
       <el-form-item label="邮箱" :label-width="60">
         <el-input v-model="user.email" autocomplete="off"/>
       </el-form-item>

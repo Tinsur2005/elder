@@ -504,10 +504,10 @@
   </el-dialog>
 
   <!-- 标注标签弹出对话框dialog -->
-  <el-dialog title="标签标注" v-model="dialogTagsVisible" width="40%" :show-close="false">
+  <el-dialog title="标签标注" v-model="dialogTagsVisible" width="40%" :close-on-click-modal="false">
     <el-form ref="form" :model="elder" label-width="80px">
-      <el-form-item label="用户名">
-        <el-input v-model="elder.name" disabled></el-input>
+      <el-form-item label="姓名">
+        <el-input v-model="elder.realName" disabled></el-input>
       </el-form-item>
       <el-form-item label="标注列表">
         <el-checkbox-group v-model="elderTagsList">

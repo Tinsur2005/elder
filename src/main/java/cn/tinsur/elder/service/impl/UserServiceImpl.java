@@ -7,7 +7,6 @@ import cn.tinsur.elder.pojo.entity.Role;
 import cn.tinsur.elder.pojo.entity.User;
 import cn.tinsur.elder.mapper.UserMapper;
 import cn.tinsur.elder.pojo.query.UserQuery;
-import cn.tinsur.elder.pojo.vo.ElderTag;
 import cn.tinsur.elder.pojo.vo.UserExcelVO;
 import cn.tinsur.elder.pojo.vo.UserRole;
 import cn.tinsur.elder.service.IUserService;

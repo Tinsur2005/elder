@@ -1,6 +1,6 @@
 <script setup>
   import userApi from '@/api/user.js'
-  import {ref} from 'vue'
+  import {nextTick, ref} from 'vue'
   import {ElMessage, ElMessageBox} from 'element-plus'
   import {
     Delete,
@@ -143,12 +143,20 @@
     dialogFormVisible.value = true
     title.value = '添加'
     user.value = {}
+    //清空上一次窗口残留的校验错误，避免红字带到新窗口里
+    nextTick(() => {
+      formRef.value?.clearValidate()
+    })
   }
 
   const showUpdateDialog = (id) => {
     dialogFormVisible.value = true
     title.value = '编辑'
     user.value = {}
+    //清空上一次窗口残留的校验错误，避免红字带到新窗口里
+    nextTick(() => {
+      formRef.value?.clearValidate()
+    })
     userApi.selectById(id).then(result => {
       user.value = result.data
     })

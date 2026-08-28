@@ -1,6 +1,6 @@
 <script setup>
   import tagsApi from '@/api/tags.js'
-  import {ref} from 'vue'
+  import {nextTick, ref} from 'vue'
   import {ElMessage, ElMessageBox} from 'element-plus'
   import {Delete, EditPen, Plus} from "@element-plus/icons-vue";
 
@@ -112,12 +112,20 @@
     dialogFormVisible.value = true
     title.value = '添加'
     tag.value = {}
+    //清空上一次窗口残留的校验错误，避免红字带到新窗口里
+    nextTick(() => {
+      formRef.value?.clearValidate()
+    })
   }
 
   const showUpdateDialog = (id) => {
     dialogFormVisible.value = true
     title.value = '编辑'
     tag.value = {}
+    //清空上一次窗口残留的校验错误，避免红字带到新窗口里
+    nextTick(() => {
+      formRef.value?.clearValidate()
+    })
     tagsApi.selectById(id).then(result => {
       tag.value = result.data
     })

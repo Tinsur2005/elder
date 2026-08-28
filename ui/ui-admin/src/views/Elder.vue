@@ -1,7 +1,7 @@
 <script setup>
   import elderApi from '@/api/elder.js'
   import tagsApi from '@/api/tags.js'
-  import {ref} from 'vue'
+  import {nextTick, ref} from 'vue'
   import {ElMessage, ElMessageBox} from 'element-plus'
   import {Plus, Download, Upload, Delete, EditPen, PriceTag} from '@element-plus/icons-vue'
   import {useTokenStore} from '@/store/token.js'
@@ -200,12 +200,20 @@
     dialogFormVisible.value = true
     title.value = '添加'
     elder.value = {}
+    //清空上一次窗口残留的校验错误，避免红字带到新窗口里
+    nextTick(() => {
+      formRef.value?.clearValidate()
+    })
   }
 
   const showUpdateDialog = (id) => {
     dialogFormVisible.value = true
     title.value = '编辑'
     elder.value = {}
+    //清空上一次窗口残留的校验错误，避免红字带到新窗口里
+    nextTick(() => {
+      formRef.value?.clearValidate()
+    })
     elderApi.selectById(id).then(result => {
       elder.value = result.data
     })

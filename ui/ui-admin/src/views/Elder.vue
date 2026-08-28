@@ -397,9 +397,7 @@
       <!--<el-table-column fixed prop="id" label="ID"/>-->
       <el-table-column prop="avatar" label="头像" width="70">
         <template #default="{row}">
-          <el-avatar
-              :src="row.avatar" style="max-height: 40px; max-width: 40px;"
-          />
+          <img :src="row.avatar" style="max-height: 40px; max-width: 40px;"/>
         </template>
       </el-table-column>
       <el-table-column prop="realName" label="姓名" width="100" :show-overflow-tooltip="true"/>

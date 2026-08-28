@@ -189,12 +189,6 @@
       <!-- element-plus的菜单标签 -->
       <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff"
                router>
-        <el-menu-item index="/user">
-          <el-icon>
-            <Management/>
-          </el-icon>
-          <span>用户管理</span>
-        </el-menu-item>
         <el-menu-item index="/elder">
           <el-icon>
             <Promotion/>
@@ -207,36 +201,30 @@
           </el-icon>
           <span>标签管理</span>
         </el-menu-item>
-        <el-menu-item index="/role">
-          <el-icon>
-            <SetUp/>
-          </el-icon>
-          <span>角色管理</span>
-        </el-menu-item>
         <el-sub-menu index="1">
           <template #title>
             <el-icon>
               <UserFilled/>
             </el-icon>
-            <span>个人中心</span>
+            <span>用户与权限</span>
           </template>
-          <el-menu-item index="/user/info">
+          <el-menu-item index="/user">
             <el-icon>
               <User/>
             </el-icon>
-            <span>基本资料</span>
+            <span>用户管理</span>
           </el-menu-item>
-          <el-menu-item index="/user/avatar">
+          <el-menu-item index="/role">
             <el-icon>
               <Crop/>
             </el-icon>
-            <span>更换头像</span>
+            <span>角色管理</span>
           </el-menu-item>
-          <el-menu-item index="/user/resetPassword">
+          <el-menu-item index="/permission">
             <el-icon>
               <EditPen/>
             </el-icon>
-            <span>重置密码</span>
+            <span>权限管理</span>
           </el-menu-item>
         </el-sub-menu>
       </el-menu>

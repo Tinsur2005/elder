@@ -42,12 +42,6 @@ public class UserRole implements Serializable {
     private Long userId;
 
     /**
-     * 逻辑删除 0（true）未删除， 1（false）已删除
-     */
-    @TableLogic
-    private Integer deleted;
-
-    /**
      * 创建时间
      */
     @TableField(value = "create_time", fill = FieldFill.INSERT)

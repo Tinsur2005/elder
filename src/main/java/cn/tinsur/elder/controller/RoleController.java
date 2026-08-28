@@ -1,13 +1,13 @@
 package cn.tinsur.elder.controller;
 
 
-import cn.tinsur.elder.mapper.RoleMapper;
 import cn.tinsur.elder.pojo.entity.Role;
+import cn.tinsur.elder.pojo.query.RoleQuery;
+import cn.tinsur.elder.service.IRoleService;
 import cn.tinsur.elder.util.Result;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,17 +22,88 @@ import java.util.List;
 @RestController
 @RequestMapping("/roles")
 public class RoleController {
-
     @Autowired
-    private RoleMapper roleMapper;
+    private IRoleService roleService;
 
     /**
-     * 查询所有角色（供用户弹窗勾选角色时展示）
+     * 获取全部角色列表List
+     * @return
      */
     @GetMapping("/list")
     public Result<List<Role>> list() {
-        List<Role> roles = roleMapper.selectList(null); //写null则查出所有角色
-        return Result.ok(roles);
+        List<Role> list = roleService.list();
+        return Result.ok(list);
     }
 
+    /**
+     * 分页查询角色列表
+     * GET /roles?page=1&limit=10&name=xxx&code=xxx
+     */
+    @GetMapping
+    public Result<IPage<Role>> pageList(RoleQuery roleQuery) {
+        IPage<Role> page = roleService.list(roleQuery);
+        return Result.ok(page);
+    }
+
+    /**
+     * 根据ID查询角色
+     * GET /roles/1
+     */
+    @GetMapping("/{id}")
+    public Result getById(@PathVariable Long id) {
+        return Result.ok(roleService.getById(id));
+    }
+
+    /**
+     * 新增角色
+     * POST /roles
+     */
+    @PostMapping
+    public Result add(@RequestBody Role role) {
+        if(isExists(role.getName())) {
+            return Result.error("已有同名称的角色存在，请修改后重试");
+        }
+        roleService.save(role);
+        return Result.ok("新增成功");
+    }
+
+    /**
+     * 修改角色
+     * PUT /roles/1
+     */
+    @PutMapping("/{id}")
+    public Result update(@PathVariable Long id, @RequestBody Role role) {
+        role.setId(id);
+        roleService.updateById(role);
+        return Result.ok("修改成功");
+    }
+
+    /**
+     * 根据ID删除角色（逻辑删除）
+     * DELETE /roles/1
+     */
+    @DeleteMapping("/{id}")
+    public Result delete(@PathVariable Long id) {
+        roleService.removeById(id);
+        return Result.ok("删除成功");
+    }
+
+    /**
+     * 批量删除角色
+     * DELETE /roles
+     */
+    @DeleteMapping
+    public Result deleteBatch(@RequestBody Long[] ids) {
+        roleService.removeByIds(java.util.Arrays.asList(ids));
+        return Result.ok("批量删除成功");
+    }
+
+    /**
+     * 判断角色是否存在
+     */
+    @GetMapping("/isExists")
+    public Boolean isExists(@RequestParam String name) {
+        Role role = roleService.getOne(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<Role>().eq("name", name));
+        return role != null;
+    }
 }

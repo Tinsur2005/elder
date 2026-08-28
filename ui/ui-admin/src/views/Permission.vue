@@ -52,6 +52,22 @@
     })
   }
 
+  //根据id更新状态（0：禁止，1：正常）
+  const handleSwitchChange = (row) => {
+    permissionApi.update(row).then(result => {
+      if (result.code === 1) {
+        if (row.status === 1) {
+          ElMessage.success('已启用')
+        } else {
+          ElMessage.info('已禁用')
+        }
+      } else {
+        ElMessage.error(result.msg)
+        loadData() //失败则重新加载还原
+      }
+    })
+  }
+
   //根据行数据打开添加子菜单对话框（传row为添加下级，不传为添加顶级菜单）
   const showAddDialog = (row) => {
     dialogFormVisible.value = true
@@ -141,6 +157,20 @@
     <el-table-column prop="path" label="路由地址"></el-table-column>
     <el-table-column prop="permissionValue" label="按钮权限"></el-table-column>
     <el-table-column prop="sort" label="排序"></el-table-column>
+    <el-table-column prop="status" label="状态" width="100">
+      <template #default="{row}">
+        <el-switch
+            v-model="row.status"
+            :active-value="1"
+            :inactive-value="0"
+            inline-prompt
+            style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
+            active-text="已启用"
+            inactive-text="已禁用"
+            @change="handleSwitchChange(row)"
+        />
+      </template>
+    </el-table-column>
     <el-table-column label="操作" align="center" width="250px" fixed="right">
       <template #default="{row}">
         <el-button size="small" type="success" :icon="Plus" @click="showAddDialog(row)" :disabled="row.type == 2">添加</el-button>

@@ -68,7 +68,7 @@
         if(row.status === 1) {
           ElMessage.success("已启用")
         } else {
-          ElMessage.primary("已禁用")
+          ElMessage.info("已禁用")
         }
       } else {
         ElMessage.error(result.msg)

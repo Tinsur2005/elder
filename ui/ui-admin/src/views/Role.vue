@@ -123,32 +123,50 @@
     })
   }
 
+  const formRef = ref()
+  //对话框dialog输入规则校验
+  const dialogRules = {
+    name: [
+      {required: true, message: '请输入角色名称', trigger: 'blur'},
+      {min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur'}
+    ],
+    code: [
+      {required: true, message: '请输入角色编码', trigger: 'blur'},
+      {min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur'}
+    ]
+  }
+
   const addOrUpdate = () => {
-    if(!role.value.name || !role.value.code) {
-      ElMessage.error('角色名称和角色编码不允许为空');
-      return
-    }
-    if (role.value.id) {//编辑
-      rolesApi.update(role.value.id, role.value).then(result => {
-        if (result.code === 1) {
-          ElMessage.success(result.msg)
-          dialogFormVisible.value = false
-          loadData()
-        } else {
-          ElMessage.error(result.msg)
-        }
-      })
-    } else {//添加
-      rolesApi.add(role.value).then(result => {
-        if (result.code === 1) {
-          ElMessage.success(result.msg)
-          dialogFormVisible.value = false
-          loadData()
-        } else {
-          ElMessage.error(result.msg)
-        }
-      })
-    }
+    // 执行表单整体校验，校验不通过则不提交
+    formRef.value.validate()
+        .then(() => {
+          //校验通过，执行新增/编辑接口
+          if (role.value.id) {//编辑
+            rolesApi.update(role.value.id, role.value).then(result => {
+              if (result.code === 1) {
+                ElMessage.success(result.msg)
+                dialogFormVisible.value = false
+                loadData()
+              } else {
+                ElMessage.error(result.msg)
+              }
+            })
+          } else {//添加
+            rolesApi.add(role.value).then(result => {
+              if (result.code === 1) {
+                ElMessage.success(result.msg)
+                dialogFormVisible.value = false
+                loadData()
+              } else {
+                ElMessage.error(result.msg)
+              }
+            })
+          }
+        })
+        .catch(() => {
+          //校验失败
+          ElMessage.error('请检查表单填写是否正确')
+        })
   }
 
 </script>
@@ -213,11 +231,11 @@
 
   <!--添加、编辑弹出框-->
   <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false" :close-on-click-modal="false">
-    <el-form :model="role">
-      <el-form-item label="角色名称" :label-width="80">
+    <el-form ref="formRef" :model="role" :rules="dialogRules">
+      <el-form-item prop="name" label="角色名称" :label-width="80">
         <el-input v-model="role.name" autocomplete="off"/>
       </el-form-item>
-      <el-form-item label="角色编码" :label-width="80">
+      <el-form-item prop="code" label="角色编码" :label-width="80">
         <el-input v-model="role.code" autocomplete="off"/>
       </el-form-item>
       <el-form-item label="角色描述" :label-width="80">

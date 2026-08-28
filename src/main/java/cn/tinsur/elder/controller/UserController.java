@@ -5,6 +5,7 @@ import cn.tinsur.elder.pojo.entity.Role;
 import cn.tinsur.elder.pojo.dto.UserPasswordDTO;
 import cn.tinsur.elder.pojo.entity.User;
 import cn.tinsur.elder.pojo.query.UserQuery;
+import cn.tinsur.elder.pojo.vo.UserVO;
 import cn.tinsur.elder.service.IUserService;
 import cn.tinsur.elder.util.JwtUtil;
 import cn.tinsur.elder.util.Result;
@@ -66,8 +67,8 @@ public class UserController {
      * GET /users?page=1&limit=10&name=xxx&phone=xxx
      */
     @GetMapping
-    public Result<IPage<User>> list(UserQuery userQuery) {
-        IPage<User> page = userService.list(userQuery);
+    public Result<IPage<UserVO>> list(UserQuery userQuery) {
+        IPage<UserVO> page = userService.list(userQuery);
         return Result.ok(page);
     }
 

@@ -359,6 +359,14 @@
       <el-table-column prop="name" label="用户名" width="100" :show-overflow-tooltip="true"/>
       <el-table-column prop="realName" label="姓名" width="100" :show-overflow-tooltip="true"/>
       <!--<el-table-column prop="password" label="密码"/>-->
+      <el-table-column label="角色" min-width="50">
+        <template #default="{row}">
+          <el-tag v-for="role in row.roles" :key="role.id" type="primary"
+                  style="margin-right: 4px">
+            {{ role.name }}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="phone" label="电话" :show-overflow-tooltip="true"/>
       <el-table-column prop="email" label="邮箱" :show-overflow-tooltip="true"/>
       <el-table-column prop="status" label="状态" width="100">

@@ -3,6 +3,7 @@ package cn.tinsur.elder.service;
 import cn.tinsur.elder.pojo.entity.Role;
 import cn.tinsur.elder.pojo.entity.User;
 import cn.tinsur.elder.pojo.query.UserQuery;
+import cn.tinsur.elder.pojo.vo.UserVO;
 import cn.tinsur.elder.util.Result;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 public interface IUserService extends IService<User> {
 
-    IPage<User> list(UserQuery userQuery);
+    IPage<UserVO> list(UserQuery userQuery);
 
     void exportExcel(HttpServletResponse response);
 

@@ -2,6 +2,7 @@ package cn.tinsur.elder.service.impl;
 
 import cn.tinsur.elder.exception.ServiceException;
 import cn.tinsur.elder.listener.UserExcelListener;
+import cn.tinsur.elder.mapper.RoleMapper;
 import cn.tinsur.elder.mapper.UserRoleMapper;
 import cn.tinsur.elder.pojo.entity.Role;
 import cn.tinsur.elder.pojo.entity.User;
@@ -9,6 +10,7 @@ import cn.tinsur.elder.mapper.UserMapper;
 import cn.tinsur.elder.pojo.query.UserQuery;
 import cn.tinsur.elder.pojo.vo.UserExcelVO;
 import cn.tinsur.elder.pojo.vo.UserRole;
+import cn.tinsur.elder.pojo.vo.UserVO;
 import cn.tinsur.elder.service.IUserService;
 import cn.tinsur.elder.util.ExcelUtil;
 import cn.tinsur.elder.util.Result;
@@ -28,7 +30,11 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -46,8 +52,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Autowired
     private UserRoleMapper userRoleMapper;
 
+    @Autowired
+    private RoleMapper roleMapper;
+
+    /**
+     * 获取用户列表（分页），返回 UserVO，并在每个UserVO中填充当前用户的角色列表roles
+     * @param userQuery
+     * @return
+     */
     @Override
-    public IPage<User> list(UserQuery userQuery) {
+    public IPage<UserVO> list(UserQuery userQuery) {
+        // 1.先查用户分页，这里使用的是先前的不带角色查询功能的代码
         IPage<User> page = new Page<>(userQuery.getPage(), userQuery.getLimit());
         LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.like(!ObjectUtils.isEmpty(userQuery.getName()),User::getName,userQuery.getName())
@@ -57,7 +72,63 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         User::getCreateTime, userQuery.getBeginCreateTime(),
                         userQuery.getEndCreateTime())
                 .orderByDesc(User::getCreateTime);
-        return userMapper.selectPage(page, lambdaQueryWrapper);
+        IPage<User> userPage = userMapper.selectPage(page, lambdaQueryWrapper);
+
+        // 2.把查到的当前页的User转成UserVO
+        List<UserVO> userVOList = userPage.getRecords().stream()
+                .map(user -> {
+                    UserVO vo = new UserVO();
+                    BeanUtils.copyProperties(user, vo);
+                    return vo;
+                })
+                .toList();
+
+        // 3.给每个VO填上角色，调用下面的fillRoles方法
+        fillRoles(userVOList);
+
+        // 4.返回UserVO类型的分页
+        IPage<UserVO> voPage = new Page<>(userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
+        voPage.setRecords(userVOList);
+        return voPage;
+    }
+
+    /**
+     * 批量给UserVO填角色
+     */
+    private void fillRoles(List<UserVO> userVOList) {
+        if (userVOList.isEmpty()) return;
+
+        // 1.当前页所有用户id，使用stream流先把所有用户id取出来
+        List<Long> userIds = userVOList.stream().map(UserVO::getId).toList();
+
+        // 2.一次查出这些用户的user-role中间表所有关联记录
+        //      .in实现只查想查的user_id所对应的角色role
+        List<UserRole> userRoles = userRoleMapper.selectList(
+                new LambdaQueryWrapper<UserRole>().in(UserRole::getUserId, userIds));
+        if (userRoles.isEmpty()) return;
+
+        // 3.一次查出用到的所有角色，把我们得到的角色id转换成一个个的角色Role对象
+        //      可能有多个重复的角色id，只需要一个id获取一次就可以了，使用.distinct去重
+        List<Long> roleIds = userRoles.stream().map(UserRole::getRoleId).distinct().toList();
+        //      把查询结果List<Role>组装成一个Map<Long, Role>，key是角色id，value是角色对象本身。
+        Map<Long, Role> roleMap = roleMapper.selectBatchIds(roleIds).stream()
+                .collect(Collectors.toMap(role -> role.getId(), r -> r));
+
+        // 4.按userId分组
+        Map<Long, List<UserRole>> groupByUserRole = userRoles.stream()
+                .collect(Collectors.groupingBy(UserRole::getUserId));
+        //      再把每个用户名下的 role_id 逐条翻译成 Role 对象，收成一个列表
+        Map<Long, List<Role>> groupByUser = new HashMap<>();
+        groupByUserRole.forEach((userId, urList) -> {
+            List<Role> roles = urList.stream()
+                    .map(ur -> roleMap.get(ur.getRoleId()))
+                    .collect(Collectors.toList());
+            groupByUser.put(userId, roles);
+        });
+
+        // 5.回填：没角色的用户传入空列表，保证前端 row.roles 不为 null
+        userVOList.forEach(vo -> vo.setRoles(
+                groupByUser.getOrDefault(vo.getId(), Collections.emptyList())));
     }
 
     /**

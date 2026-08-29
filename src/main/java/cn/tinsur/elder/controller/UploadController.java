@@ -17,11 +17,11 @@ public class UploadController {
     private AliOSSUtil aliOSSUtil;
 
     @PostMapping("/upload")
-    public Result<String> update (MultipartFile file){
+    public Result<String> update (MultipartFile file, String dir){
         String uuid = UUID.randomUUID().toString().replace("-","");
         String fileName = file.getOriginalFilename();
         String extension = fileName.substring(fileName.lastIndexOf("."));
-        fileName = uuid + extension;
+        fileName = dir + "/" + uuid + extension;
         String url = "";
         try {
             url = aliOSSUtil.uploadFile(fileName, file.getInputStream());

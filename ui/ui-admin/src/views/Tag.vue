@@ -104,12 +104,12 @@
 
 
   //添加、编辑
-  const dialogFormVisible = ref(false)
+  const drawerTagVisible = ref(false)
   const tag = ref({})
   const title = ref()
 
   const showAddDialog = () => {
-    dialogFormVisible.value = true
+    drawerTagVisible.value = true
     title.value = '添加'
     tag.value = {}
     //清空上一次窗口残留的校验错误，避免红字带到新窗口里
@@ -119,7 +119,7 @@
   }
 
   const showUpdateDialog = (id) => {
-    dialogFormVisible.value = true
+    drawerTagVisible.value = true
     title.value = '编辑'
     tag.value = {}
     //清空上一次窗口残留的校验错误，避免红字带到新窗口里
@@ -153,7 +153,7 @@
             tagsApi.update(tag.value.id, tag.value).then(result => {
               if (result.code === 1) {
                 ElMessage.success(result.msg)
-                dialogFormVisible.value = false
+                drawerTagVisible.value = false
                 loadData()
               } else {
                 ElMessage.error(result.msg)
@@ -163,7 +163,7 @@
             tagsApi.add(tag.value).then(result => {
               if (result.code === 1) {
                 ElMessage.success(result.msg)
-                dialogFormVisible.value = false
+                drawerTagVisible.value = false
                 loadData()
               } else {
                 ElMessage.error(result.msg)
@@ -237,7 +237,7 @@
 
 
   <!--添加、编辑弹出框-->
-  <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false" :close-on-click-modal="false">
+  <el-drawer v-model="drawerTagVisible" :title="title" size="35%" :close-on-click-modal="false">
     <el-form ref="formRef" :model="tag" :rules="dialogRules">
       <el-form-item prop="name" label="标签名称" :label-width="80">
         <el-input v-model="tag.name" autocomplete="off"/>
@@ -248,11 +248,11 @@
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button @click="drawerTagVisible = false">取消</el-button>
         <el-button type="primary" @click="addOrUpdate">
           确认
         </el-button>
       </div>
     </template>
-  </el-dialog>
+  </el-drawer>
 </template>

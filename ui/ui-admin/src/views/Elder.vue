@@ -72,8 +72,8 @@
   ]
 
   // ========== 对话框dalog弹出控制 ==========
-  const dialogTagsVisible = ref(false)  //弹出标注对话框dialog
-  const dialogFormVisible = ref(false)  //弹出新增/编辑对话框dialog
+  const drawerTagAssignVisible = ref(false)  //弹出标注对话框dialog
+  const drawerElderVisible = ref(false)  //弹出新增/编辑对话框dialog
 
 
   // ============== 方法 ==============
@@ -85,7 +85,7 @@
     eldersApi.getTagsById(raw.id).then(result => {
       elderTagsList.value = result.data
     })
-    dialogTagsVisible.value = true
+    drawerTagAssignVisible.value = true
   }
 
   //获取标签列表
@@ -100,7 +100,7 @@
     elderApi.updateTagsById(elder.value.id, elderTagsList.value).then(result => {
       if (result.code === 1) {
         ElMessage.success(result.msg)
-        dialogTagsVisible.value = false
+        drawerTagAssignVisible.value = false
         loadData()
       } else {
         ElMessage.error(result.msg)
@@ -208,7 +208,7 @@
 
   //添加、编辑
   const showAddDialog = () => {
-    dialogFormVisible.value = true
+    drawerElderVisible.value = true
     title.value = '添加'
     elder.value = {}
     //清空上一次窗口残留的校验错误，避免红字带到新窗口里
@@ -218,7 +218,7 @@
   }
 
   const showUpdateDialog = (id) => {
-    dialogFormVisible.value = true
+    drawerElderVisible.value = true
     title.value = '编辑'
     elder.value = {}
     //清空上一次窗口残留的校验错误，避免红字带到新窗口里
@@ -241,7 +241,7 @@
             elderApi.update(elder.value.id, elder.value).then(result => {
               if (result.code === 1) {
                 ElMessage.success(result.msg)
-                dialogFormVisible.value = false
+                drawerElderVisible.value = false
                 loadData()
               } else {
                 ElMessage.error(result.msg)
@@ -252,7 +252,7 @@
             elderApi.add(elder.value).then(result => {
               if (result.code === 1) {
                 ElMessage.success(result.msg)
-                dialogFormVisible.value = false
+                drawerElderVisible.value = false
                 loadData()
               } else {
                 ElMessage.error(result.msg)
@@ -465,12 +465,12 @@
   </el-card>
 
   <!--添加、编辑弹出框-->
-  <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false" :close-on-click-modal="false">
+  <el-drawer v-model="drawerElderVisible" :title="title" size="40%" :close-on-click-modal="false">
     <el-form ref="formRef" :model="elder" :rules="dialogRules">
       <el-form-item label="头像" :label-width="60">
         <el-upload
             class="avatar-uploader"
-            action="/api/upload"
+            action="/api/upload?dir=avatar"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
@@ -519,16 +519,16 @@
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button @click="drawerElderVisible = false">取消</el-button>
         <el-button type="primary" @click="addOrUpdate">
           确认
         </el-button>
       </div>
     </template>
-  </el-dialog>
+  </el-drawer>
 
   <!-- 标注标签弹出对话框dialog -->
-  <el-dialog title="标签标注" v-model="dialogTagsVisible" width="40%" :close-on-click-modal="false">
+  <el-drawer title="标签标注" v-model="drawerTagAssignVisible" size="35%" :close-on-click-modal="false">
     <el-form ref="form" :model="elder" label-width="80px">
       <el-form-item label="姓名">
         <el-input v-model="elder.realName" disabled></el-input>
@@ -540,10 +540,10 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="tagsSave">保存</el-button>
-        <el-button  @click="dialogTagsVisible = false">取消</el-button>
+        <el-button  @click="drawerTagAssignVisible = false">取消</el-button>
       </el-form-item>
     </el-form>
-  </el-dialog>
+  </el-drawer>
   </template>
 
 

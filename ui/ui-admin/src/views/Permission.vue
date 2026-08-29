@@ -22,7 +22,7 @@
   const type2Disabled = ref(false)
 
   // ========== 对话框dialog弹出控制 ==========
-  const dialogFormVisible = ref(false)
+  const drawerPermissionVisible = ref(false)
 
   // ========== 方法 ==========
   //加载数据
@@ -70,7 +70,7 @@
 
   //根据行数据打开添加子菜单对话框（传row为添加下级，不传为添加顶级菜单）
   const showAddDialog = (row) => {
-    dialogFormVisible.value = true
+    drawerPermissionVisible.value = true
     permission.value = {sort: 0} //排序默认0
     title.value = '添加下级菜单'
 
@@ -106,7 +106,7 @@
 
   //根据id打开编辑对话框
   const showUpdateDialog = (row) => {
-    dialogFormVisible.value = true
+    drawerPermissionVisible.value = true
     title.value = '编辑'
     permission.value = {}
     permissionApi.selectById(row.id).then(result => {
@@ -119,13 +119,13 @@
     if (permission.value.id) {//编辑
       permissionApi.update(permission.value).then(result => {
         ElMessage.success(result.msg)
-        dialogFormVisible.value = false
+        drawerPermissionVisible.value = false
         loadData()
       })
     } else {//添加
       permissionApi.add(permission.value).then(result => {
         ElMessage.success(result.msg)
-        dialogFormVisible.value = false
+        drawerPermissionVisible.value = false
         loadData()
       })
     }
@@ -181,7 +181,7 @@
   </el-table>
 
   <!-- 添加、修改的dialog -->
-  <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false">
+  <el-drawer v-model="drawerPermissionVisible" :title="title" size="35%">
     <el-form :model="permission" label-width="80px">
       <el-form-item label="上级权限" v-if="!permission.id">
         <el-input v-model="permission.parentName" :disabled="true"></el-input>
@@ -221,13 +221,13 @@
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button @click="drawerPermissionVisible = false">取消</el-button>
         <el-button type="primary" @click="addOrUpdate">
           确认
         </el-button>
       </div>
     </template>
-  </el-dialog>
+  </el-drawer>
   </el-card>
 </template>
 

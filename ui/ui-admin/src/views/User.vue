@@ -135,12 +135,12 @@
 
 
   //添加、编辑
-  const dialogFormVisible = ref(false)
+  const drawerUserVisible = ref(false)
   const user = ref({})
   const title = ref()
 
   const showAddDialog = () => {
-    dialogFormVisible.value = true
+    drawerUserVisible.value = true
     title.value = '添加'
     user.value = {}
     //清空上一次窗口残留的校验错误，避免红字带到新窗口里
@@ -150,7 +150,7 @@
   }
 
   const showUpdateDialog = (id) => {
-    dialogFormVisible.value = true
+    drawerUserVisible.value = true
     title.value = '编辑'
     user.value = {}
     //清空上一次窗口残留的校验错误，避免红字带到新窗口里
@@ -172,7 +172,7 @@
             userApi.update(user.value.id, user.value).then(result => {
               if (result.code === 1) {
                 ElMessage.success(result.msg)
-                dialogFormVisible.value = false
+                drawerUserVisible.value = false
                 loadData()
               } else {
                 ElMessage.error(result.msg)
@@ -182,7 +182,7 @@
             userApi.add(user.value).then(result => {
               if (result.code === 1) {
                 ElMessage.success(result.msg)
-                dialogFormVisible.value = false
+                drawerUserVisible.value = false
                 loadData()
               } else {
                 ElMessage.error(result.msg)
@@ -276,11 +276,11 @@
   }
 
   //角色设置
-  const dialogRolesVisible = ref(false)
+  const drawerRoleVisible = ref(false)
   const userRolesList = ref([]) // 选中的用户的角色列表
   const rolesList = ref([]) // 所有角色列表
   const showRolesDialog = (id) => {
-    dialogRolesVisible.value = true
+    drawerRoleVisible.value = true
     user.value = {}
     userApi.selectById(id).then(result => {
       user.value = result.data
@@ -297,7 +297,7 @@
     userApi.updateRolesById(user.value.id, userRolesList.value).then(result => {
       if (result.code === 1) {
         ElMessage.success(result.msg)
-        dialogRolesVisible.value = false
+        drawerRoleVisible.value = false
         loadData()
       } else {
         ElMessage.error(result.msg)
@@ -415,12 +415,12 @@
 
 
   <!--添加、编辑弹出框-->
-  <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false" :close-on-click-modal="false">
+  <el-drawer v-model="drawerUserVisible" :title="title" size="40%" :close-on-click-modal="false">
     <el-form ref="formRef" :model="user" :rules="dialogRules">
       <el-form-item label="头像" :label-width="60">
         <el-upload
             class="avatar-uploader"
-            action="/api/upload"
+            action="/api/upload?dir=avatar"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
@@ -453,17 +453,17 @@
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button @click="drawerUserVisible = false">取消</el-button>
         <el-button type="primary" @click="addOrUpdate">
           确认
         </el-button>
       </div>
     </template>
-  </el-dialog>
+  </el-drawer>
 
 
   <!-- 标角色编辑弹出对话框dialog -->
-  <el-dialog title="角色设置" v-model="dialogRolesVisible" width="40%" :close-on-click-modal="false">
+  <el-drawer title="角色设置" v-model="drawerRoleVisible" size="35%" :close-on-click-modal="false">
     <el-form ref="form" :model="user" label-width="80px">
       <el-form-item label="姓名">
         <el-input v-model="user.realName" disabled></el-input>
@@ -475,10 +475,10 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="rolesSave">保存</el-button>
-        <el-button  @click="dialogRolesVisible = false">取消</el-button>
+        <el-button  @click="drawerRoleVisible = false">取消</el-button>
       </el-form-item>
     </el-form>
-  </el-dialog>
+  </el-drawer>
 </template>
 
 

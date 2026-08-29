@@ -9,7 +9,8 @@
     SwitchButton,
     CaretBottom, Plus,
     CollectionTag, SetUp,
-    Document
+    Document,
+    HomeFilled
   } from '@element-plus/icons-vue'
   import avatar from '@/assets/default.png'
   //条目被点击后,调用的函数
@@ -188,8 +189,14 @@
     <el-aside width="200px">
       <div class="el-aside__logo"></div>
       <!-- element-plus的菜单标签 -->
-      <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff"
-               router>
+      <el-menu :default-active="$route.path" active-text-color="#409EFF" text-color="#303133"
+               :background-color="'#fff'" router>
+        <el-menu-item index="/">
+          <el-icon>
+            <HomeFilled/>
+          </el-icon>
+          <span>首页</span>
+        </el-menu-item>
         <el-menu-item index="/elder">
           <el-icon>
             <Promotion/>
@@ -279,7 +286,7 @@
       <el-form-item label="头像" :label-width="60">
         <el-upload
             class="avatar-uploader"
-            action="/api/upload"
+            action="/api/upload?dir=avatar"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
@@ -345,15 +352,27 @@
     height: 100vh;
 
     .el-aside {
-      background-color: #232323;
+      background-color: #fff;
+      border-right: 1px solid #f0f0f0;
+      display: flex;
+      flex-direction: column;
 
       &__logo {
-        height: 120px;
-        background: url('@/assets/logo.png') no-repeat center / 150px auto;
+        height: 96px;
+        background: url('@/assets/logo.png') no-repeat center / 130px auto;
+        border-bottom: 1px solid #f5f5f5;
       }
 
       .el-menu {
         border-right: none;
+        flex: 1;
+        overflow-y: auto;
+
+        .el-menu-item.is-active {
+          background-color: #ecf5ff;
+          border-right: 3px solid var(--el-color-primary);
+          font-weight: 600;
+        }
       }
     }
 
@@ -362,6 +381,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      border-bottom: 1px solid #f0f0f0;
+      padding: 0 20px;
 
       .el-dropdown__box {
         display: flex;
@@ -379,12 +400,20 @@
       }
     }
 
+    .el-main {
+      background-color: #f5f7fa;
+      padding: 16px;
+    }
+
     .el-footer {
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 14px;
-      color: #666;
+      color: #909399;
+      background-color: #fff;
+      height: 44px;
+      border-top: 1px solid #f0f0f0;
     }
   }
 
@@ -420,6 +449,4 @@
     font-size: 12px;      /* 小字 */
     color: #999;          /* 灰色 */
   }
-
-
 </style>

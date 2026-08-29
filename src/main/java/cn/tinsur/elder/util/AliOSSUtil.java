@@ -73,7 +73,9 @@ public class AliOSSUtil {
         OSS ossClient = new OSSClientBuilder().build(ENDPOINT, accessKeyId, accessKeySecret);
         try {
             // 删除文件或目录。如果要删除目录，目录必须为空。
-            ossClient.deleteObject(BUCKET_NAME, url.substring(url.lastIndexOf("/") + 1));
+            // 只去掉域名前缀，保留完整的文件夹路径（如 avatar/xxx.jpg）
+            String objectName = url.substring(url.indexOf("aliyuncs.com/") + "aliyuncs.com/".length());
+            ossClient.deleteObject(BUCKET_NAME, objectName);
         } catch (OSSException oe) {
             System.out.println("Caught an OSSException, which means your request made it to OSS, "
                     + "but was rejected with an error response for some reason.");

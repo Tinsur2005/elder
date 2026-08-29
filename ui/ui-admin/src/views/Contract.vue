@@ -42,7 +42,7 @@
   const createTimeRange = ref([])
 
   // ========== 对话框dialog弹出控制 ==========
-  const dialogFormVisible = ref(false) // 弹出新增/编辑对话框dialog
+  const drawerContractVisible = ref(false) // 弹出新增/编辑对话框dialog
 
   // ========== 老人远程搜索（选择老人） ==========
 
@@ -204,14 +204,14 @@
 
   // 添加、编辑
   const showAddDialog = () => {
-    dialogFormVisible.value = true
+    drawerContractVisible.value = true
     title.value = '添加'
     contract.value = {}
     elderOptions.value = [] // 清空老人搜索结果
   }
 
   const showUpdateDialog = (id) => {
-    dialogFormVisible.value = true
+    drawerContractVisible.value = true
     title.value = '编辑'
     contract.value = {}
     contractApi.selectById(id).then(result => {
@@ -239,7 +239,7 @@
             contractApi.update(contract.value.id, contract.value).then(result => {
               if (result.code === 1) {
                 ElMessage.success(result.msg)
-                dialogFormVisible.value = false
+                drawerContractVisible.value = false
                 loadData()
               } else {
                 ElMessage.error(result.msg)
@@ -250,7 +250,7 @@
             contractApi.add(contract.value).then(result => {
               if (result.code === 1) {
                 ElMessage.success(result.msg)
-                dialogFormVisible.value = false
+                drawerContractVisible.value = false
                 loadData()
               } else {
                 ElMessage.error(result.msg)
@@ -378,7 +378,7 @@
   </el-card>
 
   <!--添加、编辑弹出框-->
-  <el-dialog v-model="dialogFormVisible" :title="title" width="500" :lock-scroll="false" :close-on-click-modal="false">
+  <el-drawer v-model="drawerContractVisible" :title="title" size="40%" :close-on-click-modal="false">
     <el-form ref="formRef" :model="contract" :rules="dialogRules">
       <el-form-item prop="contractNo" label="合同编号" :label-width="80">
         <el-input v-model="contract.contractNo" autocomplete="off"/>
@@ -424,7 +424,7 @@
       <el-form-item label="合同文件" :label-width="80">
         <div class="contract-file-field">
           <el-upload
-              action="/api/upload"
+              action="/api/upload?dir=contract"
               :show-file-list="false"
               :on-success="handleFileSuccess"
               :before-upload="beforeFileUpload"
@@ -444,13 +444,13 @@
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button @click="drawerContractVisible = false">取消</el-button>
         <el-button type="primary" @click="addOrUpdate">
           确认
         </el-button>
       </div>
     </template>
-  </el-dialog>
+  </el-drawer>
 </template>
 
 <style scoped>

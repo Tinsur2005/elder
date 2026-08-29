@@ -3,6 +3,7 @@
 import {createRouter, createWebHistory} from 'vue-router'
 // 引入一个一个可能要呈现组件
 import Index from '@/views/Index.vue'
+import Home from '@/views/Home.vue'
 import Login from '@/views/Login.vue'
 import User from '@/views/User.vue'
 import Elder from '@/views/Elder.vue'
@@ -20,6 +21,7 @@ const router = createRouter({
         },
         {
             path: '/', component: Index, children: [
+                {path: '/', component: Home},
                 {path: '/user', component: User},
                 {path: '/elder', component: Elder},
                 {path: '/tag', component: Tag},

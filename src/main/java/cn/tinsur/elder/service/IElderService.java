@@ -50,5 +50,13 @@ public interface IElderService extends IService<Elder> {
 
     void exportExcel(HttpServletResponse response);
 
+    /**
+     * 根据真实姓名（realName）模糊查询老人，供合同选老人等"远程搜索"下拉框使用
+     * 可输入部分姓名，也可输入全部姓名，返回匹配到的老人列表（最多返回20条）
+     * @param name 老人真实姓名的关键字（可空，为空则返回最近20个老人）
+     * @return
+     */
+    List<Elder> searchByName(String name);
+
     void importExcel(MultipartFile file);
 }

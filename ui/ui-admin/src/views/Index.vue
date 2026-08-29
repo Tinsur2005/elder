@@ -8,7 +8,8 @@
     EditPen,
     SwitchButton,
     CaretBottom, Plus,
-    CollectionTag, SetUp
+    CollectionTag, SetUp,
+    Document
   } from '@element-plus/icons-vue'
   import avatar from '@/assets/default.png'
   //条目被点击后,调用的函数
@@ -200,6 +201,12 @@
             <CollectionTag/>
           </el-icon>
           <span>标签管理</span>
+        </el-menu-item>
+        <el-menu-item index="/contract">
+          <el-icon>
+            <Document/>
+          </el-icon>
+          <span>合同管理</span>
         </el-menu-item>
         <el-sub-menu index="1">
           <template #title>

@@ -1,4 +1,4 @@
-package cn.tinsur.elder.pojo.query;
+package cn.tinsur.elder.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -70,11 +70,6 @@ public class Contract implements Serializable {
      */
     @TableField("file_url")
     private String fileUrl;
-
-    /**
-     * 状态(0:已过期 1:生效中 2:已续签)
-     */
-    private Integer status;
 
     /**
      * 备注

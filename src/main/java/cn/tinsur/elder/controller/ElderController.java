@@ -107,6 +107,15 @@ public class ElderController {
     }
 
     /**
+     * 根据真实姓名（realName）模糊查询老人，供合同选老人等"远程搜索"下拉框使用
+     * GET /elders/searchByName?name=张
+     */
+    @GetMapping("/searchByName")
+    public Result<List<Elder>> searchByName(@RequestParam String name) {
+        return Result.ok(elderService.searchByName(name));
+    }
+
+    /**
      * 获取指定老人Tags标注列表，
      * result.data中存放老人所有的Tag组成的List列表
      */

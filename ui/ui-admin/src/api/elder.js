@@ -23,6 +23,10 @@ const elderApi = {
         // 根据id获取老人的标注标签
         return request.get(`/elders/getTagsById/${id}`);
     },
+    searchByName(name) {
+        // 根据真实姓名（可输入部分或全部）模糊搜索老人，供合同等"选老人"远程下拉框使用
+        return request.get("/elders/searchByName", {params: {name}});
+    },
     updateTagsById(id, tags) {
         // 根据老人id来修改标注标签（修改的是elder-tags中间表的数据）
         return request.put(`/elders/updateTags/${id}`, tags)

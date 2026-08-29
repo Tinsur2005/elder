@@ -128,6 +128,24 @@ public class ElderServiceImpl extends ServiceImpl<ElderMapper, Elder> implements
     }
 
     /**
+     * 根据真实姓名（realName）模糊查询老人，供合同选老人等"远程搜索"下拉框使用
+     * 可输入部分姓名，也可输入全部姓名，返回匹配到的老人列表（最多返回20条）
+     * @param name 老人真实姓名的关键字（可空，为空则返回最近20个老人）
+     * @return
+     */
+    @Override
+    public List<Elder> searchByName(String name) {
+        LambdaQueryWrapper<Elder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper
+                // 按真实姓名模糊匹配，可输入部分或全部（如"张"）
+                .like(!ObjectUtils.isEmpty(name), Elder::getRealName, name)
+                .orderByDesc(Elder::getCreateTime)
+                // 最多只返回20条，避免下拉框一次加载太多
+                .last("LIMIT 20");
+        return elderMapper.selectList(lambdaQueryWrapper);
+    }
+
+    /**
      * 根据id获取标签列表
      * @param id
      * @return

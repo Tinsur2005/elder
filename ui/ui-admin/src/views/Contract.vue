@@ -345,13 +345,14 @@
           <span v-else>其他</span>
         </template>
       </el-table-column>
-      <el-table-column prop="signTime" label="签订时间" width="160"/>
+      <el-table-column prop="signTime" label="生效时间" width="160"/>
       <el-table-column prop="expireTime" label="过期时间" width="160"/>
       <el-table-column label="状态" width="100">
         <template #default="{row}">
           <!-- 合同状态按时间自动判定，无需存储，参考elder.vue的el-tag v-if写法 -->
           <el-tag type="danger" v-if="row.expireTime && new Date(row.expireTime).getTime() < Date.now()">已过期</el-tag>
-          <el-tag type="info" v-else-if="row.signTime && new Date(row.signTime).getTime() > Date.now()">待生效</el-tag>
+          <el-tag type="info" v-else-if="!row.signTime">待签订</el-tag>
+          <el-tag type="primary" v-else-if="new Date(row.signTime).getTime() > Date.now()">待生效</el-tag>
           <el-tag type="success" v-else>生效中</el-tag>
         </template>
       </el-table-column>
@@ -414,7 +415,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="签订时间" :label-width="80">
+      <el-form-item label="生效时间" :label-width="80">
         <el-date-picker v-model="contract.signTime" type="datetime" value-format="YYYY-MM-DD HH:mm:ss" placeholder="选择签订时间"/>
       </el-form-item>
       <el-form-item label="过期时间" :label-width="80">

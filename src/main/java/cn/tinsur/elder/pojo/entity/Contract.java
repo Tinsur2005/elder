@@ -54,7 +54,7 @@ public class Contract implements Serializable {
     private Integer contractType;
 
     /**
-     * 合同签订/创建时间(业务字段)
+     * 合同生效时间
      */
     @TableField("sign_time")
     private Date signTime;

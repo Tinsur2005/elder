@@ -2,11 +2,13 @@
   import elderApi from '@/api/elder.js'
   import tagsApi from '@/api/tags.js'
   import {nextTick, ref} from 'vue'
+  import {useRouter} from 'vue-router'
   import {ElMessage, ElMessageBox} from 'element-plus'
   import {Plus, Download, Upload, Delete, EditPen, PriceTag} from '@element-plus/icons-vue'
   import {useTokenStore} from '@/store/token.js'
   import eldersApi from "@/api/elder.js";
   const tokenStore = useTokenStore()
+  const router = useRouter()
 
   // ========== 对象 ==========
 
@@ -136,6 +138,15 @@
     }
     createTimeRange.value = []
     loadData()
+  }
+
+  //跳转到合同管理页面，并通过路由传参自动搜索该老人在合同页面查询
+  const goContract = (row) => {
+    let route = {
+      path: '/contract',
+      query: {elderId: row.id}
+    }
+    router.push(route)
   }
 
   //根据id删除
@@ -425,6 +436,11 @@
       <el-table-column prop="birthday" label="生日" :show-overflow-tooltip="true" width="125">
         <template #default="{row}">
           {{ formatDate(row.birthday) }}
+        </template>
+      </el-table-column>
+      <el-table-column label="合同" width="100" align="center">
+        <template #default="{row}">
+          <el-link type="primary" @click="goContract(row)">查看合同</el-link>
         </template>
       </el-table-column>
       <el-table-column prop="remark" label="备注" :show-overflow-tooltip="true" width="125"/>

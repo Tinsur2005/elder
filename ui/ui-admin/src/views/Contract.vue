@@ -2,14 +2,16 @@
   import contractApi from '@/api/contract.js'
   import elderApi from '@/api/elder.js'
   import {ref} from 'vue'
+  import {useRoute} from 'vue-router'
   import {ElMessage, ElMessageBox} from 'element-plus'
   import {Plus, Delete, EditPen, Upload, Document} from '@element-plus/icons-vue'
   import {useTokenStore} from '@/store/token.js'
   const tokenStore = useTokenStore()
+  const route = useRoute()
 
   // ================== 对象 ==================
 
-  //分页信息和搜索条件（本页只按创建时间搜索，故没有名称等其他搜索条件）
+  //分页信息和搜索条件（按合同名称、创建时间模糊搜索）
   const contractQuery = ref({
     page: 1,
     limit: 10
@@ -67,28 +69,6 @@
 
   // ============== 方法 ==============
 
-  // 返回合同状态对应的标签样式（type决定不同颜色的标签）
-  // 合同状态不用用户手动选择，而是根据当前时间与签订/过期时间的先后关系自动判定：
-  //   当前时间晚于过期时间 → 已过期；早于签订时间 → 待生效；二者之间 → 生效中
-  const getStatus = (row) => {
-    const now = Date.now()
-    // 当前时间晚于过期时间 → 已过期
-    if (row.expireTime && new Date(row.expireTime).getTime() < now) {
-      return {type: 'danger', text: '已过期'}
-    }
-    // 当前时间早于签订时间 → 待生效
-    if (row.signTime && new Date(row.signTime).getTime() > now) {
-      return {type: 'info', text: '待生效'}
-    }
-    // 其余情况即在签订时间与过期时间之间 → 生效中
-    return {type: 'success', text: '生效中'}
-  }
-
-  // 返回合同类型的中文名称
-  const getContractType = (type) => {
-    return contractTypeOptions.find(item => item.value === type)?.label || '其他'
-  }
-
   // 查看合同：点击后在新窗口打开合同的url链接
   const viewContract = (row) => {
     if (!row.fileUrl) {
@@ -130,6 +110,22 @@
     })
   }
 
+  // 页面加载时：如果从老人列表带elderId跳转过来，自动按这个老人搜索，并在搜索框回显"姓名（身份证号）"
+  const initQuery = () => {
+    if (route.query.elderId) {
+      contractQuery.value.elderId = route.query.elderId
+      // 把该老人生成一个可显示的下拉选项，让搜索框回显姓名而不是数字id
+      elderApi.selectById(route.query.elderId).then(result => {
+        if (result.code === 1) {
+          // 用后端返回的id回填，保证与el-option:value严格相等（Long被序列化成字符串）
+          contractQuery.value.elderId = result.data.id
+          elderOptions.value = [result.data]
+        }
+      })
+    }
+  }
+
+  initQuery()
   loadData()
 
   // 搜索按钮点击事件
@@ -141,6 +137,8 @@
   // 重置按钮点击事件
   const reset = () => {
     contractQuery.value = {
+      contractName: '',
+      elderId: '',
       page: 1,
       limit: 10
     }
@@ -290,6 +288,29 @@
     </template>
     <!--模糊查找-->
     <el-form :inline="true">
+      <el-form-item label="合同名称">
+        <el-input v-model="contractQuery.contractName" placeholder="请输入合同名称" clearable style="width: 200px"/>
+      </el-form-item>
+      <!-- 按老人搜索合同，复用对话框里的远程搜索，使用已存在的loadElderOptions、elderOptions和elderLoading -->
+      <el-form-item label="老人">
+        <el-select
+            v-model="contractQuery.elderId"
+            filterable
+            remote
+            reserve-keyword
+            clearable
+            placeholder="请输入老人姓名搜索"
+            :remote-method="loadElderOptions"
+            :loading="elderLoading"
+            style="width: 200px">
+          <el-option
+              v-for="item in elderOptions"
+              :key="item.id"
+              :label="`${item.realName}（${item.idCardNo}）`"
+              :value="item.id"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker
             v-model="createTimeRange"
@@ -318,14 +339,20 @@
       </el-table-column>
       <el-table-column prop="contractType" label="类型" width="100">
         <template #default="{row}">
-          {{ getContractType(row.contractType) }}
+          <!-- 合同类型只有3种，直接内联判断，无需额外方法 -->
+          <span v-if="row.contractType === 0">服务合同</span>
+          <span v-else-if="row.contractType === 1">入住合同</span>
+          <span v-else>其他</span>
         </template>
       </el-table-column>
       <el-table-column prop="signTime" label="签订时间" width="160"/>
       <el-table-column prop="expireTime" label="过期时间" width="160"/>
-      <el-table-column prop="status" label="状态" width="100">
+      <el-table-column label="状态" width="100">
         <template #default="{row}">
-          <el-tag :type="getStatus(row).type">{{ getStatus(row).text }}</el-tag>
+          <!-- 合同状态按时间自动判定，无需存储，参考elder.vue的el-tag v-if写法 -->
+          <el-tag type="danger" v-if="row.expireTime && new Date(row.expireTime).getTime() < Date.now()">已过期</el-tag>
+          <el-tag type="info" v-else-if="row.signTime && new Date(row.signTime).getTime() > Date.now()">待生效</el-tag>
+          <el-tag type="success" v-else>生效中</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="remark" label="备注" :show-overflow-tooltip="true"/>

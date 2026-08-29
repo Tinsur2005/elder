@@ -48,6 +48,10 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         IPage<Contract> page = new Page<>(contractQuery.getPage(), contractQuery.getLimit());
         LambdaQueryWrapper<Contract> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper
+                .like(!ObjectUtils.isEmpty(contractQuery.getContractName()),
+                        Contract::getContractName, contractQuery.getContractName())
+                .eq(!ObjectUtils.isEmpty(contractQuery.getElderId()),
+                        Contract::getElderId, contractQuery.getElderId())
                 .between(!ObjectUtils.isEmpty(contractQuery.getBeginCreateTime())
                                 && !ObjectUtils.isEmpty(contractQuery.getEndCreateTime()),
                         Contract::getCreateTime, contractQuery.getBeginCreateTime(),

@@ -20,4 +20,5 @@ public interface ITagService extends IService<Tag> {
      */
     IPage<Tag> list(TagQuery tagQuery);
 
+    Long getCount(Long id);
 }

@@ -1,11 +1,14 @@
 package cn.tinsur.elder.controller;
 
 
+import cn.tinsur.elder.exception.ServiceException;
 import cn.tinsur.elder.pojo.entity.Tag;
 import cn.tinsur.elder.pojo.query.TagQuery;
 import cn.tinsur.elder.service.ITagService;
+import cn.tinsur.elder.service.impl.TagServiceImpl;
 import cn.tinsur.elder.util.Result;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -84,6 +87,9 @@ public class TagController {
      */
     @DeleteMapping("/{id}")
     public Result delete(@PathVariable Long id) {
+        if(tagService.getCount(id) > 0){
+            return Result.error("标签下存在绑定数据，不允许删除");
+        }
         tagService.removeById(id);
         return Result.ok("删除成功");
     }
@@ -94,6 +100,7 @@ public class TagController {
      */
     @DeleteMapping
     public Result deleteBatch(@RequestBody Long[] ids) {
+
         tagService.removeByIds(java.util.Arrays.asList(ids));
         return Result.ok("批量删除成功");
     }

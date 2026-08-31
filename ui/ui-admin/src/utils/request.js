@@ -6,6 +6,9 @@ const baseURL = '/api'
 const request = axios.create({baseURL})
 
 import {useTokenStore} from "@/store/token.js";
+// 标记是否正在跳转登录页，防止同一批 401 响应弹出多条提示、多次跳转
+let isRedirectingToLogin = false
+
 //添加请求拦截器
 request.interceptors.request.use(
     config => {
@@ -13,7 +16,7 @@ request.interceptors.request.use(
         //添加Token
         const tokenStore = useTokenStore()
         //判断token是否为空
-        if(tokenStore) {
+        if(tokenStore && tokenStore.token) {
             config.headers.Authorization = tokenStore.token
         }
         return config
@@ -34,10 +37,18 @@ request.interceptors.response.use(
         return response.data
     },
     error => {
-        //判断响应状态码,如果为401,则证明未登录,提示请登录,并跳转到登录页面
-        if (error.response.status === 401) {
-            ElMessage.error('登录失效，请先登录')
-            router.push('/login')
+        //判断响应状态码,如果为401,则证明未登录,提示请登录
+        if (error.response && error.response.status === 401) {
+            //清除过期 token，否则路由守卫又会将用户弹回首页造成死循环
+            const tokenStore = useTokenStore()
+            tokenStore.removeToken()
+            //防止首页多个请求同时 401 导致提示刷屏、重复跳转
+            if (!isRedirectingToLogin) {
+                isRedirectingToLogin = true
+                ElMessage.error('登录失效，请先登录')
+                router.push('/login')
+                setTimeout(() => { isRedirectingToLogin = false }, 2000)
+            }
         } else {
             ElMessage.error('服务异常')
         }

@@ -39,4 +39,9 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements ITagS
                 .orderByDesc(Tag::getCreateTime);
         return tagMapper.selectPage(page, lambdaQueryWrapper);
     }
+
+    @Override
+    public Long getCount(Long id) {
+        return tagMapper.getCount(id);
+    }
 }

@@ -69,6 +69,5 @@ public class PermissionController {
         permissionService.removeById(id);
         return Result.ok("删除成功");
     }
-
 }
 

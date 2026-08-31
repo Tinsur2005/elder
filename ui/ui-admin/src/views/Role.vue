@@ -1,8 +1,9 @@
 <script setup>
   import rolesApi from '@/api/roles.js'
+  import permissionApi from '@/api/permission.js'
   import {nextTick, ref} from 'vue'
   import {ElMessage, ElMessageBox} from 'element-plus'
-  import {Delete, EditPen, Plus} from "@element-plus/icons-vue";
+  import {Delete, EditPen, Plus, Stamp} from "@element-plus/icons-vue";
 
   //表格数据
   const list = ref([])
@@ -177,6 +178,48 @@
         })
   }
 
+  // ============ 权限分配 ============
+  //权限分配抽屉的显示控制
+  const drawerPermissionVisible = ref(false)
+  //权限树数据（List<PermissionVO>）
+  const treeData = ref([])
+  //权限树实例，用于回显勾选状态
+  const treeRef = ref()
+  //el-tree 的展示字段配置：树节点显示 name，子节点取 children
+  const defaultProps = ref({
+    children: 'children',
+    label: 'name'
+  })
+  //打开权限分配抽屉：加载权限树和回显该角色已分配的权限
+  const showAssignedPermissionDialog = (row) => {
+    drawerPermissionVisible.value = true
+    role.value = row
+    treeData.value = []
+    //先加载权限树
+    permissionApi.selectPermissionTree().then(treeResult => {
+      treeData.value = treeResult.data
+      //再查该角色已分配的权限id集合，用于回显勾选
+      return rolesApi.selectPermissionById(row.id)
+    }).then(permissionResult => {
+      //等树节点渲染完成后，再回显勾选状态
+      nextTick(() => {
+        treeRef.value?.setCheckedKeys(permissionResult.data)
+      })
+    })
+  }
+
+  //保存角色权限：收集当前勾选（含父级）的权限id，调用先删后插接口
+  const assignPermission = () => {
+    let permissionIds = treeRef.value.getCheckedKeys()
+    rolesApi.updatePermission(role.value.id, permissionIds).then(result => {
+      if (result.code === 1) {
+        ElMessage.success(result.msg)
+        drawerPermissionVisible.value = false
+      } else {
+        ElMessage.error(result.msg)
+      }
+    })
+  }
 </script>
 
 <template>
@@ -218,9 +261,10 @@
       <el-table-column prop="code" label="角色编码" :show-overflow-tooltip="true"/>
       <el-table-column prop="description" label="角色描述" :show-overflow-tooltip="true"/>
       <el-table-column prop="createTime" label="创建时间" :show-overflow-tooltip="true"/>
-      <el-table-column align="center" width="200px" fixed="right" label="操作">
+      <el-table-column align="center" width="280px" fixed="right" label="操作">
         <template #default="{ row }">
           <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)">编辑</el-button>
+          <el-button size="small" type="success" :icon="Stamp" @click="showAssignedPermissionDialog(row)">权限分配</el-button>
           <el-button size="small" type="danger" :icon="Delete" @click="deleteById(row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -256,6 +300,24 @@
         <el-button type="primary" @click="addOrUpdate">
           确认
         </el-button>
+      </div>
+    </template>
+  </el-drawer>
+
+  <!--权限分配弹出框-->
+  <el-drawer v-model="drawerPermissionVisible" title="权限分配" size="35%" :close-on-click-modal="false">
+    <el-tree
+        :data="treeData"
+        ref="treeRef"
+        show-checkbox
+        node-key="id"
+        default-expand-all
+        :props="defaultProps">
+    </el-tree>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="drawerPermissionVisible = false">取消</el-button>
+        <el-button type="primary" @click="assignPermission">保存</el-button>
       </div>
     </template>
   </el-drawer>

@@ -76,7 +76,7 @@
       <div class="welcome-body">
         <div class="welcome-text">
           <h2 class="welcome-title">{{ greeting() }}，{{ userInfoStore.user.name }}</h2>
-          <p class="welcome-desc">欢迎回到智慧社区养老管理系统，今天也要元气满满地开展工作哦～</p>
+          <p class="welcome-desc">欢迎回到智慧社区养老管理系统！</p>
         </div>
         <div class="welcome-date">
           <el-icon><Timer/></el-icon>
@@ -142,7 +142,7 @@
             <el-descriptions-item label="系统名称">智慧社区养老管理系统</el-descriptions-item>
             <el-descriptions-item label="当前版本">v1.0.0</el-descriptions-item>
             <el-descriptions-item label="技术栈">Spring Boot + Vue 3</el-descriptions-item>
-            <el-descriptions-item label="运行环境">生产环境</el-descriptions-item>
+            <el-descriptions-item label="运行状态">正常</el-descriptions-item>
           </el-descriptions>
         </el-card>
       </el-col>

@@ -3,6 +3,7 @@ package cn.tinsur.elder.controller;
 
 import cn.tinsur.elder.pojo.entity.Role;
 import cn.tinsur.elder.pojo.query.RoleQuery;
+import cn.tinsur.elder.pojo.vo.PermissionVO;
 import cn.tinsur.elder.service.IRoleService;
 import cn.tinsur.elder.util.Result;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -105,5 +106,21 @@ public class RoleController {
     public Boolean isExists(@RequestParam String name) {
         Role role = roleService.getOne(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<Role>().eq("name", name));
         return role != null;
+    }
+
+    /**
+     * 根据ID查该权限的菜单树
+     */
+    @GetMapping("/selectPermissionById/{id}")
+    public Result<List<Long>> selectPermissionById(@PathVariable Long id){
+        return Result.ok(roleService.selectPermissionById(id));
+    }
+
+    /**
+     * 修改更新角色的权限列表
+     */
+    @PutMapping("/updatePermission/{id}")
+    public Result updatePermission (@PathVariable Long id, @RequestBody Long[] permissions) {
+        return roleService.updatePermission(id, permissions);
     }
 }

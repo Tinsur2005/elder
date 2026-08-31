@@ -29,6 +29,14 @@ const rolesApi = {
     deleteAll(ids) {
         // axios 的 delete 第2个参数是 config，请求体必须放在 data 字段里
         return request.delete("/roles", {data: ids});
+    },
+    // 查询该角色已分配的权限id集合（用于权限回显）
+    selectPermissionById(id) {
+        return request.get(`/roles/selectPermissionById/${id}`);
+    },
+    // 给角色分配权限（先删后插，传入权限id数组）
+    updatePermission(id, permissionIds) {
+        return request.put(`/roles/updatePermission/${id}`, permissionIds);
     }
 }
 export default rolesApi

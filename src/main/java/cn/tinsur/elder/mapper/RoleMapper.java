@@ -3,6 +3,8 @@ package cn.tinsur.elder.mapper;
 import cn.tinsur.elder.pojo.entity.Role;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 /**
  * <p>
  * 角色表 Mapper 接口

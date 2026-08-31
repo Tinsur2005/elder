@@ -316,7 +316,7 @@
           <el-button type="danger" :icon="Delete" @click="deleteAll" v-if="hasBtnPermission('user:deleteAll')">批量删除</el-button>
         </div>
         <div class="header-right">
-          <el-button type="primary" :icon="Download" @click="exportExcel">导出Excel</el-button>
+          <el-button type="primary" :icon="Download" @click="exportExcel" v-if="hasBtnPermission('user:export')">导出Excel</el-button>
           <el-upload
               :icon="Upload"
               class="inline-block"
@@ -329,7 +329,7 @@
               :on-success="importExcelSuccess"
               :headers="{Authorization: tokenStore.token}"
               name="file">
-            <el-button type="primary" :icon="Upload">导入Excel</el-button>
+            <el-button type="primary" :icon="Upload" v-if="hasBtnPermission('user:import')">导入Excel</el-button>
           </el-upload>
         </div>
       </div>
@@ -416,7 +416,7 @@
 
 
   <!--添加、编辑弹出框-->
-  <el-drawer v-model="drawerUserVisible" :title="title" size="40%" :close-on-click-modal="false">
+  <el-drawer v-model="drawerUserVisible" :title="title" size="40%" :close-on-click-modal="true">
     <el-form ref="formRef" :model="user" :rules="dialogRules">
       <el-form-item label="头像" :label-width="60">
         <el-upload
@@ -464,7 +464,7 @@
 
 
   <!-- 标角色编辑弹出对话框dialog -->
-  <el-drawer title="角色设置" v-model="drawerRoleVisible" size="35%" :close-on-click-modal="false">
+  <el-drawer title="角色设置" v-model="drawerRoleVisible" size="35%" :close-on-click-modal="true">
     <el-form ref="form" :model="user" label-width="80px">
       <el-form-item label="姓名">
         <el-input v-model="user.realName" disabled></el-input>

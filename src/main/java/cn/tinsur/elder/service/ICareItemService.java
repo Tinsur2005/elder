@@ -5,6 +5,8 @@ import cn.tinsur.elder.pojo.query.CareItemQuery;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * <p>
  * 护理项目表 服务类
@@ -21,4 +23,10 @@ public interface ICareItemService extends IService<CareItem> {
      * @return 分页结果
      */
     IPage<CareItem> list(CareItemQuery careItemQuery);
+
+    /**
+     * 获取全部启用状态的护理项目列表（供护理计划等"选护理项目"下拉框使用）
+     * @return 护理项目的List列表
+     */
+    List<CareItem> listAll();
 }

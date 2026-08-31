@@ -194,4 +194,23 @@ public class UserController {
     public Result updateRoles (@PathVariable Long id, @RequestBody Long[] roles) {
         return userService.updateRoles(id, roles);
     }
+
+    /**
+     * 按角色搜索用户（供护理计划等"选护理人员"远程下拉框使用）
+     * GET /users/searchByRole?roleId=3&name=xxx
+     */
+    @GetMapping("/searchByRole")
+    public Result<List<User>> searchByRole(@RequestParam Long roleId,
+                                           @RequestParam(required = false) String name) {
+        return Result.ok(userService.searchByRole(roleId, name));
+    }
+
+    /**
+     * 按姓名搜索所有用户（不做角色限定，供护理计划等"选护理人员"远程下拉框使用）
+     * GET /users/searchByName?name=xxx
+     */
+    @GetMapping("/searchByName")
+    public Result<List<User>> searchByName(@RequestParam(required = false) String name) {
+        return Result.ok(userService.searchByName(name));
+    }
 }

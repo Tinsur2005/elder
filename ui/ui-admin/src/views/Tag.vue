@@ -238,7 +238,7 @@
 
 
   <!--添加、编辑弹出框-->
-  <el-drawer v-model="drawerTagVisible" :title="title" size="35%" :close-on-click-modal="false">
+  <el-drawer v-model="drawerTagVisible" :title="title" size="35%" :close-on-click-modal="true">
     <el-form ref="formRef" :model="tag" :rules="dialogRules">
       <el-form-item prop="name" label="标签名称" :label-width="80">
         <el-input v-model="tag.name" autocomplete="off"/>

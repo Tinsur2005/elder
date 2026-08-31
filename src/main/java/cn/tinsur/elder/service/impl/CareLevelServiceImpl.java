@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.util.List;
+
 /**
  * <p>
  * 护理等级表 服务实现类
@@ -38,5 +40,12 @@ public class CareLevelServiceImpl extends ServiceImpl<CareLevelMapper, CareLevel
                         careLevelQuery.getEndCreateTime())
                 .orderByAsc(CareLevel::getSort);
         return careLevelMapper.selectPage(page, lambdaQueryWrapper);
+    }
+
+    @Override
+    public List<CareLevel> listAll() {
+        return careLevelMapper.selectList(new LambdaQueryWrapper<CareLevel>()
+                .eq(CareLevel::getStatus, 1)
+                .orderByAsc(CareLevel::getSort));
     }
 }

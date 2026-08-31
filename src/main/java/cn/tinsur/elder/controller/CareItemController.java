@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * <p>
@@ -87,6 +88,15 @@ public class CareItemController {
     public Result deleteBatch(@RequestBody Long[] ids) {
         careItemService.removeByIds(Arrays.asList(ids));
         return Result.ok("批量删除成功");
+    }
+
+    /**
+     * 获取全部启用状态的护理项目列表List（供护理计划等"选护理项目"下拉框使用）
+     * GET /care-items/list
+     */
+    @GetMapping("/list")
+    public Result<List<CareItem>> list() {
+        return Result.ok(careItemService.listAll());
     }
 
     /**

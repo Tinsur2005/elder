@@ -379,7 +379,7 @@
   </el-card>
 
   <!--添加、编辑弹出框-->
-  <el-drawer v-model="drawerContractVisible" :title="title" size="40%" :close-on-click-modal="false">
+  <el-drawer v-model="drawerContractVisible" :title="title" size="40%" :close-on-click-modal="true">
     <el-form ref="formRef" :model="contract" :rules="dialogRules">
       <el-form-item prop="contractNo" label="合同编号" :label-width="80">
         <el-input v-model="contract.contractNo" autocomplete="off"/>

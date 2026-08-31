@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * <p>
@@ -87,6 +88,15 @@ public class CareLevelController {
     public Result deleteBatch(@RequestBody Long[] ids) {
         careLevelService.removeByIds(Arrays.asList(ids));
         return Result.ok("批量删除成功");
+    }
+
+    /**
+     * 获取全部启用状态的护理等级列表List（供护理计划等"选护理等级"下拉框使用）
+     * GET /care-levels/list
+     */
+    @GetMapping("/list")
+    public Result<List<CareLevel>> list() {
+        return Result.ok(careLevelService.listAll());
     }
 
     /**

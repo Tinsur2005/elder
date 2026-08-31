@@ -311,7 +311,7 @@
 
 
   <!--添加、编辑弹出框-->
-  <el-drawer v-model="drawerCareItemVisible" :title="title" size="40%" :close-on-click-modal="false">
+  <el-drawer v-model="drawerCareItemVisible" :title="title" size="40%" :close-on-click-modal="true">
     <el-form ref="formRef" :model="careItem" :rules="dialogRules">
       <el-form-item label="图片" :label-width="80">
         <el-upload

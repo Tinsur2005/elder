@@ -44,6 +44,12 @@ const userApi = {
     },updateRolesById(id, roles) {
         // 根据用户id来修改角色（修改的是user_roles中间表的数据）
         return request.put(`/users/updateRoles/${id}`, roles)
+    },searchByRole(roleId, name) {
+        // 根据角色id（可加姓名关键字）搜索用户，供护理计划等"选护理人员"远程下拉框使用
+        return request.get("/users/searchByRole", {params: {roleId, name}});
+    },searchByName(name) {
+        // 按真实姓名（可输入部分或全部）模糊搜索所有用户，供护理计划等"选护理人员"远程下拉框使用，不限定角色
+        return request.get("/users/searchByName", {params: {name}});
     },
 }
 

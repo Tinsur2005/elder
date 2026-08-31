@@ -364,7 +364,7 @@
           <el-button type="danger" :icon="Delete" @click="deleteAll" v-if="hasBtnPermission('elder:deleteAll')">批量删除</el-button>
         </div>
         <div class="header-right">
-          <el-button type="primary" :icon="Download" @click="exportExcel">导出Excel</el-button>
+          <el-button type="primary" :icon="Download" @click="exportExcel" v-if="hasBtnPermission('elder:export')">导出Excel</el-button>
           <el-upload
               :icon="Upload"
               class="inline-block"
@@ -377,7 +377,7 @@
               :on-success="importExcelSuccess"
               :headers="{Authorization: tokenStore.token}"
               name="file">
-            <el-button type="primary" :icon="Upload">导入Excel</el-button>
+            <el-button type="primary" :icon="Upload" v-if="hasBtnPermission('elder:import')">导入Excel</el-button>
           </el-upload>
         </div>
       </div>
@@ -468,7 +468,7 @@
   </el-card>
 
   <!--添加、编辑弹出框-->
-  <el-drawer v-model="drawerElderVisible" :title="title" size="40%" :close-on-click-modal="false">
+  <el-drawer v-model="drawerElderVisible" :title="title" size="40%" :close-on-click-modal="true">
     <el-form ref="formRef" :model="elder" :rules="dialogRules">
       <el-form-item label="头像" :label-width="60">
         <el-upload
@@ -531,7 +531,7 @@
   </el-drawer>
 
   <!-- 标注标签弹出对话框dialog -->
-  <el-drawer title="标签标注" v-model="drawerTagAssignVisible" size="35%" :close-on-click-modal="false">
+  <el-drawer title="标签标注" v-model="drawerTagAssignVisible" size="35%" :close-on-click-modal="true">
     <el-form ref="form" :model="elder" label-width="80px">
       <el-form-item label="姓名">
         <el-input v-model="elder.realName" disabled></el-input>

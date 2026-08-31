@@ -9,6 +9,10 @@ const careItemApi = {
     selectById(id) {
         return request.get(`/care-items/${id}`);
     },
+    // 获取全部启用状态的护理项目列表List（供护理计划等"选护理项目"下拉框使用）
+    listAll() {
+        return request.get(`/care-items/list`)
+    },
     // 新增护理项目
     add(careItem) {
         return request.post("/care-items", careItem)

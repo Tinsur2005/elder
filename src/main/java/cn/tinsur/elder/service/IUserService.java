@@ -53,4 +53,20 @@ public interface IUserService extends IService<User> {
     Result updateRoles(Long id, Long[] roleIds);
 
     Map<String, Object> selectPermissionByUserId(Long id);
+
+    /**
+     * 按角色搜索用户（供护理计划等"选护理人员"远程下拉框使用）
+     * @param roleId 角色id（护工=3）
+     * @param name 可选的姓名关键字，为空则返回该角色下全部用户
+     * @return 用户的List列表
+     */
+    List<User> searchByRole(Long roleId, String name);
+
+    /**
+     * 按姓名搜索所有用户（不做任何角色限定，供护理计划等"选护理人员"远程下拉框使用，
+     * 这样即使删掉"护工"角色也不影响绑定人员）
+     * @param name 可选的姓名关键字，为空则返回全部用户
+     * @return 用户的List列表
+     */
+    List<User> searchByName(String name);
 }

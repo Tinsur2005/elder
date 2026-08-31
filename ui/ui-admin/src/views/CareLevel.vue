@@ -278,7 +278,7 @@
 
 
   <!--添加、编辑弹出框-->
-  <el-drawer v-model="drawerCareLevelVisible" :title="title" size="40%" :close-on-click-modal="false">
+  <el-drawer v-model="drawerCareLevelVisible" :title="title" size="40%" :close-on-click-modal="true">
     <el-form ref="formRef" :model="careLevel" :rules="dialogRules">
       <el-form-item prop="name" label="等级名称" :label-width="80">
         <el-input v-model="careLevel.name" autocomplete="off"/>

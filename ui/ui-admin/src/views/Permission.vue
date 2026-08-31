@@ -71,7 +71,7 @@
   //根据行数据打开添加子菜单对话框（传row为添加下级，不传为添加顶级菜单）
   const showAddDialog = (row) => {
     drawerPermissionVisible.value = true
-    permission.value = {sort: 0} //排序默认0
+    permission.value = {sort: 0, status: 1} //排序默认0、状态默认启用(1)
     title.value = '添加下级菜单'
 
     if (row) {//点击右侧添加按钮

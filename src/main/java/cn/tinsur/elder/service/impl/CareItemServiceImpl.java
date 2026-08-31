@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.util.List;
+
 /**
  * <p>
  * 护理项目表 服务实现类
@@ -38,5 +40,12 @@ public class CareItemServiceImpl extends ServiceImpl<CareItemMapper, CareItem> i
                         careItemQuery.getEndCreateTime())
                 .orderByAsc(CareItem::getSort);
         return careItemMapper.selectPage(page, lambdaQueryWrapper);
+    }
+
+    @Override
+    public List<CareItem> listAll() {
+        return careItemMapper.selectList(new LambdaQueryWrapper<CareItem>()
+                .eq(CareItem::getStatus, 1)
+                .orderByAsc(CareItem::getSort));
     }
 }

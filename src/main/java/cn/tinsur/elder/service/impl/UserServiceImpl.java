@@ -258,4 +258,41 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         });
         return Map.of("routerList", permissionService.buildTree(permissionVOList), "btnList", btnList);
     }
+
+    /**
+     * 按角色搜索用户：先查出该角色下所有 user-role 中间表记录的 userId，
+     * 再根据姓名关键字（可为空）在这些用户中做模糊查询
+     */
+    @Override
+    public List<User> searchByRole(Long roleId, String name) {
+        // 1.查该角色下所有 user_role 记录，取出 userId 列表
+        List<Long> userIds = userRoleMapper.selectList(
+                        new LambdaQueryWrapper<UserRole>().eq(UserRole::getRoleId, roleId))
+                .stream()
+                .map(UserRole::getUserId)
+                .toList();
+        if (userIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+        // 2.按姓名（可选）模糊查询这些用户，未输入姓名则返回全部
+        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper
+                .in(User::getId, userIds)
+                .like(!ObjectUtils.isEmpty(name), User::getRealName, name);
+        return userMapper.selectList(lambdaQueryWrapper);
+    }
+
+    /**
+     * 按姓名搜索所有用户，不做角色限定（供护理计划等"选护理人员"远程下拉框使用）
+     * 不判断角色，是为了避免删掉"护工"这个角色后导致绑定人员的功能失效
+     * @param name 可选的姓名关键字，为空则返回全部用户
+     * @return 用户的List列表
+     */
+    @Override
+    public List<User> searchByName(String name) {
+        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        //按真实姓名（可输入部分或全部）模糊查询所有用户
+        lambdaQueryWrapper.like(!ObjectUtils.isEmpty(name), User::getRealName, name);
+        return userMapper.selectList(lambdaQueryWrapper);
+    }
 }

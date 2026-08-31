@@ -9,6 +9,10 @@ const careLevelApi = {
     selectById(id) {
         return request.get(`/care-levels/${id}`);
     },
+    // 获取全部启用状态的护理等级列表List（供护理计划等"选护理等级"下拉框使用）
+    listAll() {
+        return request.get(`/care-levels/list`)
+    },
     // 新增护理等级
     add(careLevel) {
         return request.post("/care-levels", careLevel)

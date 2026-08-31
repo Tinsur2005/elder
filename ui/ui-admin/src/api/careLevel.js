@@ -1,0 +1,30 @@
+import request from "@/utils/request.js";
+
+const careLevelApi = {
+    // 分页查询护理等级列表
+    list(careLevelQuery) {
+        return request.get("/care-levels", {params: careLevelQuery});
+    },
+    // 根据ID查询护理等级
+    selectById(id) {
+        return request.get(`/care-levels/${id}`);
+    },
+    // 新增护理等级
+    add(careLevel) {
+        return request.post("/care-levels", careLevel)
+    },
+    // 修改护理等级
+    update(id, careLevel) {
+        return request.put(`/care-levels/${id}`, careLevel)
+    },
+    // 根据ID删除护理等级
+    deleteById(id) {
+        return request.delete(`/care-levels/${id}`);
+    },
+    // 批量删除护理等级
+    deleteAll(ids) {
+        // axios 的 delete 第2个参数是 config，请求体必须放在 data 字段里
+        return request.delete("/care-levels", {data: ids});
+    }
+}
+export default careLevelApi

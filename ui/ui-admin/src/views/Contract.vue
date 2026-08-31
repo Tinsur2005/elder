@@ -6,6 +6,7 @@
   import {ElMessage, ElMessageBox} from 'element-plus'
   import {Plus, Delete, EditPen, Upload, Document} from '@element-plus/icons-vue'
   import {useTokenStore} from '@/store/token.js'
+  import hasBtnPermission from "@/utils/btnPermission.js";
   const tokenStore = useTokenStore()
   const route = useRoute()
 
@@ -280,8 +281,8 @@
     <template #header>
       <div class="header">
         <div class="header-left">
-          <el-button type="primary" :icon="Plus" @click="showAddDialog">添加</el-button>
-          <el-button type="danger" :icon="Delete" @click="deleteAll">批量删除</el-button>
+          <el-button type="primary" :icon="Plus" @click="showAddDialog" v-if="hasBtnPermission('contract:add')">添加</el-button>
+          <el-button type="danger" :icon="Delete" @click="deleteAll" v-if="hasBtnPermission('contract:deleteAll')">批量删除</el-button>
         </div>
         <div class="header-right"></div>
       </div>
@@ -360,9 +361,9 @@
       <el-table-column prop="createTime" label="创建时间" width="160"/>
       <el-table-column align="center" width="280" fixed="right" label="操作">
         <template #default="{ row }">
-          <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)">编辑</el-button>
-          <el-button size="small" type="success" :icon="Document" @click="viewContract(row)">查看合同</el-button>
-          <el-button size="small" type="danger" :icon="Delete" @click="deleteById(row.id)">删除</el-button>
+          <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)" v-if="hasBtnPermission('contract:update')">编辑</el-button>
+          <el-button size="small" type="success" :icon="Document" @click="viewContract(row)" v-if="hasBtnPermission('contract:get')">查看合同</el-button>
+          <el-button size="small" type="danger" :icon="Delete" @click="deleteById(row.id)" v-if="hasBtnPermission('contract:deleteById')">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

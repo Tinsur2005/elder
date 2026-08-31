@@ -132,7 +132,14 @@ public class UserController {
         Integer id = (Integer) map.get("id");
         User user = userService.getById(id);
         user.setPassword(null);
-        return Result.ok(user);
+
+        Map<String, Object> permissionMap = userService.selectPermissionByUserId(user.getId());
+
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("user", user);
+        resultMap.put("routerList", permissionMap.get("routerList"));
+        resultMap.put("btnList", permissionMap.get("btnList"));
+        return Result.ok(resultMap);
     }
 
     /**

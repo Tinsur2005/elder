@@ -2,15 +2,19 @@ package cn.tinsur.elder.service.impl;
 
 import cn.tinsur.elder.exception.ServiceException;
 import cn.tinsur.elder.listener.UserExcelListener;
+import cn.tinsur.elder.mapper.PermissionMapper;
 import cn.tinsur.elder.mapper.RoleMapper;
 import cn.tinsur.elder.mapper.UserRoleMapper;
+import cn.tinsur.elder.pojo.entity.Permission;
 import cn.tinsur.elder.pojo.entity.Role;
 import cn.tinsur.elder.pojo.entity.User;
 import cn.tinsur.elder.mapper.UserMapper;
 import cn.tinsur.elder.pojo.query.UserQuery;
+import cn.tinsur.elder.pojo.vo.PermissionVO;
 import cn.tinsur.elder.pojo.vo.UserExcelVO;
 import cn.tinsur.elder.pojo.entity.UserRole;
 import cn.tinsur.elder.pojo.vo.UserVO;
+import cn.tinsur.elder.service.IPermissionService;
 import cn.tinsur.elder.service.IUserService;
 import cn.tinsur.elder.util.ExcelUtil;
 import cn.tinsur.elder.util.Result;
@@ -30,10 +34,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -54,6 +55,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Autowired
     private RoleMapper roleMapper;
+
+    @Autowired
+    private IPermissionService permissionService;
+
 
     /**
      * 获取用户列表（分页），返回 UserVO，并在每个UserVO中填充当前用户的角色列表roles
@@ -233,5 +238,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         deleteAllRolesById(id);
         addRoleById(id, roles);
         return Result.ok("更新成功");
+    }
+
+    @Override
+    public Map<String, Object> selectPermissionByUserId(Long id) {
+        //根据用户id查询这个用户所有权限
+        List<Permission> permissionList = userMapper.selectPermissionByUserId(id);
+        //把List<Permission> 转换成List<PermissionVO>
+        List<String> btnList = new ArrayList<>();
+        List<PermissionVO> permissionVOList = new ArrayList<>();
+        permissionList.forEach(permission -> {
+            if (permission.getType() == 2) {//按钮权限
+                btnList.add(permission.getPermissionValue());
+            } else {//目录和菜单权限
+                PermissionVO permissionVO = new PermissionVO();
+                BeanUtils.copyProperties(permission, permissionVO);
+                permissionVOList.add(permissionVO);
+            }
+        });
+        return Map.of("routerList", permissionService.buildTree(permissionVOList), "btnList", btnList);
     }
 }

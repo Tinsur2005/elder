@@ -3,6 +3,7 @@
   import {nextTick, ref} from 'vue'
   import {ElMessage, ElMessageBox} from 'element-plus'
   import {Delete, EditPen, Plus} from "@element-plus/icons-vue";
+  import hasBtnPermission from "@/utils/btnPermission.js";
 
   //表格数据
   const list = ref([])
@@ -183,8 +184,8 @@
   <el-card class="">
     <template #header>
       <div class="header">
-        <el-button type="primary" :icon="Plus" @click="showAddDialog">添加</el-button>
-        <el-button type="danger" :icon="Delete" @click="deleteAll">批量删除</el-button>
+        <el-button type="primary" :icon="Plus" @click="showAddDialog" v-if="hasBtnPermission('tag:add')">添加</el-button>
+        <el-button type="danger" :icon="Delete" @click="deleteAll" v-if="hasBtnPermission('tag:deleteAll')">批量删除</el-button>
       </div>
     </template>
     <!--模糊查找-->
@@ -219,8 +220,8 @@
       <el-table-column prop="createTime" label="创建时间" :show-overflow-tooltip="true"/>
       <el-table-column align="center" width="200px" fixed="right" label="操作">
         <template #default="{ row }">
-          <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)">编辑</el-button>
-          <el-button size="small" type="danger" :icon="Delete" @click="deleteById(row.id)">删除</el-button>
+          <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)" v-if="hasBtnPermission('tag:update')">编辑</el-button>
+          <el-button size="small" type="danger" :icon="Delete" @click="deleteById(row.id)" v-if="hasBtnPermission('tag:delete')">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

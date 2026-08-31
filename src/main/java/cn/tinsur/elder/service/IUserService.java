@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -50,4 +51,6 @@ public interface IUserService extends IService<User> {
     void addRoleById(Long id, Long[] rowId);
 
     Result updateRoles(Long id, Long[] roleIds);
+
+    Map<String, Object> selectPermissionByUserId(Long id);
 }

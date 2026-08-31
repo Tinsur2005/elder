@@ -7,6 +7,7 @@
   import {Plus, Download, Upload, Delete, EditPen, PriceTag} from '@element-plus/icons-vue'
   import {useTokenStore} from '@/store/token.js'
   import eldersApi from "@/api/elder.js";
+  import hasBtnPermission from "@/utils/btnPermission.js";
   const tokenStore = useTokenStore()
   const router = useRouter()
 
@@ -359,8 +360,8 @@
     <template #header>
       <div class="header">
         <div class="header-left">
-          <el-button type="primary" :icon="Plus" @click="showAddDialog">添加</el-button>
-          <el-button type="danger" :icon="Delete" @click="deleteAll">批量删除</el-button>
+          <el-button type="primary" :icon="Plus" @click="showAddDialog" v-if="hasBtnPermission('elder:add')">添加</el-button>
+          <el-button type="danger" :icon="Delete" @click="deleteAll" v-if="hasBtnPermission('elder:deleteAll')">批量删除</el-button>
         </div>
         <div class="header-right">
           <el-button type="primary" :icon="Download" @click="exportExcel">导出Excel</el-button>
@@ -442,16 +443,16 @@
       </el-table-column>
       <el-table-column label="合同" width="100" align="center">
         <template #default="{row}">
-          <el-link type="primary" @click="goContract(row)">查看合同</el-link>
+          <el-link type="primary" @click="goContract(row)" v-if="hasBtnPermission('contract:get')">查看合同</el-link>
         </template>
       </el-table-column>
       <el-table-column prop="remark" label="备注" :show-overflow-tooltip="true" width="125"/>
       <el-table-column prop="createTime" label="创建时间" :show-overflow-tooltip="true" width="160"/>
       <el-table-column align="center" width="250px" fixed="right" label="操作">
         <template #default="{ row }">
-          <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)">编辑</el-button>
+          <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)" v-if="hasBtnPermission('elder:update')">编辑</el-button>
           <el-button size="small" type="success" :icon="PriceTag" @click="showAssignedTagDialog(row)">标注</el-button>
-          <el-button size="small" type="danger" :icon="Delete" @click="deleteById(row.id)">删除</el-button>
+          <el-button size="small" type="danger" :icon="Delete" @click="deleteById(row.id)" v-if="hasBtnPermission('elder:deleteById')">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

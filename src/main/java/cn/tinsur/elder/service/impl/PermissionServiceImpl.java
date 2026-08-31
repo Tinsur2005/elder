@@ -54,7 +54,24 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     }
 
     /**
-     * 构建子节点树
+     * 给定任何一个List<PermissionVO>，都可以返回一个树形结构
+     *
+     * @param permissionVOList
+     * @return
+     */
+    public List<PermissionVO> buildTree(List<PermissionVO> permissionVOList) {
+        //所有一级分类
+        List<PermissionVO> permissionVOTree = permissionVOList.stream()
+                .filter(permissionVO -> permissionVO.getParentId() == 0)
+                .map(permissionVO -> {
+                    permissionVO.setChildren(buildChildrenTree(permissionVO, permissionVOList)); // 构建children
+                    return permissionVO;
+                }).toList();
+        return permissionVOTree;
+    }
+
+    /**
+     * 构建子节点树，需要传入父节点和所有节点列表
      * @param parentPermissionVO 父节点
      * @param permissionVOList 子节点
      * @return

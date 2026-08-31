@@ -1,7 +1,10 @@
 package cn.tinsur.elder.mapper;
 
+import cn.tinsur.elder.pojo.entity.Permission;
 import cn.tinsur.elder.pojo.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface UserMapper extends BaseMapper<User> {
 
+    List<Permission> selectPermissionByUserId(Long id);
 }

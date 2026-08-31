@@ -78,14 +78,14 @@
       permission.value.parentId = row.id
       permission.value.parentName = row.name
       if (row.type == 0) {
-        //在目录下面添加，可以添加：菜单
+        //在目录下面添加，只能选择：菜单、按钮（不能选目录本身）
         permission.value.type = 1
         typeDisabled.value = false
         type0Disabled.value = true
         type1Disabled.value = false
-        type2Disabled.value = true
+        type2Disabled.value = false
       } else if (row.type == 1) {
-        //在菜单下面添加：只能添加：按钮
+        //在菜单下面添加，只能选择：按钮（不能选目录和菜单）
         permission.value.type = 2
         typeDisabled.value = false
         type0Disabled.value = true

@@ -37,6 +37,9 @@
   const router = useRouter()
   const resetForm = ref()
 
+  // 菜单
+  const menuData = ref([]);
+
   // ============ 对话框控制  ============
   //控制用户信息对话框
   const dialogFormVisible = ref(false)
@@ -48,7 +51,9 @@
   const getUserInfo = () => {
     userApi.userInfo().then(result => {
       if(result.code === 1) {
-        userInfoStore.setUserInfo(result.data)
+        userInfoStore.setUserInfo(result.data.user)
+        menuData.value = result.data.routerList
+        userInfoStore.setBtnList(result.data.btnList)
       }
     })
   }
@@ -191,56 +196,27 @@
       <!-- element-plus的菜单标签 -->
       <el-menu :default-active="$route.path" active-text-color="#409EFF" text-color="#303133"
                :background-color="'#fff'" router>
-        <el-menu-item index="/">
-          <el-icon>
-            <HomeFilled/>
-          </el-icon>
-          <span>首页</span>
-        </el-menu-item>
-        <el-menu-item index="/elder">
-          <el-icon>
-            <Promotion/>
-          </el-icon>
-          <span>老人管理</span>
-        </el-menu-item>
-        <el-menu-item index="/tag">
-          <el-icon>
-            <CollectionTag/>
-          </el-icon>
-          <span>标签管理</span>
-        </el-menu-item>
-        <el-menu-item index="/contract">
-          <el-icon>
-            <Document/>
-          </el-icon>
-          <span>合同管理</span>
-        </el-menu-item>
-        <el-sub-menu index="1">
-          <template #title>
-            <el-icon>
-              <UserFilled/>
-            </el-icon>
-            <span>用户与权限</span>
-          </template>
-          <el-menu-item index="/user">
-            <el-icon>
-              <User/>
-            </el-icon>
-            <span>用户管理</span>
+        <!-- 动态生成菜单 -->
+        <template v-for="(menu, index) in menuData" :index="index.toString()">
+          <el-sub-menu v-if="menu.children?.length>0" :index="menu.name">
+            <template #title>
+              <component
+                  class="icons"
+                  :is="menu.icon"
+                  style="width: 1em; height: 1em; margin-right: 8px" >
+              </component>
+              <span>{{ menu.name }}</span>
+            </template>
+            <el-menu-item v-for="(child, ind) in menu.children" :index="child.path">
+              <el-icon><component :is="child.icon"></component></el-icon>
+              <span>{{ child.name }}</span>
+            </el-menu-item>
+          </el-sub-menu>
+          <el-menu-item v-else :index="menu.path">
+            <el-icon><component :is="menu.icon"></component></el-icon>
+            <span>{{ menu.name }}</span>
           </el-menu-item>
-          <el-menu-item index="/role">
-            <el-icon>
-              <Crop/>
-            </el-icon>
-            <span>角色管理</span>
-          </el-menu-item>
-          <el-menu-item index="/permission">
-            <el-icon>
-              <EditPen/>
-            </el-icon>
-            <span>权限管理</span>
-          </el-menu-item>
-        </el-sub-menu>
+        </template>
       </el-menu>
     </el-aside>
     <!-- 右侧主区域 -->

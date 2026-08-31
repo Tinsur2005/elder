@@ -11,6 +11,7 @@
   } from '@element-plus/icons-vue'
   import {useTokenStore} from '@/store/token.js'
   import rolesApi from "@/api/roles.js";
+  import hasBtnPermission from "@/utils/btnPermission.js";
   const tokenStore = useTokenStore()
 
   //表格数据
@@ -311,8 +312,8 @@
     <template #header>
       <div class="header">
         <div class="header-left">
-          <el-button type="primary" :icon="Plus" @click="showAddDialog">添加</el-button>
-          <el-button type="danger" :icon="Delete" @click="deleteAll">批量删除</el-button>
+          <el-button type="primary" :icon="Plus" @click="showAddDialog" v-if="hasBtnPermission('user:add')">添加</el-button>
+          <el-button type="danger" :icon="Delete" @click="deleteAll" v-if="hasBtnPermission('user:deleteAll')">批量删除</el-button>
         </div>
         <div class="header-right">
           <el-button type="primary" :icon="Download" @click="exportExcel">导出Excel</el-button>
@@ -396,9 +397,9 @@
       <el-table-column prop="createTime" label="创建时间"/>
       <el-table-column align="center" width="250px" fixed="right" label="操作">
         <template #default="{ row }">
-          <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)">编辑</el-button>
+          <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)" v-if="hasBtnPermission('user:update')">编辑</el-button>
           <el-button size="small" type="success" :icon="User" @click="showRolesDialog(row.id)">角色</el-button>
-          <el-button size="small" type="danger" :icon="Delete" @click="deleteById(row.id)">删除</el-button>
+          <el-button size="small" type="danger" :icon="Delete" @click="deleteById(row.id)" v-if="hasBtnPermission('user:deleteById')">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

@@ -4,7 +4,8 @@ export const useUserInfoStore = defineStore('userInfo', {
     //存储数据点的地方
     state() {
         return {
-            user: {}
+            user: {},
+            btnList: []
         }
     },
     //方法
@@ -13,11 +14,16 @@ export const useUserInfoStore = defineStore('userInfo', {
             this.user = user
         },
         removeUserInfo() {
-            this.user={}
+            this.user = {}
+        },
+        setBtnList(btnList) {
+            this.btnList = btnList
+        },
+        removeBtnList() {
+            this.btnList = []
         }
     },
-    persist:{
+    persist: {
         enabled: true,  //开启缓存，存储在本地localstorage
     }
-    }
-)
+})

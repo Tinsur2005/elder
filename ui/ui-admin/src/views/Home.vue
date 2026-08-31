@@ -1,8 +1,6 @@
 <script setup>
-  import elderApi from '@/api/elder.js'
-  import contractApi from '@/api/contract.js'
-  import userApi from '@/api/user.js'
-  import tagsApi from '@/api/tags.js'
+  import dashboardApi from '@/api/dashboard.js'
+  import EChart from '@/components/EChart.vue'
   import {ref} from 'vue'
   import {useRouter} from 'vue-router'
   import {useUserInfoStore} from '@/store/userInfo.js'
@@ -11,30 +9,75 @@
   const router = useRouter()
   const userInfoStore = useUserInfoStore()
 
-  // ============ 统计数据（进入页面时请求，取自各列表接口的 total，无需改后端） ============
-  const stats = ref({
-    elder: 0,    // 老人总数
-    contract: 0, // 合同总数
-    user: 0,     // 用户总数
-    tag: 0       // 标签总数
-  })
+  // ============ 看板数据（进入页面时从后端获取，统计卡片和图表共用一次请求） ============
+  const dashboard = ref({})
 
-  // 供列表分页接口取 total 使用，limit 设为1只看总数
-  const loadStats = () => {
-    elderApi.list({page: 1, limit: 1}).then(result => {
-      stats.value.elder = result.data.total
-    })
-    contractApi.list({page: 1, limit: 1}).then(result => {
-      stats.value.contract = result.data.total
-    })
-    userApi.list({page: 1, limit: 1}).then(result => {
-      stats.value.user = result.data.total
-    })
-    tagsApi.listAll().then(result => {
-      stats.value.tag = result.data.length
+  //各图表的echarts配置项，异步拿到数据后由构建方法生成
+  const weekTaskOption = ref({})
+  const todayTaskStatusOption = ref({})
+  const contractTypeOption = ref({})
+  const elderTagOption = ref({})
+
+  const loadDashboard = () => {
+    dashboardApi.getDashboard().then(result => {
+      dashboard.value = result.data
+      //根据后端数据生成各图表的配置项
+      weekTaskOption.value = buildWeekTaskOption(result.data.weekTaskList || [])
+      todayTaskStatusOption.value = buildPieOption('今日任务状态', result.data.todayTaskStatusList || [])
+      contractTypeOption.value = buildPieOption('合同类型', result.data.contractTypeList || [])
+      elderTagOption.value = buildElderTagOption(result.data.elderTagList || [])
     })
   }
-  loadStats()
+  loadDashboard()
+
+  // ============ 图表配置构建 ============
+
+  //近7天护理任务柱状图配置：每天的待执行/已完成/已跳过三根柱子
+  const buildWeekTaskOption = (weekTaskList) => {
+    return {
+      tooltip: {trigger: 'axis'},
+      legend: {data: ['待执行', '已完成', '已跳过'], top: 0},
+      grid: {left: 40, right: 20, top: 56, bottom: 30},
+      xAxis: {type: 'category', data: weekTaskList.map(item => item.date)},
+      yAxis: {type: 'value', minInterval: 1},
+      series: [
+        {name: '待执行', type: 'bar', data: weekTaskList.map(item => item.pendingCount), itemStyle: {color: '#E6A23C'}},
+        {name: '已完成', type: 'bar', data: weekTaskList.map(item => item.completedCount), itemStyle: {color: '#67C23A'}},
+        {name: '已跳过', type: 'bar', data: weekTaskList.map(item => item.skippedCount), itemStyle: {color: '#909399'}}
+      ]
+    }
+  }
+
+  //通用饼图配置：今日任务状态、合同类型两个饼图共用这一个构建方法，避免重复代码
+  const buildPieOption = (seriesName, nameValueList) => {
+    return {
+      tooltip: {trigger: 'item', formatter: '{b}：{c}（{d}%）'},
+      legend: {bottom: 0},
+      series: [
+        {
+          name: seriesName,
+          type: 'pie',
+          radius: ['40%', '65%'],
+          center: ['50%', '45%'],
+          label: {formatter: '{b}\n{c}'},
+          data: nameValueList
+        }
+      ]
+    }
+  }
+
+  //老人标签条形图配置：横向柱状，按数量从大到小排列（后端已排好序）
+  const buildElderTagOption = (elderTagList) => {
+    return {
+      tooltip: {trigger: 'axis', axisPointer: {type: 'shadow'}},
+      grid: {left: 80, right: 30, top: 20, bottom: 30},
+      xAxis: {type: 'value', minInterval: 1},
+      yAxis: {type: 'category', data: elderTagList.map(item => item.name)},
+      series: [
+        {name: '老人数量', type: 'bar', data: elderTagList.map(item => item.value), itemStyle: {color: '#409EFF'}, barMaxWidth: 24}
+      ]
+    }
+  }
 
   // ============ 顶部问候语 ============
   // 根据当前小时段返回对应的问候语
@@ -59,7 +102,7 @@
   const quickLinks = [
     {name: '老人管理',                 icon: UserFilled,  path: '/elder'},
     {name: '合同管理',                 icon: Document,    path: '/contract'},
-    {name: '标签管理',                 icon: CollectionTag, path: '/tag'},
+    {name: '护理任务',                 icon: Timer,       path: '/careTask'},
     {name: '用户管理',                 icon: User,        path: '/user'},
   ]
 
@@ -88,10 +131,10 @@
     <!-- ② 统计卡片 -->
     <el-row :gutter="16" class="stat-row">
       <el-col :xs="12" :sm="12" :md="6" v-for="(item, i) in [
-        {label: '老人总数', value: stats.elder,    icon: UserFilled,   color: '#409EFF'},
-        {label: '合同总数', value: stats.contract, icon: Document,     color: '#67C23A'},
-        {label: '用户总数', value: stats.user,     icon: User,         color: '#E6A23C'},
-        {label: '标签总数', value: stats.tag,      icon: CollectionTag, color: '#F56C6C'},
+        {label: '老人总数',       value: dashboard.elderCount ?? 0,          icon: UserFilled,   color: '#409EFF'},
+        {label: '合同总数',       value: dashboard.contractCount ?? 0,       icon: Document,     color: '#67C23A'},
+        {label: '用户总数',       value: dashboard.userCount ?? 0,           icon: User,         color: '#E6A23C'},
+        {label: '今日待执行任务', value: dashboard.todayPendingTaskCount ?? 0, icon: CollectionTag, color: '#F56C6C'},
       ]" :key="i">
         <el-card class="stat-card" shadow="hover">
           <div class="stat-body">
@@ -107,7 +150,55 @@
       </el-col>
     </el-row>
 
-    <!-- ③ 快捷入口 + 系统信息 -->
+    <!-- ③ 数据图表：护理任务两张图 -->
+    <el-row :gutter="16">
+      <el-col :xs="24" :md="14">
+        <el-card class="panel" shadow="never">
+          <template #header>
+            <div class="panel-header">
+              <span>近7天护理任务完成情况</span>
+            </div>
+          </template>
+          <EChart :option="weekTaskOption" height="300px"/>
+        </el-card>
+      </el-col>
+      <el-col :xs="24" :md="10">
+        <el-card class="panel" shadow="never">
+          <template #header>
+            <div class="panel-header">
+              <span>今日护理任务状态</span>
+            </div>
+          </template>
+          <EChart :option="todayTaskStatusOption" height="300px"/>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <!-- ④ 数据图表：合同与标签两张图 -->
+    <el-row :gutter="16">
+      <el-col :xs="24" :md="10">
+        <el-card class="panel" shadow="never">
+          <template #header>
+            <div class="panel-header">
+              <span>合同类型分布</span>
+            </div>
+          </template>
+          <EChart :option="contractTypeOption" height="300px"/>
+        </el-card>
+      </el-col>
+      <el-col :xs="24" :md="14">
+        <el-card class="panel" shadow="never">
+          <template #header>
+            <div class="panel-header">
+              <span>老人标签分布</span>
+            </div>
+          </template>
+          <EChart :option="elderTagOption" height="300px"/>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <!-- ⑤ 快捷入口 + 系统信息 -->
     <el-row :gutter="16" class="bottom-row">
       <el-col :xs="24" :md="16">
         <el-card class="panel" shadow="never">

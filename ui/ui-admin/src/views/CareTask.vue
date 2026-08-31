@@ -2,10 +2,12 @@
   import careTaskApi from '@/api/careTask.js'
   import elderApi from '@/api/elder.js'
   import {useUserInfoStore} from '@/store/userInfo.js'
+  import {useTokenStore} from '@/store/token.js'
   import {ref} from 'vue'
   import {ElMessage, ElMessageBox} from 'element-plus'
   import {Plus} from "@element-plus/icons-vue";
   import hasBtnPermission from "@/utils/btnPermission.js";
+  const tokenStore = useTokenStore()
 
   // ================== 对象 ==================
 
@@ -113,19 +115,27 @@
     drawerCompleteVisible.value = true
   }
 
-  //照片上传成功回调：往照片URL列表里收集这次上传返回的URL，并让el-upload能显示缩略图
-  const handleUploadSuccess = (response, file) => {
-    if (response.code === 1) {
-      imgList.value.push(response.data)
-      file.url = response.data //设置thumbnail显示上传成功的图片
+  //上传打卡照片成功后，把返回的url收集进照片URL列表，并设置缩略图显示上传成功的图片
+  const handleImgSuccess = (result, file) => {
+    imgList.value.push(result.data)
+    file.url = result.data
+  }
+  //上传时校验打卡照片的文件格式
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+  const beforeImgUpload = (rawFile) => {
+    if (!allowedTypes.includes(rawFile.type)) {
+      ElMessage.error('不支持的文件格式（仅支持jpg/png/webp）')
+      return false
+    } else if (rawFile.size / 1024 / 1024 > 2) {
+      ElMessage.error('上传的文件大小不允许超过2MB')
+      return false
     }
+    return true
   }
 
   //照片移除回调：把对应的URL从照片列表里去掉
-  const handleUploadRemove = (file) => {
-    //移除的这张图可能是已经上传的（有url），也可能是本次刚传的（在response.data里）
-    const url = file.url || file.response?.data
-    imgList.value = imgList.value.filter(item => item !== url)
+  const handleImgRemove = (file) => {
+    imgList.value = imgList.value.filter(item => item !== file.url)
   }
 
   //提交完成打卡
@@ -291,9 +301,13 @@
             action="/api/upload?dir=careTask"
             list-type="picture-card"
             accept="image/*"
-            :on-success="handleUploadSuccess"
-            :on-remove="handleUploadRemove"
-            :limit="6">
+            multiple
+            :limit="6"
+            :on-success="handleImgSuccess"
+            :on-remove="handleImgRemove"
+            :before-upload="beforeImgUpload"
+            :headers="{Authorization: tokenStore.token}"
+            name="file">
           <el-icon><Plus/></el-icon>
         </el-upload>
       </el-form-item>

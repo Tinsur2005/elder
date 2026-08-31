@@ -1,0 +1,351 @@
+<script setup>
+  import careTaskApi from '@/api/careTask.js'
+  import elderApi from '@/api/elder.js'
+  import {useUserInfoStore} from '@/store/userInfo.js'
+  import {ref} from 'vue'
+  import {ElMessage, ElMessageBox} from 'element-plus'
+  import {Plus} from "@element-plus/icons-vue";
+  import hasBtnPermission from "@/utils/btnPermission.js";
+
+  // ================== 对象 ==================
+
+  //表格数据
+  const list = ref([])
+  const total = ref(0)
+  //完成打卡弹框里的表单对象（记录执行结果、备注、执行人）
+  const completeForm = ref({})
+
+  // ================== 选项 ==================
+
+  // 任务状态选项（状态：0待执行 1已完成 2已跳过/取消）
+  const statusOptions = [
+    {value: 0, label: '待执行'},
+    {value: 1, label: '已完成'},
+    {value: 2, label: '已跳过'},
+  ]
+
+  // ================== 下拉数据 ==================
+
+  // 老人远程搜索：存放远程搜索出来的可选老人列表，供下拉框展示"姓名（身份证号）"
+  const elderOptions = ref([])
+  // 是否正在加载远程搜索结果（控制下拉框的loading转圈）
+  const elderLoading = ref(false)
+  // 远程搜索方法：根据用户输入的老人姓名（可部分可全部）去后端模糊搜索老人
+  const loadElderOptions = (query) => {
+    // 没有输入内容时不搜索，直接清空列表
+    if (!query) {
+      elderOptions.value = []
+      return
+    }
+    elderLoading.value = true
+    elderApi.searchByName(query).then(result => {
+      elderOptions.value = result.data
+    }).finally(() => {
+      elderLoading.value = false
+    })
+  }
+
+  // ================== 变量 ==================
+
+  //分页信息和搜索条件（按老人、状态、计划执行日期范围模糊搜索）
+  const careTaskQuery = ref({
+    elderId: '',
+    status: '',
+    page: 1,
+    limit: 10
+  })
+
+  //计划执行日期范围，用于搜索，初始化置为空，在日期选择框选择后被赋值
+  const planDateRange = ref([])
+
+  //完成打卡弹框的弹出控制
+  const drawerCompleteVisible = ref(false)
+  //完成打卡的照片URL列表（上传成功后收集，保存时用逗号拼接存入execute_img）
+  const imgList = ref([])
+
+  //详情抽屉的展示对象
+  const detail = ref({})
+  //详情抽屉的弹出控制
+  const drawerDetailVisible = ref(false)
+
+  // ================== 方法 ==================
+
+  //加载数据
+  const loadData = () => {
+    careTaskQuery.value.beginPlanExecuteDate = planDateRange.value?.[0]
+    careTaskQuery.value.endPlanExecuteDate = planDateRange.value?.[1]
+
+    careTaskApi.list(careTaskQuery.value).then(result => {
+      list.value = result.data.records
+      total.value = result.data.total
+    })
+  }
+
+  loadData()
+
+  const onSearch = () => {
+    careTaskQuery.value.page = 1 //重置搜索时页码
+    loadData()
+  }
+
+  //重置按钮点击事件
+  const reset = () => {
+    careTaskQuery.value = {
+      elderId: '',
+      status: '',
+      page: 1,
+      limit: 10
+    }
+    planDateRange.value = []
+    loadData()
+  }
+
+  //打开完成打卡弹框：记录执行结果、备注、现场照片，执行人取当前登录用户
+  const showCompleteDialog = (row) => {
+    const userInfoStore = useUserInfoStore()
+    completeForm.value = {
+      id: row.id,
+      executeResult: '',
+      remark: '',
+      userId: userInfoStore.user.id  //实际执行人取当前登录用户
+    }
+    imgList.value = [] //照片列表清空，由用户现场上传
+    drawerCompleteVisible.value = true
+  }
+
+  //照片上传成功回调：往照片URL列表里收集这次上传返回的URL，并让el-upload能显示缩略图
+  const handleUploadSuccess = (response, file) => {
+    if (response.code === 1) {
+      imgList.value.push(response.data)
+      file.url = response.data //设置thumbnail显示上传成功的图片
+    }
+  }
+
+  //照片移除回调：把对应的URL从照片列表里去掉
+  const handleUploadRemove = (file) => {
+    //移除的这张图可能是已经上传的（有url），也可能是本次刚传的（在response.data里）
+    const url = file.url || file.response?.data
+    imgList.value = imgList.value.filter(item => item !== url)
+  }
+
+  //提交完成打卡
+  const submitComplete = () => {
+    if (!completeForm.value.executeResult) {
+      ElMessage.error('请填写执行结果')
+      return
+    }
+    //照片URL列表用逗号拼接存入execute_img（多张以逗号隔开）
+    completeForm.value.executeImg = imgList.value.join(',')
+    careTaskApi.complete(completeForm.value).then(result => {
+      if (result.code === 1) {
+        ElMessage.success(result.msg)
+        drawerCompleteVisible.value = false
+        loadData()
+      } else {
+        ElMessage.error(result.msg)
+      }
+    })
+  }
+
+  //跳过/取消任务
+  const skipById = (id) => {
+    ElMessageBox.confirm(
+        '确认跳过该任务吗？', '提示',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'warning',
+          lockScroll: false //防止抖动
+        }
+    ).then(() => {
+      careTaskApi.skip(id).then(result => {
+        if (result.code === 1) {
+          ElMessage.success(result.msg)
+          loadData()
+        } else {
+          ElMessage.error(result.msg)
+        }
+      })
+    })
+  }
+
+  //打开详情抽屉：加载该任务的完整记录
+  const showDetailDialog = (row) => {
+    drawerDetailVisible.value = true
+    detail.value = {}
+    careTaskApi.selectById(row.id).then(result => {
+      if (result.code === 1) {
+        detail.value = result.data
+      }
+    })
+  }
+</script>
+
+<template>
+  <el-card>
+    <!--模糊查找-->
+    <el-form :inline="true">
+      <!-- 按老人搜索任务，复用远程搜索下拉框 -->
+      <el-form-item label="老人">
+        <el-select
+            v-model="careTaskQuery.elderId"
+            filterable
+            remote
+            reserve-keyword
+            clearable
+            placeholder="请输入老人姓名搜索"
+            :remote-method="loadElderOptions"
+            :loading="elderLoading"
+            style="width: 180px">
+          <el-option
+              v-for="item in elderOptions"
+              :key="item.id"
+              :label="`${item.realName}（${item.idCardNo}）`"
+              :value="item.id"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="状态">
+        <el-select v-model="careTaskQuery.status" placeholder="全部" clearable style="width: 130px">
+          <el-option
+              v-for="item in statusOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="计划执行日期">
+        <el-date-picker
+            v-model="planDateRange"
+            type="daterange"
+            value-format="YYYY-MM-DD HH:mm:ss"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onSearch">搜索</el-button>
+        <el-button @click="reset">重置</el-button>
+      </el-form-item>
+    </el-form>
+    <!--表单-->
+    <el-table :data="list" border style="width: 100%">
+      <el-table-column prop="elderName" label="老人" width="120" :show-overflow-tooltip="true"/>
+      <el-table-column prop="careItemName" label="护理项目" min-width="140" :show-overflow-tooltip="true"/>
+      <el-table-column prop="planExecuteDate" label="计划执行日期" width="120" align="center"/>
+      <el-table-column prop="planExecuteTime" label="计划执行时间" width="110" align="center"/>
+      <el-table-column prop="userName" label="执行人" width="110" align="center">
+        <template #default="{row}">
+          {{ row.userName || '—' }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="actualExecuteTime" label="实际完成时间" width="150" align="center">
+        <template #default="{row}">
+          {{ row.actualExecuteTime || '—' }}
+        </template>
+      </el-table-column>
+      <el-table-column label="状态" width="90" align="center">
+        <template #default="{row}">
+          <!-- 任务状态只有3种，直接内联判断 -->
+          <el-tag v-if="row.status === 0" type="warning">待执行</el-tag>
+          <el-tag v-else-if="row.status === 1" type="success">已完成</el-tag>
+          <el-tag v-else type="info">已跳过</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" width="230px" fixed="right" label="操作">
+        <template #default="{ row }">
+          <!-- 只有待执行的任务才能执行完成/跳过 -->
+          <el-button size="small" type="success" @click="showCompleteDialog(row)" v-if="row.status === 0 && hasBtnPermission('careTask:complete')">完成任务</el-button>
+          <el-button size="small" type="warning" @click="skipById(row.id)" v-if="row.status === 0 && hasBtnPermission('careTask:skip')">跳过</el-button>
+          <el-button size="small" type="primary" @click="showDetailDialog(row)" v-if="hasBtnPermission('careTask:get')">详情</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+        v-model:current-page="careTaskQuery.page"
+        v-model:page-size="careTaskQuery.limit"
+        :page-sizes="[10, 20, 30, 40]"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+        @change="loadData"
+        style="margin-top: 20px; justify-content: flex-end"
+    />
+  </el-card>
+
+  <!--完成打卡弹出框-->
+  <el-drawer v-model="drawerCompleteVisible" title="完成任务打卡" size="40%" :close-on-click-modal="true">
+    <el-form :model="completeForm" label-width="90">
+      <el-form-item label="执行结果" required>
+        <el-input
+            v-model="completeForm.executeResult"
+            type="textarea"
+            :rows="3"
+            placeholder="如：血压 120/80 mmHg / 吃药完成"
+        />
+      </el-form-item>
+      <el-form-item label="打卡照片">
+        <!-- 现场打卡照片上传，返回URL收集进imgList，多张以逗号拼接存入execute_img -->
+        <el-upload
+            action="/api/upload?dir=careTask"
+            list-type="picture-card"
+            accept="image/*"
+            :on-success="handleUploadSuccess"
+            :on-remove="handleUploadRemove"
+            :limit="6">
+          <el-icon><Plus/></el-icon>
+        </el-upload>
+      </el-form-item>
+      <el-form-item label="执行备注">
+        <el-input
+            v-model="completeForm.remark"
+            type="textarea"
+            :rows="2"
+            placeholder="选填，如：老人精神状态一般"
+        />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="drawerCompleteVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitComplete">确认完成</el-button>
+      </div>
+    </template>
+  </el-drawer>
+
+  <!--详情抽屉-->
+  <el-drawer v-model="drawerDetailVisible" title="任务详情" size="40%" :close-on-click-modal="true">
+    <el-descriptions :column="1" border v-if="detail.id">
+      <el-descriptions-item label="老人">{{ detail.elderName }}</el-descriptions-item>
+      <el-descriptions-item label="护理项目">{{ detail.careItemName }}</el-descriptions-item>
+      <el-descriptions-item label="计划执行日期">{{ detail.planExecuteDate }}</el-descriptions-item>
+      <el-descriptions-item label="计划执行时间">{{ detail.planExecuteTime }}</el-descriptions-item>
+      <el-descriptions-item label="执行人">{{ detail.userName || '—' }}</el-descriptions-item>
+      <el-descriptions-item label="任务状态">
+        <el-tag v-if="detail.status === 0" type="warning">待执行</el-tag>
+        <el-tag v-else-if="detail.status === 1" type="success">已完成</el-tag>
+        <el-tag v-else type="info">已跳过</el-tag>
+      </el-descriptions-item>
+      <el-descriptions-item label="实际完成时间">{{ detail.actualExecuteTime || '—' }}</el-descriptions-item>
+      <el-descriptions-item label="执行结果">{{ detail.executeResult || '—' }}</el-descriptions-item>
+      <el-descriptions-item label="执行备注">{{ detail.remark || '—' }}</el-descriptions-item>
+      <el-descriptions-item label="打卡照片">
+        <div v-if="detail.executeImg">
+          <!-- 照片URL以逗号隔开，拆开逐个预览 -->
+          <el-image
+              v-for="(img, index) in detail.executeImg.split(',')"
+              :key="index"
+              :src="img"
+              :preview-src-list="detail.executeImg.split(',')"
+              :initial-index="index"
+              fit="cover"
+              style="width: 100px; height: 100px; margin-right: 8px"
+              :preview-teleported="true"
+          />
+        </div>
+        <span v-else>—</span>
+      </el-descriptions-item>
+    </el-descriptions>
+  </el-drawer>
+</template>

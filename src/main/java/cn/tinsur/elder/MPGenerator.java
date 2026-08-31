@@ -15,7 +15,7 @@ import com.baomidou.mybatisplus.generator.fill.Column;
 
 public class MPGenerator {
     //需要配置
-    private static final String dbTables = "care_plan_item";             //需要生成的表名
+    private static final String dbTables = "care_task";             //需要生成的表名
     private static final Boolean enableSwagger = false;                 //是否开启Swagger
 
     public static void main(String[] args) {

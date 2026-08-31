@@ -14,6 +14,7 @@ import Contract from '@/views/Contract.vue'
 import CareItem from '@/views/CareItem.vue'
 import CareLevel from '@/views/CareLevel.vue'
 import CarePlan from '@/views/CarePlan.vue'
+import CareTask from '@/views/CareTask.vue'
 
 //创建路由器
 const router = createRouter({
@@ -33,7 +34,8 @@ const router = createRouter({
                 {path: '/contract', component: Contract},
                 {path: '/careItem', component: CareItem},
                 {path: '/careLevel', component: CareLevel},
-                {path: '/carePlan', component: CarePlan}
+                {path: '/carePlan', component: CarePlan},
+                {path: '/careTask', component: CareTask}
             ]
         }
     ]

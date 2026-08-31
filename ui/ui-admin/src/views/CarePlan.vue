@@ -247,7 +247,6 @@
           executeTime: item.executeTime || '',
           executeDay: item.executeDay || '',
           executeCycle: item.executeCycle,
-          executeFrequency: item.executeFrequency,
           remark: item.remark || ''
         }))
       })
@@ -298,7 +297,6 @@
       executeTime: '',         //护理服务时间
       executeDay: '',          //执行日：选"每周"存周几、选"每月"存几号，每天为空
       executeCycle: 0,         //执行周期，默认每天
-      executeFrequency: 1,     //执行频次，默认1次
       remark: ''
     })
   }
@@ -317,7 +315,6 @@
           executeTime: item.executeTime,
           executeDay: item.executeDay,
           executeCycle: item.executeCycle,
-          executeFrequency: item.executeFrequency,
           remark: item.remark
         }))
   }
@@ -610,11 +607,6 @@
                 :value="item.value"
             />
           </el-select>
-        </template>
-      </el-table-column>
-      <el-table-column label="执行频次" width="130" align="center">
-        <template #default="{ row }">
-          <el-input-number v-model="row.executeFrequency" :min="1" size="small"/>
         </template>
       </el-table-column>
       <el-table-column label="删除" width="70" align="center">

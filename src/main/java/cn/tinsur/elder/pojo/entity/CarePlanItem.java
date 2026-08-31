@@ -58,12 +58,6 @@ public class CarePlanItem implements Serializable {
     private Integer executeCycle;
 
     /**
-     * 执行频次
-     */
-    @TableField("execute_frequency")
-    private Integer executeFrequency;
-
-    /**
      * 备注
      */
     private String remark;

@@ -11,6 +11,7 @@ import Tag from '@/views/Tag.vue'
 import Role from '@/views/Role.vue'
 import Permission from '@/views/Permission.vue'
 import Contract from '@/views/Contract.vue'
+import CareItem from '@/views/CareItem.vue'
 
 //创建路由器
 const router = createRouter({
@@ -27,7 +28,8 @@ const router = createRouter({
                 {path: '/tag', component: Tag},
                 {path: '/role', component: Role},
                 {path: '/permission', component: Permission},
-                {path: '/contract', component: Contract}
+                {path: '/contract', component: Contract},
+                {path: '/careItem', component: CareItem}
             ]
         }
     ]

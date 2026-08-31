@@ -104,15 +104,46 @@
     }
   }
 
-  //根据id打开编辑对话框
-  const showUpdateDialog = (row) => {
-    drawerPermissionVisible.value = true
-    title.value = '编辑'
-    permission.value = {}
-    permissionApi.selectById(row.id).then(result => {
-      permission.value = result.data
-    })
+  //根据编辑时当前节点的类型和是否有子节点，计算允许切换的权限类型
+//type：当前权限类型（0目录、1菜单、2按钮）；children：该节点的子节点列表
+const setEditTypeDisable = (type, children) => {
+  //判断当前节点下是否还有子节点（目录/菜单下面可能还有下级）
+  const hasChildren = children && children.length > 0
+  //最终允许勾选上的类型集合
+  let allow = []
+  if (hasChildren) {
+    //有子节点的节点类型不能改：目录下面有菜单只能保持目录，菜单下面有子级只能保持菜单
+    allow = [type]
+  } else {
+    //无子节点（叶子）才允许切换，并按当前类型限定可切换范围
+    if (type === 0) {
+      //目录叶子：可切换为 目录、菜单、按钮
+      allow = [0, 1, 2]
+    } else if (type === 1) {
+      //菜单叶子：可切换为 菜单、按钮
+      allow = [1, 2]
+    } else {
+      //按钮叶子（以此类推）：可切换为 菜单、按钮
+      allow = [1, 2]
+    }
   }
+  //不在允许集合里的类型就禁用对应的单选项
+  type0Disabled.value = !allow.includes(0)
+  type1Disabled.value = !allow.includes(1)
+  type2Disabled.value = !allow.includes(2)
+}
+
+//根据id打开编辑对话框
+const showUpdateDialog = (row) => {
+  drawerPermissionVisible.value = true
+  title.value = '编辑'
+  permission.value = {}
+  permissionApi.selectById(row.id).then(result => {
+    permission.value = result.data
+    //根据当前节点类型和是否有子节点，计算编辑时可切换的类型
+    setEditTypeDisable(result.data.type, row.children)
+  })
+}
 
   //新增或编辑提交
   const addOrUpdate = () => {
@@ -187,7 +218,8 @@
         <el-input v-model="permission.parentName" :disabled="true"></el-input>
       </el-form-item>
       <el-form-item label="权限类型">
-        <el-radio-group v-model="permission.type" :disabled="typeDisabled || !!permission.id">
+        <el-radio-group v-model="permission.type" :disabled="typeDisabled">
+          <!-- 每个类型的可切换与否由 type0Disabled/type1Disabled/type2Disabled 控制，不再整组禁用，这样编辑时才能切换类型 -->
           <el-radio :label="0" :disabled="type0Disabled">目录</el-radio>
           <el-radio :label="1" :disabled="type1Disabled">菜单</el-radio>
           <el-radio :label="2" :disabled="type2Disabled">按钮</el-radio>

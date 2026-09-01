@@ -61,4 +61,14 @@ public class CareTaskController {
     public Result skip(@PathVariable Long id) {
         return careTaskService.skip(id);
     }
+
+    /**
+     * 根据ID删除任务（用于清理今天以前的过期任务）
+     * DELETE /care-task/1
+     */
+    @DeleteMapping("/{id}")
+    public Result delete(@PathVariable Long id) {
+        careTaskService.removeById(id);
+        return Result.ok("删除成功");
+    }
 }

@@ -364,7 +364,7 @@
         <template #default="{row}">
           <el-avatar
               :src="row.avatar" style="max-height: 40px; max-width: 40px;"
-          />
+          >{{ (row.realName || '?').slice(-1) }}</el-avatar>
         </template>
       </el-table-column>
       <el-table-column prop="name" label="用户名" width="100" :show-overflow-tooltip="true"/>

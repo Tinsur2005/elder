@@ -13,6 +13,12 @@ public class Elder {
     private String password;
     private String realName;
     private String avatar;
+
+    /**
+     * 性别（0：女，1：男）
+     */
+    private Integer gender;
+
     private String idCardNo;
     private int status;
     private String phone;

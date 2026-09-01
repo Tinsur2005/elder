@@ -35,6 +35,12 @@ public class ElderExcelVO {
     private String avatar;
 
     /**
+     * 性别（0：女，1：男）
+     */
+    @ExcelProperty(value = "性别（0：女，1：男）")
+    private Integer gender;
+
+    /**
      * 身份证号
      */
     @ExcelProperty(value = "身份证号")

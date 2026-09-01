@@ -7,6 +7,7 @@ import Home from '@/views/Home.vue'
 import Login from '@/views/Login.vue'
 import User from '@/views/User.vue'
 import Elder from '@/views/Elder.vue'
+import Family from '@/views/Family.vue'
 import Tag from '@/views/Tag.vue'
 import Role from '@/views/Role.vue'
 import Permission from '@/views/Permission.vue'
@@ -28,6 +29,7 @@ const router = createRouter({
                 {path: '/', component: Home},
                 {path: '/user', component: User},
                 {path: '/elder', component: Elder},
+                {path: '/family', component: Family},
                 {path: '/tag', component: Tag},
                 {path: '/role', component: Role},
                 {path: '/permission', component: Permission},

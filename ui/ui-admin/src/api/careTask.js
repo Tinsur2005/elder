@@ -16,6 +16,10 @@ const careTaskApi = {
     // 跳过/取消任务
     skip(id) {
         return request.put(`/care-task/skip/${id}`)
+    },
+    // 根据ID删除任务（用于清理今天以前的过期任务）
+    deleteById(id) {
+        return request.delete(`/care-task/${id}`)
     }
 }
 export default careTaskApi

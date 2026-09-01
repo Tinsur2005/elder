@@ -72,6 +72,18 @@
     },
   ]
 
+  // 性别选项
+  const genderOptions = [
+    {
+      value: 1,
+      label: '男',
+    },
+    {
+      value: 0,
+      label: '女',
+    },
+  ]
+
   // ========== 对话框dalog弹出控制 ==========
   const drawerTagAssignVisible = ref(false)  //弹出标注对话框dialog
   const drawerElderVisible = ref(false)  //弹出新增/编辑对话框dialog
@@ -411,10 +423,16 @@
         <template #default="{row}">
           <el-avatar
               :src="row.avatar" style="max-height: 40px; max-width: 40px;"
-          />
+          >{{ (row.realName || '?').slice(-1) }}</el-avatar>
         </template>
       </el-table-column>
       <el-table-column prop="realName" label="姓名" width="100" :show-overflow-tooltip="true"/>
+      <el-table-column prop="gender" label="性别" width="70">
+        <template #default="{row}">
+          <el-tag type="primary" v-if="row.gender === 1">男</el-tag>
+          <el-tag type="danger" v-else-if="row.gender === 0">女</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="phone" label="电话" :show-overflow-tooltip="true" width="115"/>
       <el-table-column prop="status" label="状态" min-width="100" :resizable="false">
         <template #default="{row}">
@@ -496,6 +514,16 @@
       </el-form-item>
       <el-form-item prop="realName" label="姓名" :label-width="80">
         <el-input v-model="elder.realName" autocomplete="off"/>
+      </el-form-item>
+      <el-form-item prop="gender" label="性别" :label-width="80">
+        <el-select v-model="elder.gender" placeholder="请选择性别" style="width: 220px">
+          <el-option
+              v-for="item in genderOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item prop="phone" label="手机号" :label-width="80">
         <el-input v-model="elder.phone" autocomplete="off"/>

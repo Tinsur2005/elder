@@ -5,7 +5,7 @@
   import {useTokenStore} from '@/store/token.js'
   import {ref} from 'vue'
   import {ElMessage, ElMessageBox} from 'element-plus'
-  import {Plus} from "@element-plus/icons-vue";
+  import {Plus, CircleCheck, CircleClose, View, Delete} from "@element-plus/icons-vue";
   import hasBtnPermission from "@/utils/btnPermission.js";
   const tokenStore = useTokenStore()
 
@@ -189,10 +189,56 @@
       }
     })
   }
+
+  //判断任务的计划执行日期是否在今天以前（日期格式为yyyy-MM-dd，字符串直接比较大小即可）
+  const isBeforeToday = (planExecuteDate) => {
+    if (!planExecuteDate) return false
+    const d = new Date()
+    //拼出今天的yyyy-MM-dd，补零保证格式和后端返回的日期一致
+    const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    return planExecuteDate < today
+  }
+
+  //根据id删除任务（只允许删除今天以前的过期任务）
+  const deleteById = (id) => {
+    ElMessageBox.confirm(
+        '您确认要删除该任务么? 删除后不可恢复',
+        '警告',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'warning',
+          lockScroll: false //防止抖动
+        }
+    ).then(() => {
+      careTaskApi.deleteById(id).then(result => {
+        if (result.code === 1) {
+          ElMessage.success(result.msg)
+          loadData()
+        } else {
+          ElMessage.error(result.msg)
+        }
+      })
+    })
+  }
 </script>
 
 <template>
   <el-card>
+    <template #header>
+      <div class="header">
+        <!-- 顶部提示：只有过期任务（昨天及以前）才能删除，与其他页面头部操作行位置一致 -->
+        <div class="header-left">
+          <el-alert
+              title="提示：只能删除昨天及以前的任务记录，今天的任务不允许删除"
+              type="warning"
+              show-icon
+              :closable="false"
+          />
+        </div>
+        <div class="header-right"></div>
+      </div>
+    </template>
     <!--模糊查找-->
     <el-form :inline="true">
       <!-- 按老人搜索任务，复用远程搜索下拉框 -->
@@ -242,16 +288,16 @@
     </el-form>
     <!--表单-->
     <el-table :data="list" border style="width: 100%">
-      <el-table-column prop="elderName" label="老人" width="120" :show-overflow-tooltip="true"/>
-      <el-table-column prop="careItemName" label="护理项目" min-width="140" :show-overflow-tooltip="true"/>
-      <el-table-column prop="planExecuteDate" label="计划执行日期" width="120" align="center"/>
-      <el-table-column prop="planExecuteTime" label="计划执行时间" width="110" align="center"/>
-      <el-table-column prop="userName" label="执行人" width="110" align="center">
+      <el-table-column prop="elderName" label="老人" width="110" :show-overflow-tooltip="true"/>
+      <el-table-column prop="careItemName" label="护理项目" min-width="150" :show-overflow-tooltip="true"/>
+      <el-table-column prop="planExecuteDate" label="计划执行日期" width="115" align="center"/>
+      <el-table-column prop="planExecuteTime" label="计划执行时间" width="115" align="center"/>
+      <el-table-column prop="userName" label="执行人" width="90" align="center">
         <template #default="{row}">
           {{ row.userName || '—' }}
         </template>
       </el-table-column>
-      <el-table-column prop="actualExecuteTime" label="实际完成时间" width="150" align="center">
+      <el-table-column prop="actualExecuteTime" label="实际完成时间" width="165" align="center">
         <template #default="{row}">
           {{ row.actualExecuteTime || '—' }}
         </template>
@@ -264,12 +310,14 @@
           <el-tag v-else type="info">已跳过</el-tag>
         </template>
       </el-table-column>
-      <el-table-column align="center" width="230px" fixed="right" label="操作">
+      <el-table-column align="center" width="350px" fixed="right" label="操作">
         <template #default="{ row }">
           <!-- 只有待执行的任务才能执行完成/跳过 -->
-          <el-button size="small" type="success" @click="showCompleteDialog(row)" v-if="row.status === 0 && hasBtnPermission('careTask:complete')">完成任务</el-button>
-          <el-button size="small" type="warning" @click="skipById(row.id)" v-if="row.status === 0 && hasBtnPermission('careTask:skip')">跳过</el-button>
-          <el-button size="small" type="primary" @click="showDetailDialog(row)" v-if="hasBtnPermission('careTask:get')">详情</el-button>
+          <el-button size="small" type="success" :icon="CircleCheck" @click="showCompleteDialog(row)" v-if="row.status === 0 && hasBtnPermission('careTask:complete')">完成任务</el-button>
+          <el-button size="small" type="warning" :icon="CircleClose" @click="skipById(row.id)" v-if="row.status === 0 && hasBtnPermission('careTask:skip')">跳过</el-button>
+          <el-button size="small" type="primary" :icon="View" @click="showDetailDialog(row)" v-if="hasBtnPermission('careTask:get')">详情</el-button>
+          <!-- 只有过期任务（计划执行日期在今天以前）才显示删除按钮，今天的任务不允许删 -->
+          <el-button size="small" type="danger" :icon="Delete" @click="deleteById(row.id)" v-if="isBeforeToday(row.planExecuteDate) && hasBtnPermission('careTask:deleteById')">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

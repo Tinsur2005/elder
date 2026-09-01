@@ -193,9 +193,11 @@
     <!-- 左侧菜单 -->
     <el-aside width="200px">
       <div class="el-aside__logo"></div>
-      <!-- element-plus的菜单标签 -->
-      <el-menu :default-active="$route.path" active-text-color="#409EFF" text-color="#303133"
-               :background-color="'#fff'" router>
+      <!-- 用el-scrollbar包裹菜单：菜单过长时显示细圆角滚动条，替代丑陋的原生滚动条 -->
+      <el-scrollbar class="aside-scrollbar">
+        <!-- element-plus的菜单标签 -->
+        <el-menu :default-active="$route.path" active-text-color="#409EFF" text-color="#303133"
+                 :background-color="'#fff'" router>
         <!-- 动态生成菜单 -->
         <template v-for="(menu, index) in menuData" :index="index.toString()">
           <el-sub-menu v-if="menu.children?.length>0" :index="menu.name">
@@ -218,6 +220,7 @@
           </el-menu-item>
         </template>
       </el-menu>
+      </el-scrollbar>
     </el-aside>
     <!-- 右侧主区域 -->
     <el-container>
@@ -334,15 +337,29 @@
       flex-direction: column;
 
       &__logo {
-        height: 96px;
-        background: url('@/assets/logo.png') no-repeat center / 130px auto;
+        height: 120px;
+        background: url('@/assets/logo.png') no-repeat center / 170px auto;
         border-bottom: 1px solid #f5f5f5;
+      }
+
+      // 侧边栏滚动区域：占据logo以下的所有剩余高度，菜单过长时出现细滚动条
+      .aside-scrollbar {
+        flex: 1;
+
+        // 美化滚动条：6px细轨道、圆角浅灰滑块，悬停时加深
+        :deep(.el-scrollbar__bar.is-vertical) {
+          width: 6px;
+          right: 2px;
+        }
+
+        :deep(.el-scrollbar__thumb) {
+          background-color: #c0c4cc;
+          border-radius: 3px;
+        }
       }
 
       .el-menu {
         border-right: none;
-        flex: 1;
-        overflow-y: auto;
 
         .el-menu-item.is-active {
           background-color: #ecf5ff;

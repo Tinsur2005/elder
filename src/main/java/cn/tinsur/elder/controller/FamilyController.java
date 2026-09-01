@@ -61,7 +61,8 @@ public class FamilyController {
             return Result.error("已有同名家属存在，请修改用户名后重试");
         }
         familyService.save(family);
-        return Result.ok("新增成功");
+        // save后MyBatis-Plus会把自增id回填到family对象中，返回给前端供新增后直接绑定老人
+        return Result.ok("新增成功", family.getId());
     }
 
     /**

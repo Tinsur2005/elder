@@ -191,18 +191,6 @@
     children: 'children',
     label: 'name'
   })
-  //递归收集权限树中的叶子节点id（没有子节点的权限，通常是按钮权限）
-  const getCheckedLeafIdList = (permissionVOList, leafIdList) => {
-    permissionVOList.forEach(permissionVO => {
-      if (permissionVO.children && permissionVO.children.length) {
-        //有子节点，继续往下递归找叶子
-        getCheckedLeafIdList(permissionVO.children, leafIdList)
-      } else {
-        //没有子节点的就是叶子，收集它的id
-        leafIdList.push(permissionVO.id)
-      }
-    })
-  }
 
   //打开权限分配抽屉：加载权限树和回显该角色已分配的权限
   const showAssignedPermissionDialog = (row) => {
@@ -215,27 +203,19 @@
       //再查该角色已分配的权限id集合，用于回显勾选
       return rolesApi.selectPermissionById(row.id)
     }).then(permissionResult => {
+      //树开启了check-strictly（父子勾选不联动），勾了什么存什么，
+      //所以回显时直接把已分配的权限id全部勾上即可，和保存时的数据完全对应
       const assignedIds = permissionResult.data || []
-      //回显时只勾选这个角色"已分配的叶子权限"（一般是按钮权限）
-      //父级目录、菜单会随叶子自动联动成"勾选"或"半选"状态，
-      //这样就不会把整个菜单权限误当成都勾选了
-      let checkedLeafIdList = []
-      getCheckedLeafIdList(treeData.value, checkedLeafIdList)
-      const checkedIds = checkedLeafIdList.filter(id => assignedIds.includes(id))
       //等树节点渲染完成后，再回显勾选状态
       nextTick(() => {
-        treeRef.value?.setCheckedKeys(checkedIds)
+        treeRef.value?.setCheckedKeys(assignedIds)
       })
     })
   }
 
-  //保存角色权限：收集当前勾选且半选的权限id，调用先删后插接口
+  //保存角色权限：收集当前勾选的权限id（check-strictly模式下没有半选状态，勾了哪个节点就保存哪个），调用先删后插接口
   const assignPermission = () => {
-    //getCheckedNodes(leafOnly=false, includeHalfChecked=true)
-    //既返回完全勾选的节点，也返回"半选"的父级节点（目录、菜单）
-    //这样即使某个按钮没勾选，它的父级菜单处于半选状态也会一并保存，
-    //避免"取消一个按钮权限就把整个菜单权限弄丢"的问题
-    let checkedNodes = treeRef.value.getCheckedNodes(false, true)
+    let checkedNodes = treeRef.value.getCheckedNodes()
     let permissionIds = checkedNodes.map(node => node.id)
     rolesApi.updatePermission(role.value.id, permissionIds).then(result => {
       if (result.code === 1) {
@@ -332,10 +312,13 @@
 
   <!--权限分配弹出框-->
   <el-drawer v-model="drawerPermissionVisible" title="权限分配" size="35%" :close-on-click-modal="true">
+<!-- check-strictly：父子节点勾选不联动，勾选父节点（目录/菜单）不会自动全选下面的子节点，
+     这样可以只给角色"查看页面"的菜单权限，而不用强制带上所有按钮权限 -->
     <el-tree
         :data="treeData"
         ref="treeRef"
         show-checkbox
+        check-strictly
         node-key="id"
         default-expand-all
         :props="defaultProps">

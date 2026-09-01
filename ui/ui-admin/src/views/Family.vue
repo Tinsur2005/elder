@@ -2,11 +2,13 @@
   import familyApi from '@/api/family.js'
   import elderApi from '@/api/elder.js'
   import {nextTick, ref} from 'vue'
+  import {useRouter} from 'vue-router'
   import {ElMessage, ElMessageBox} from 'element-plus'
-  import {Plus, Download, Delete, EditPen, Connection} from '@element-plus/icons-vue'
+  import {Plus, Delete, EditPen, View, Document} from '@element-plus/icons-vue'
   import {useTokenStore} from '@/store/token.js'
   import hasBtnPermission from "@/utils/btnPermission.js";
   const tokenStore = useTokenStore()
+  const router = useRouter()
 
   // ========== 对象 ==========
 
@@ -83,32 +85,35 @@
   // 这个变量将在 loadElderOptions 方法中被赋值
   const elderOptions = ref([])
 
-  //某个家属关联的老人id存到这个List，供关联老人对话框使用，初始化置为空List
-  // 这个变量将在 showAssignedElderDialog 方法中被赋值
+  //某个家属关联的老人id存到这个List，供添加/编辑抽屉中的"关联老人"下拉框使用，初始化置为空List
+  // 打开添加/编辑抽屉时会被赋值
   const familyEldersList = ref([])
 
-  // ========== 对话框dalog弹出控制 ==========
-  const drawerElderAssignVisible = ref(false)  //弹出关联老人对话框dialog
+  // ========== 对话框dialog弹出控制 ==========
+  const drawerDetailVisible = ref(false)  //弹出家属详情抽屉
   const drawerFamilyVisible = ref(false)  //弹出新增/编辑对话框dialog
 
+  // 详情抽屉中的数据：当前查看的家属信息 + 该家属关联的老人列表
+  const detailFamily = ref({})
+  const detailElders = ref([])
 
   // ============== 方法 ==============
-  // 显示关联老人对话框
-  const showAssignedElderDialog = (raw) => {
-    elderOptions.value = [] //先把elderOptions清空，防止网络慢的时候遗漏旧数据在对话框中
-    familyEldersList.value = [] //同时清空上一次勾选的残留
-    loadElderOptions('')   // 执行loadElderOptions方法来初始化elderOptions，确保下拉框中已有可选的老人
-    family.value = raw
+  // 显示家属详情抽屉：上面是家属信息，下面是关联老人的列表
+  const showDetailDrawer = (raw) => {
+    detailFamily.value = raw
+    detailElders.value = [] //先清空上一次的残留，防止网络慢时显示旧数据
     familyApi.getEldersById(raw.id).then(result => {
-      // 回显：把已关联的老人合并进选项，防止远程搜索下拉框里搜不到已关联的老人
-      const assigned = result.data
-      elderOptions.value = [...assigned, ...elderOptions.value.filter(o => !assigned.some(e => e.id === o.id))]
-      familyEldersList.value = assigned.map(e => e.id)
+      detailElders.value = result.data
     })
-    drawerElderAssignVisible.value = true
+    drawerDetailVisible.value = true
   }
 
-  //远程搜索老人：根据真实姓名（可输入部分或全部）模糊搜索，供关联老人下拉框使用
+  // 查看合同：跳转到合同管理页面，并通过路由传参自动搜索该老人的合同（与Elder.vue的goContract一致，无合同则搜索结果为空）
+  const goContract = (elder) => {
+    router.push({path: '/contract', query: {elderId: elder.id}})
+  }
+
+  //远程搜索老人：根据真实姓名（可输入部分或全部）模糊搜索，供添加/编辑抽屉中"关联老人"下拉框使用
   const loadElderOptions = (query) => {
     elderApi.searchByName(query).then(result => {
       //合并时保留已关联但搜索结果里没有的老人选项，避免回显丢失
@@ -117,17 +122,9 @@
     })
   }
 
-  // 保存关联老人列表，当关联老人对话框点击保存按钮时调用此方法
-  const eldersSave = () => {
-    familyApi.updateEldersById(family.value.id, familyEldersList.value).then(result => {
-      if (result.code === 1) {
-        ElMessage.success(result.msg)
-        drawerElderAssignVisible.value = false
-        loadData()
-      } else {
-        ElMessage.error(result.msg)
-      }
-    })
+  // 保存关联老人列表（修改的是elder-family中间表的数据），绑定逻辑与原来的关联老人抽屉保持一致
+  const saveElders = (familyId) => {
+    return familyApi.updateEldersById(familyId, familyEldersList.value)
   }
 
 
@@ -220,6 +217,10 @@
     drawerFamilyVisible.value = true
     title.value = '添加'
     family.value = {}
+    //新增时没有已关联的老人，清空上一次的残留并初始化下拉框选项
+    elderOptions.value = []
+    familyEldersList.value = []
+    loadElderOptions('')
     //清空上一次窗口残留的校验错误，避免红字带到新窗口里
     nextTick(() => {
       formRef.value?.clearValidate()
@@ -230,6 +231,16 @@
     drawerFamilyVisible.value = true
     title.value = '编辑'
     family.value = {}
+    //编辑时初始化下拉框选项，并回显已关联的老人
+    elderOptions.value = []
+    familyEldersList.value = []
+    loadElderOptions('')
+    familyApi.getEldersById(id).then(result => {
+      // 回显：把已关联的老人合并进选项，防止远程搜索下拉框里搜不到已关联的老人
+      const assigned = result.data
+      elderOptions.value = [...assigned, ...elderOptions.value.filter(o => !assigned.some(e => e.id === o.id))]
+      familyEldersList.value = assigned.map(e => e.id)
+    })
     //清空上一次窗口残留的校验错误，避免红字带到新窗口里
     nextTick(() => {
       formRef.value?.clearValidate()
@@ -253,20 +264,40 @@
             // 编辑
             familyApi.update(family.value.id, family.value).then(result => {
               if (result.code === 1) {
-                ElMessage.success(result.msg)
-                drawerFamilyVisible.value = false
-                loadData()
+                // 保存关联的老人（允许清空全部关联）
+                saveElders(family.value.id).then(res => {
+                  if (res.code === 1) {
+                    ElMessage.success(result.msg)
+                    drawerFamilyVisible.value = false
+                    loadData()
+                  } else {
+                    ElMessage.error(res.msg)
+                  }
+                })
               } else {
                 ElMessage.error(result.msg)
               }
             })
           } else {
-            // 添加
+            // 添加，后端返回新家属的id，用于新增后直接绑定老人
             familyApi.add(family.value).then(result => {
               if (result.code === 1) {
-                ElMessage.success(result.msg)
-                drawerFamilyVisible.value = false
-                loadData()
+                if (familyEldersList.value.length > 0) {
+                  // 有勾选老人时才保存关联
+                  saveElders(result.data).then(res => {
+                    if (res.code === 1) {
+                      ElMessage.success(result.msg)
+                      drawerFamilyVisible.value = false
+                      loadData()
+                    } else {
+                      ElMessage.error(res.msg)
+                    }
+                  })
+                } else {
+                  ElMessage.success(result.msg)
+                  drawerFamilyVisible.value = false
+                  loadData()
+                }
               } else {
                 ElMessage.error(result.msg)
               }
@@ -406,7 +437,7 @@
       <el-table-column align="center" width="300px" fixed="right" label="操作">
         <template #default="{ row }">
           <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)" v-if="hasBtnPermission('family:update')">编辑</el-button>
-          <el-button size="small" type="success" :icon="Connection" @click="showAssignedElderDialog(row)">关联老人</el-button>
+          <el-button size="small" type="success" :icon="View" @click="showDetailDrawer(row)" v-if="hasBtnPermission('family:view')">查看</el-button>
           <el-button size="small" type="danger" :icon="Delete" @click="deleteById(row.id)" v-if="hasBtnPermission('family:deleteById')">删除</el-button>
         </template>
       </el-table-column>
@@ -475,6 +506,20 @@
       <el-form-item prop="phone" label="手机号" :label-width="80">
         <el-input v-model="family.phone" autocomplete="off"/>
       </el-form-item>
+      <el-form-item label="关联老人" :label-width="80">
+        <el-select v-model="familyEldersList"
+                   multiple filterable remote :remote-method="loadElderOptions"
+                   :reserve-keyword="false"
+                   :loading="false" placeholder="输入老人姓名进行远程搜索"
+                   style="width: 100%">
+          <el-option
+              v-for="elder in elderOptions"
+              :key="elder.id"
+              :label="elder.realName"
+              :value="elder.id"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item prop="status" label="状态" :label-width="80">
         <el-select v-model="family.status" placeholder="请选择状态" style="width: 220px">
           <el-option
@@ -499,31 +544,48 @@
     </template>
   </el-drawer>
 
-  <!-- 关联老人弹出对话框dialog -->
-  <el-drawer title="关联老人" v-model="drawerElderAssignVisible" size="35%" :close-on-click-modal="true">
-    <el-form ref="form" :model="family" label-width="80px">
-      <el-form-item label="家属姓名">
-        <el-input v-model="family.realName" disabled></el-input>
-      </el-form-item>
-      <el-form-item label="关联老人">
-        <el-select v-model="familyEldersList"
-                   multiple filterable remote :remote-method="loadElderOptions"
-                   :reserve-keyword="false"
-                   :loading="false" placeholder="输入老人姓名进行远程搜索"
-                   style="width: 100%">
-          <el-option
-              v-for="elder in elderOptions"
-              :key="elder.id"
-              :label="elder.realName"
-              :value="elder.id"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="eldersSave">保存</el-button>
-        <el-button  @click="drawerElderAssignVisible = false">取消</el-button>
-      </el-form-item>
-    </el-form>
+  <!-- 家属详情抽屉：上面是家属信息，下面是关联老人的列表 -->
+  <el-drawer title="家属详情" v-model="drawerDetailVisible" size="50%" :close-on-click-modal="true">
+    <el-descriptions :column="2" border>
+      <el-descriptions-item label="姓名" label-align="right" width="120">{{ detailFamily.realName }}</el-descriptions-item>
+      <el-descriptions-item label="用户名" label-align="right" width="120">{{ detailFamily.name }}</el-descriptions-item>
+      <el-descriptions-item label="性别" label-align="right">
+        <span v-if="detailFamily.gender === 1">男</span>
+        <span v-else-if="detailFamily.gender === 0">女</span>
+      </el-descriptions-item>
+      <el-descriptions-item label="关系" label-align="right">{{ detailFamily.relation }}</el-descriptions-item>
+      <el-descriptions-item label="手机号" label-align="right">{{ detailFamily.phone }}</el-descriptions-item>
+      <el-descriptions-item label="状态" label-align="right">
+        <el-tag type="info" v-if="detailFamily.status === 0">已停用</el-tag>
+        <el-tag type="success" v-else-if="detailFamily.status === 1">正常</el-tag>
+      </el-descriptions-item>
+      <el-descriptions-item label="备注" label-align="right">{{ detailFamily.remark || '-' }}</el-descriptions-item>
+      <el-descriptions-item label="创建时间" label-align="right">{{ detailFamily.createTime }}</el-descriptions-item>
+    </el-descriptions>
+
+    <p>关联老人</p>
+    <el-table :data="detailElders" border style="width: 100%">
+      <el-table-column prop="realName" label="老人姓名" :show-overflow-tooltip="true"/>
+      <el-table-column prop="phone" label="手机号" :show-overflow-tooltip="true" width="130"/>
+      <el-table-column prop="idCardNo" label="身份证号" :show-overflow-tooltip="true" width="180"/>
+      <el-table-column prop="status" label="状态" width="90">
+        <template #default="{row}">
+          <el-tag type="info" v-if="row.status === 0">已停用</el-tag>
+          <el-tag type="success" v-else-if="row.status === 1">正常</el-tag>
+          <el-tag type="primary" v-else-if="row.status === 2">请假</el-tag>
+          <el-tag type="danger" v-else-if="row.status === 3">退住中</el-tag>
+          <el-tag type="warning" v-else-if="row.status === 4">入住中</el-tag>
+          <el-tag type="info" v-else-if="row.status === 5">已退住</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="createTime" label="创建时间" :show-overflow-tooltip="true" width="170"/>
+      <el-table-column label="操作" align="center" width="150">
+        <template #default="{row}">
+          <el-button size="small" type="success" :icon="Document" @click="goContract(row)"
+                     v-if="hasBtnPermission('contract:get')">查看合同</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
   </el-drawer>
 </template>
 

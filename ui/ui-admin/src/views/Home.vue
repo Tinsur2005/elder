@@ -2,11 +2,9 @@
   import dashboardApi from '@/api/dashboard.js'
   import EChart from '@/components/EChart.vue'
   import {ref} from 'vue'
-  import {useRouter} from 'vue-router'
   import {useUserInfoStore} from '@/store/userInfo.js'
-  import {Timer, User, Document, CollectionTag, Promotion, UserFilled, ArrowRight, SetUp} from '@element-plus/icons-vue'
+  import {Timer, User, Document, CollectionTag, UserFilled} from '@element-plus/icons-vue'
 
-  const router = useRouter()
   const userInfoStore = useUserInfoStore()
 
   // ============ 看板数据（进入页面时从后端获取，统计卡片和图表共用一次请求） ============
@@ -96,20 +94,6 @@
     const weeks = ['日', '一', '二', '三', '四', '五', '六']
     return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 星期${weeks[d.getDay()]}`
   }
-
-  // ============ 快捷入口 ============
-  // 快捷入口列表：点击跳转到对应系统页面
-  const quickLinks = [
-    {name: '老人管理',                 icon: UserFilled,  path: '/elder'},
-    {name: '合同管理',                 icon: Document,    path: '/contract'},
-    {name: '护理任务',                 icon: Timer,       path: '/careTask'},
-    {name: '用户管理',                 icon: User,        path: '/user'},
-  ]
-
-  // 点击快捷入口跳转
-  const go = (path) => {
-    router.push(path)
-  }
 </script>
 
 <template>
@@ -197,47 +181,6 @@
         </el-card>
       </el-col>
     </el-row>
-
-    <!-- ⑤ 快捷入口 + 系统信息 -->
-    <el-row :gutter="16" class="bottom-row">
-      <el-col :xs="24" :md="16">
-        <el-card class="panel" shadow="never">
-          <template #header>
-            <div class="panel-header">
-              <span>快捷入口</span>
-              <el-icon><Promotion/></el-icon>
-            </div>
-          </template>
-          <el-row :gutter="12">
-            <el-col :xs="12" :sm="6" v-for="(item, i) in quickLinks" :key="i">
-              <div class="quick-item" @click="go(item.path)">
-                <div class="quick-icon">
-                  <el-icon :size="22"><component :is="item.icon"/></el-icon>
-                </div>
-                <span class="quick-name">{{ item.name }}</span>
-                <el-icon class="quick-arrow"><ArrowRight/></el-icon>
-              </div>
-            </el-col>
-          </el-row>
-        </el-card>
-      </el-col>
-      <el-col :xs="24" :md="8">
-        <el-card class="panel" shadow="never">
-          <template #header>
-            <div class="panel-header">
-              <span>系统信息</span>
-              <el-icon><SetUp/></el-icon>
-            </div>
-          </template>
-          <el-descriptions :column="1" class="sys-desc">
-            <el-descriptions-item label="系统名称">智慧社区养老管理系统</el-descriptions-item>
-            <el-descriptions-item label="当前版本">v1.0.0</el-descriptions-item>
-            <el-descriptions-item label="技术栈">Spring Boot + Vue 3</el-descriptions-item>
-            <el-descriptions-item label="运行状态">正常</el-descriptions-item>
-          </el-descriptions>
-        </el-card>
-      </el-col>
-    </el-row>
   </div>
 </template>
 
@@ -321,43 +264,5 @@
     align-items: center;
     justify-content: space-between;
     font-weight: 600;
-  }
-  .quick-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px;
-    border: 1px solid var(--el-border-color-lighter);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-bottom: 12px;
-  }
-  .quick-item:hover {
-    border-color: var(--el-color-primary);
-    color: var(--el-color-primary);
-    box-shadow: 0 4px 12px rgba(64, 158, 255, 0.12);
-    transform: translateY(-2px);
-  }
-  .quick-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    background: var(--el-color-primary-light-9);
-    color: var(--el-color-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .quick-name {
-    flex: 1;
-    font-size: 14px;
-    color: #303133;
-  }
-  .quick-arrow {
-    color: #c0c4cc;
-  }
-  .sys-desc {
-    margin-top: 4px;
   }
 </style>

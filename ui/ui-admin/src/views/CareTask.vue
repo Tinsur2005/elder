@@ -49,6 +49,16 @@
 
   // ================== 变量 ==================
 
+  //快捷筛选模式：all全部 / todayAll仅今天(全部) / todayTodo仅今天(待执行) / allTodo全部待执行
+  //默认"仅今天(全部)"，进入页面先看今天的任务
+  const filterMode = ref('todayAll')
+  const filterOptions = [
+    {label: '全部', value: 'all'},
+    {label: '仅今天（全部）', value: 'todayAll'},
+    {label: '仅今天（待执行）', value: 'todayTodo'},
+    {label: '全部待执行', value: 'allTodo'},
+  ]
+
   //分页信息和搜索条件（按老人、状态、计划执行日期范围模糊搜索）
   const careTaskQuery = ref({
     elderId: '',
@@ -83,12 +93,45 @@
     })
   }
 
-  loadData()
-
   const onSearch = () => {
     careTaskQuery.value.page = 1 //重置搜索时页码
     loadData()
   }
+
+  //拼出今天的yyyy-MM-dd（补零保证格式和后端日期一致）
+  const todayStr = () => {
+    const d = new Date()
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  }
+
+  //快捷筛选切换：把选中模式翻译成 状态+计划执行日期范围 两个标准查询条件后查询
+  const onFilterChange = () => {
+    applyFilter(filterMode.value)
+    careTaskQuery.value.page = 1
+    loadData()
+  }
+
+  //把快捷筛选模式翻译成 状态+计划执行日期范围 两个标准查询条件（不触发查询）
+  const applyFilter = (mode) => {
+    const today = todayStr()
+    if (mode === 'all') {
+      careTaskQuery.value.status = ''
+      planDateRange.value = []
+    } else if (mode === 'todayAll') {
+      careTaskQuery.value.status = ''
+      planDateRange.value = [`${today} 00:00:00`, `${today} 23:59:59`]
+    } else if (mode === 'todayTodo') {
+      careTaskQuery.value.status = 0
+      planDateRange.value = [`${today} 00:00:00`, `${today} 23:59:59`]
+    } else {
+      careTaskQuery.value.status = 0
+      planDateRange.value = []
+    }
+  }
+
+  //进入页面默认按"仅今天(全部)"查询
+  applyFilter(filterMode.value)
+  loadData()
 
   //重置按钮点击事件
   const reset = () => {
@@ -99,6 +142,8 @@
       limit: 10
     }
     planDateRange.value = []
+    filterMode.value = 'todayAll' //快捷筛选还原为默认的"仅今天(全部)"
+    applyFilter(filterMode.value)
     loadData()
   }
 
@@ -304,6 +349,10 @@
         <el-button @click="reset">重置</el-button>
       </el-form-item>
     </el-form>
+    <!--快捷筛选：选中后自动填入上方状态、计划执行日期范围两个查询条件-->
+    <el-form-item label="快捷筛选">
+      <el-segmented v-model="filterMode" :options="filterOptions" @change="onFilterChange"/>
+    </el-form-item>
     <!--表单-->
     <el-table :data="list" border style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55"/>

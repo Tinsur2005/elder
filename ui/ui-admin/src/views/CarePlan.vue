@@ -287,6 +287,9 @@
     ],
     startDate: [
       {required: true, message: '请选择开始日期', trigger: 'blur'}
+    ],
+    endDate: [
+      {required: true, message: '创建计划后需一次性生成任务，必须选择结束日期', trigger: 'blur'}
     ]
   }
 
@@ -538,7 +541,7 @@
       <el-form-item prop="startDate" label="开始日期" :label-width="80">
         <el-date-picker v-model="carePlan.startDate" type="date" value-format="YYYY-MM-DD" placeholder="选择开始日期" style="width: 220px"/>
       </el-form-item>
-      <el-form-item label="结束日期" :label-width="80">
+      <el-form-item prop="endDate" label="结束日期" :label-width="80">
         <el-date-picker v-model="carePlan.endDate" type="date" value-format="YYYY-MM-DD" placeholder="选择结束日期" style="width: 220px"/>
       </el-form-item>
       <el-form-item prop="status" label="状态" :label-width="80">

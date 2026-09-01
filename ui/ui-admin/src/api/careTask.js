@@ -17,9 +17,13 @@ const careTaskApi = {
     skip(id) {
         return request.put(`/care-task/skip/${id}`)
     },
-    // 根据ID删除任务（用于清理今天以前的过期任务）
+    // 根据ID删除任务
     deleteById(id) {
         return request.delete(`/care-task/${id}`)
+    },
+    // 批量删除任务（axios 的 delete 第2个参数是 config，请求体必须放在 data 字段里）
+    deleteAll(ids) {
+        return request.delete("/care-task", {data: ids});
     }
 }
 export default careTaskApi

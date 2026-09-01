@@ -8,11 +8,13 @@ import cn.tinsur.elder.mapper.UserMapper;
 import cn.tinsur.elder.pojo.entity.CareLevel;
 import cn.tinsur.elder.pojo.entity.CarePlan;
 import cn.tinsur.elder.pojo.entity.CarePlanItem;
+import cn.tinsur.elder.pojo.entity.CareTask;
 import cn.tinsur.elder.pojo.entity.Elder;
 import cn.tinsur.elder.pojo.entity.User;
 import cn.tinsur.elder.pojo.query.CarePlanQuery;
 import cn.tinsur.elder.pojo.vo.CarePlanVO;
 import cn.tinsur.elder.service.ICarePlanService;
+import cn.tinsur.elder.service.ICareTaskService;
 import cn.tinsur.elder.util.Result;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -52,6 +54,9 @@ public class CarePlanServiceImpl extends ServiceImpl<CarePlanMapper, CarePlan> i
 
     @Autowired
     private CarePlanItemMapper carePlanItemMapper;
+
+    @Autowired
+    private ICareTaskService careTaskService;
 
     /**
      * 获取护理计划列表（分页），返回 CarePlanVO，并给每个 VO 填充老人姓名 elName、护理人员姓名 uName、护理等级名称 lName
@@ -167,7 +172,8 @@ public class CarePlanServiceImpl extends ServiceImpl<CarePlanMapper, CarePlan> i
 
     /**
      * 根据计划id更新护理项目，传入的第二个参数应该是护理项目实体组成的List列表
-     * 这个方法的实现方法是，先根据id删除计划项目的中间表中所有数据，再根据id和carePlanItems列表插入新的数据
+     * 这个方法的实现方法是，先根据id删除计划项目的中间表中所有数据，再根据id和carePlanItems列表插入新的数据，
+     * 保存完后按新配置重新生成该计划的任务（删除未执行任务重算，已完成/已跳过的历史打卡保留）
      * @param id
      * @param carePlanItems
      * @return
@@ -176,6 +182,36 @@ public class CarePlanServiceImpl extends ServiceImpl<CarePlanMapper, CarePlan> i
     public Result updateCareItems(Long id, List<CarePlanItem> carePlanItems) {
         deleteAllCareItemsById(id);
         addCareItemById(id, carePlanItems);
+        careTaskService.regenerateTasksForPlan(id);
         return Result.ok("更新成功");
+    }
+
+    /**
+     * 根据计划id删除护理计划，级联删除该计划的全部任务（含已完成打卡记录）和护理项目
+     * @param id
+     */
+    @Override
+    public void deletePlanById(Long id) {
+        //1.删该计划全部护理任务
+        careTaskService.remove(new LambdaQueryWrapper<CareTask>().eq(CareTask::getCarePlanId, id));
+        //2.删该计划全部护理项目
+        deleteAllCareItemsById(id);
+        //3.删计划本身
+        carePlanMapper.deleteById(id);
+    }
+
+    /**
+     * 批量删除护理计划，同样级联删除各计划的全部任务和护理项目
+     * @param ids 计划id集合
+     */
+    @Override
+    public void deletePlanBatch(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) return;
+        //1.删各计划全部护理任务
+        careTaskService.remove(new LambdaQueryWrapper<CareTask>().in(CareTask::getCarePlanId, ids));
+        //2.删各计划全部护理项目
+        carePlanItemMapper.delete(new LambdaQueryWrapper<CarePlanItem>().in(CarePlanItem::getCarePlanId, ids));
+        //3.删计划本身
+        removeByIds(ids);
     }
 }

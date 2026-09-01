@@ -10,6 +10,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+
 /**
  * <p>
  * 护理任务与打卡记录表 前端控制器
@@ -63,12 +65,22 @@ public class CareTaskController {
     }
 
     /**
-     * 根据ID删除任务（用于清理今天以前的过期任务）
+     * 根据ID删除任务
      * DELETE /care-task/1
      */
     @DeleteMapping("/{id}")
     public Result delete(@PathVariable Long id) {
         careTaskService.removeById(id);
         return Result.ok("删除成功");
+    }
+
+    /**
+     * 批量删除任务
+     * DELETE /care-task
+     */
+    @DeleteMapping
+    public Result deleteBatch(@RequestBody Long[] ids) {
+        careTaskService.removeByIds(Arrays.asList(ids));
+        return Result.ok("批量删除成功");
     }
 }

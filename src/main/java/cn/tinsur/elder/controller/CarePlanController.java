@@ -54,6 +54,10 @@ public class CarePlanController {
      */
     @PostMapping
     public Result add(@RequestBody CarePlan carePlan) {
+        //一次性生成整个计划周期的任务要求计划必须有结束日期
+        if (carePlan.getEndDate() == null) {
+            return Result.error("结束日期必填：创建计划后需一次性生成整个计划周期内的任务");
+        }
         if (isExists(carePlan.getName())) {
             return Result.error("已有同名护理计划，请修改后重试");
         }
@@ -74,22 +78,22 @@ public class CarePlanController {
     }
 
     /**
-     * 根据ID删除护理计划
+     * 根据ID删除护理计划（级联删除该计划的全部任务和护理项目）
      * DELETE /care-plans/1
      */
     @DeleteMapping("/{id}")
     public Result delete(@PathVariable Long id) {
-        carePlanService.removeById(id);
+        carePlanService.deletePlanById(id);
         return Result.ok("删除成功");
     }
 
     /**
-     * 批量删除护理计划
+     * 批量删除护理计划（级联删除各计划的全部任务和护理项目）
      * DELETE /care-plans
      */
     @DeleteMapping
     public Result deleteBatch(@RequestBody Long[] ids) {
-        carePlanService.removeByIds(Arrays.asList(ids));
+        carePlanService.deletePlanBatch(Arrays.asList(ids));
         return Result.ok("批量删除成功");
     }
 

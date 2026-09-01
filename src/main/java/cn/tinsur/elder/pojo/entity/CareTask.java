@@ -48,6 +48,12 @@ public class CareTask implements Serializable {
     private Long careItemId;
 
     /**
+     * 来源护理项目ID(care_plan_item.id)，可追溯任务属于哪个计划的哪个项目
+     */
+    @TableField("care_plan_item_id")
+    private Long carePlanItemId;
+
+    /**
      * 护理项目名称(冗余，防止项目改名历史记录变动)
      */
     @TableField("care_item_name")

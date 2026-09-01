@@ -190,16 +190,7 @@
     })
   }
 
-  //判断任务的计划执行日期是否在今天以前（日期格式为yyyy-MM-dd，字符串直接比较大小即可）
-  const isBeforeToday = (planExecuteDate) => {
-    if (!planExecuteDate) return false
-    const d = new Date()
-    //拼出今天的yyyy-MM-dd，补零保证格式和后端返回的日期一致
-    const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-    return planExecuteDate < today
-  }
-
-  //根据id删除任务（只允许删除今天以前的过期任务）
+  //根据id删除任务
   const deleteById = (id) => {
     ElMessageBox.confirm(
         '您确认要删除该任务么? 删除后不可恢复',
@@ -221,20 +212,47 @@
       })
     })
   }
+
+  //多选的任务id集合，供批量删除用
+  let ids = []
+  const handleSelectionChange = (rows) => {
+    ids = rows.map(row => row.id)
+  }
+
+  //批量删除选中的任务
+  const deleteAll = () => {
+    if (ids.length === 0) {
+      ElMessage.error('请选择要删除的记录')
+      return
+    }
+    ElMessageBox.confirm(
+        `您确认要删除选中的 ${ids.length} 条任务么? 删除后不可恢复`,
+        '警告',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'warning',
+          lockScroll: false //防止抖动
+        }
+    ).then(() => {
+      careTaskApi.deleteAll(ids).then(result => {
+        if (result.code === 1) {
+          ElMessage.success(result.msg)
+          loadData()
+        } else {
+          ElMessage.error(result.msg)
+        }
+      })
+    })
+  }
 </script>
 
 <template>
   <el-card>
     <template #header>
       <div class="header">
-        <!-- 顶部提示：只有过期任务（昨天及以前）才能删除，与其他页面头部操作行位置一致 -->
         <div class="header-left">
-          <el-alert
-              title="提示：只能删除昨天及以前的任务记录，今天的任务不允许删除"
-              type="warning"
-              show-icon
-              :closable="false"
-          />
+          <el-button type="danger" :icon="Delete" @click="deleteAll" v-if="hasBtnPermission('careTask:deleteAll')">批量删除</el-button>
         </div>
         <div class="header-right"></div>
       </div>
@@ -287,7 +305,8 @@
       </el-form-item>
     </el-form>
     <!--表单-->
-    <el-table :data="list" border style="width: 100%">
+    <el-table :data="list" border style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55"/>
       <el-table-column prop="elderName" label="老人" width="110" :show-overflow-tooltip="true"/>
       <el-table-column prop="careItemName" label="护理项目" min-width="150" :show-overflow-tooltip="true"/>
       <el-table-column prop="planExecuteDate" label="计划执行日期" width="115" align="center"/>
@@ -316,8 +335,7 @@
           <el-button size="small" type="success" :icon="CircleCheck" @click="showCompleteDialog(row)" v-if="row.status === 0 && hasBtnPermission('careTask:complete')">完成任务</el-button>
           <el-button size="small" type="warning" :icon="CircleClose" @click="skipById(row.id)" v-if="row.status === 0 && hasBtnPermission('careTask:skip')">跳过</el-button>
           <el-button size="small" type="primary" :icon="View" @click="showDetailDialog(row)" v-if="hasBtnPermission('careTask:get')">详情</el-button>
-          <!-- 只有过期任务（计划执行日期在今天以前）才显示删除按钮，今天的任务不允许删 -->
-          <el-button size="small" type="danger" :icon="Delete" @click="deleteById(row.id)" v-if="isBeforeToday(row.planExecuteDate) && hasBtnPermission('careTask:deleteById')">删除</el-button>
+          <el-button size="small" type="danger" :icon="Delete" @click="deleteById(row.id)" v-if="hasBtnPermission('careTask:deleteById')">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -411,3 +429,17 @@
     </el-descriptions>
   </el-drawer>
 </template>
+
+<style scoped>
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .header-left,
+  .header-right {
+    display: flex;
+    align-items: center;
+  }
+</style>

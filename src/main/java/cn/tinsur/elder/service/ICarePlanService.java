@@ -41,4 +41,16 @@ public interface ICarePlanService extends IService<CarePlan> {
      * @return
      */
     Result updateCareItems(Long id, List<CarePlanItem> carePlanItems);
+
+    /**
+     * 根据计划id删除护理计划，级联删除该计划的全部任务（含已完成打卡记录）和护理项目
+     * @param id 计划id
+     */
+    void deletePlanById(Long id);
+
+    /**
+     * 批量删除护理计划，同样级联删除各计划的全部任务和护理项目
+     * @param ids 计划id集合
+     */
+    void deletePlanBatch(List<Long> ids);
 }

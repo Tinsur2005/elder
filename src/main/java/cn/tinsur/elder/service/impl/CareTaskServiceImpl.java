@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,7 @@ import java.util.stream.Collectors;
  * @author Tinsur
  * @since 2026-08-31
  */
+@Slf4j
 @Service
 public class CareTaskServiceImpl extends ServiceImpl<CareTaskMapper, CareTask> implements ICareTaskService {
 
@@ -64,16 +66,13 @@ public class CareTaskServiceImpl extends ServiceImpl<CareTaskMapper, CareTask> i
 
     /**
      * 获取护理任务列表（分页），返回 CareTaskVO，并给每个 VO 填充老人姓名、执行护理员姓名。
-     * 查询前先自动生成本日护理任务，保证今天该有的任务一定出现在列表里
+     * 任务由「保存护理计划项目」时一次性生成整个计划周期，这里只做查询
      *
      * @param careTaskQuery
      * @return
      */
     @Override
     public IPage<CareTaskVO> list(CareTaskQuery careTaskQuery) {
-        // 0.先自动生成本日护理任务（已存在的不会重复生成）
-        generateTodayTasks();
-
         // 1.先查护理任务分页（按老人、状态、计划执行日期范围筛选）
         IPage<CareTask> page = new Page<>(careTaskQuery.getPage(), careTaskQuery.getLimit());
         LambdaQueryWrapper<CareTask> lambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -193,37 +192,24 @@ public class CareTaskServiceImpl extends ServiceImpl<CareTaskMapper, CareTask> i
     }
 
     /**
-     * 自动生成本日护理任务（幂等，重复调用不会重复生成）：
-     * 扫描所有"进行中(status=1)"且"今天在计划周期内(开始日期<=今天,且结束日期为空或>=今天)"的护理计划，
-     * 对其中每个护理项目，按执行周期+执行日判定今天是不是执行日：
+     * 按护理计划一次性生成整个计划周期内的所有任务：
+     * 遍历 [startDate, endDate] 的每一天 × 每个护理项目，按执行周期+执行日判定该天是不是执行日：
      * - 每天(cycle=0)：每天都执行
-     * - 每周(cycle=1)：今天星期几(周一=1~周日=7) 等于 项目的执行日才执行
-     * - 每月(cycle=2)：今天几号(1~31) 等于 项目的执行日才执行
-     * 满足执行日时，若该 计划+项目+今天 还没有任何任务记录（无论什么状态），
-     * 就插入一条 待执行(0) 的任务；已存在则不生成，避免把已完成/已跳过的覆盖掉
+     * - 每周(cycle=1)：该天星期几(周一=1~周日=7) 等于 项目的执行日才执行
+     * - 每月(cycle=2)：该天几号(1~31) 等于 项目的执行日才执行
+     * 是执行日则组装一条 待执行(0) 的任务（项目名冗余固化、执行人取计划的护理人员、
+     * 计划执行时间取项目配置、记录来源护理项目id），全部组装完后批量插入
      */
-    private void generateTodayTasks() {
-        LocalDate today = LocalDate.now();
-        // 今天零点，用于和计划开始/结束日期这种 java.util.Date 比较
-        Date todayDate = Date.from(today.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
+    @Override
+    public void generateTasksForPlan(CarePlan plan, List<CarePlanItem> items) {
+        // 一次性生成要求计划有明确的开始/结束日期，缺失则跳过（存量数据兜底，日志提示）
+        if (plan.getStartDate() == null || plan.getEndDate() == null) {
+            log.warn("护理计划[id={}]缺少开始/结束日期，跳过任务生成", plan.getId());
+            return;
+        }
 
-        // 1.查所有进行中、今天在计划周期内的护理计划（结束日期为空视为长期计划）
-        List<CarePlan> plans = carePlanMapper.selectList(
-                new LambdaQueryWrapper<CarePlan>()
-                        .eq(CarePlan::getStatus, 1)
-                        .le(CarePlan::getStartDate, todayDate)
-                        .and(w -> w.isNull(CarePlan::getEndDate).or().ge(CarePlan::getEndDate, todayDate)));
-        if (plans.isEmpty()) return;
-
-        // 2.一次查出这些计划的所有护理项目，按计划id分组，避免反复查库
-        List<Long> planIds = plans.stream().map(CarePlan::getId).filter(Objects::nonNull).collect(Collectors.toList());
-        Map<Long, List<CarePlanItem>> itemMap = carePlanItemMapper.selectList(
-                        new LambdaQueryWrapper<CarePlanItem>().in(CarePlanItem::getCarePlanId, planIds))
-                .stream().collect(Collectors.groupingBy(CarePlanItem::getCarePlanId));
-
-        // 3.把涉及的所有护理项目id一次查出项目名，组装成 Map 供写任务时取冗余名称
-        Map<Long, String> careItemNameMap = itemMap.values().stream()
-                .flatMap(List::stream)
+        // 1.一次查出涉及的所有护理项目id对应的项目名，组装成 Map 供写任务时取冗余名称
+        Map<Long, String> careItemNameMap = items.stream()
                 .map(CarePlanItem::getCareItemId)
                 .filter(Objects::nonNull)
                 .distinct()
@@ -234,34 +220,61 @@ public class CareTaskServiceImpl extends ServiceImpl<CareTaskMapper, CareTask> i
                             return careItem == null ? null : careItem.getName();
                         }));
 
-        // 4.遍历每个计划的项目，按执行日规则判定今天是不是执行日，是则生成任务
-        for (CarePlan plan : plans) {
-            List<CarePlanItem> items = itemMap.get(plan.getId());
-            if (items == null || items.isEmpty()) continue;
+        // 2.遍历计划周期的每一天 × 每个项目，按执行日规则判定该天是不是执行日，是则组装任务
+        LocalDate start = toLocalDate(plan.getStartDate());
+        LocalDate end = toLocalDate(plan.getEndDate());
+        List<CareTask> tasks = new ArrayList<>();
+        for (LocalDate day = start; !day.isAfter(end); day = day.plusDays(1)) {
+            // 当天零点，用于和任务表的 plan_execute_date 这种 java.util.Date 比较
+            Date dayDate = Date.from(day.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
             for (CarePlanItem item : items) {
-                if (!isTaskDay(today, item)) continue; //今天不是该项目的执行日，跳过
+                if (!isTaskDay(day, item)) continue; //该天不是该项目的执行日，跳过
 
-                // 幂等校验：该 计划+项目+今天 已存在任务（不管什么状态）就不再生成
-                Long exist = careTaskMapper.selectCount(
-                        new LambdaQueryWrapper<CareTask>()
-                                .eq(CareTask::getCarePlanId, plan.getId())
-                                .eq(CareTask::getCareItemId, item.getCareItemId())
-                                .eq(CareTask::getPlanExecuteDate, todayDate));
-                if (exist != null && exist > 0) continue;
-
-                // 组装并插入一条待执行任务
                 CareTask task = new CareTask();
                 task.setElderId(plan.getElderId());                       //老人
                 task.setCarePlanId(plan.getId());                         //来源护理计划
+                task.setCarePlanItemId(item.getId());                     //来源护理项目（可追溯任务来源）
                 task.setCareItemId(item.getCareItemId());                 //护理项目
                 task.setCareItemName(careItemNameMap.get(item.getCareItemId())); //项目名冗余，防止改名历史变动
                 task.setUserId(plan.getUserId());                         //指定执行护理员=计划的护理人员
-                task.setPlanExecuteDate(todayDate);                       //计划执行日期=今天
+                task.setPlanExecuteDate(dayDate);                         //计划执行日期=循环到的当天
                 task.setPlanExecuteTime(item.getExecuteTime());           //计划执行时间=项目配置的时间
                 task.setStatus(0);                                        //待执行
-                careTaskMapper.insert(task);
+                tasks.add(task);
             }
         }
+
+        // 3.批量插入整个计划周期的任务
+        saveBatch(tasks);
+    }
+
+    /**
+     * 重新生成某计划的任务（方案B）：
+     * 1.物理删除该计划下所有 待执行(0) 的任务，已完成/已跳过(1/2)的历史打卡记录保留不动
+     * 2.查计划 + 项目列表，按新配置重新生成整个计划周期的任务
+     * 创建计划、编辑计划/项目保存后都会走到这里，保证任务与计划配置一致
+     */
+    @Override
+    public void regenerateTasksForPlan(Long planId) {
+        // 1.删除该计划下所有待执行任务
+        careTaskMapper.delete(new LambdaQueryWrapper<CareTask>()
+                .eq(CareTask::getCarePlanId, planId)
+                .eq(CareTask::getStatus, 0));
+
+        // 2.查计划与项目列表，重新生成
+        CarePlan plan = carePlanMapper.selectById(planId);
+        if (plan == null) return;
+        List<CarePlanItem> items = carePlanItemMapper.selectList(
+                new LambdaQueryWrapper<CarePlanItem>().eq(CarePlanItem::getCarePlanId, planId));
+        if (items.isEmpty()) return;
+        generateTasksForPlan(plan, items);
+    }
+
+    /**
+     * java.util.Date 转 LocalDate（用于遍历计划周期）
+     */
+    private LocalDate toLocalDate(Date date) {
+        return date.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
     }
 
     /**

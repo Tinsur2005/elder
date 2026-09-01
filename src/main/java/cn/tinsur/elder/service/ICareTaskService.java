@@ -1,11 +1,15 @@
 package cn.tinsur.elder.service;
 
+import cn.tinsur.elder.pojo.entity.CarePlan;
+import cn.tinsur.elder.pojo.entity.CarePlanItem;
 import cn.tinsur.elder.pojo.entity.CareTask;
 import cn.tinsur.elder.pojo.query.CareTaskQuery;
 import cn.tinsur.elder.pojo.vo.CareTaskVO;
 import cn.tinsur.elder.util.Result;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -49,4 +53,23 @@ public interface ICareTaskService extends IService<CareTask> {
      * @return 处理结果
      */
     Result skip(Long id);
+
+    /**
+     * 按护理计划一次性生成整个计划周期内的所有任务：
+     * 遍历 [startDate, endDate] 的每一天 × 每个护理项目，按执行周期判定该天是否执行日，
+     * 是则插入一条 待执行(0) 的任务
+     *
+     * @param plan  护理计划（开始/结束日期必填）
+     * @param items 该计划包含的护理项目列表
+     */
+    void generateTasksForPlan(CarePlan plan, List<CarePlanItem> items);
+
+    /**
+     * 重新生成某计划的任务（方案B）：
+     * 删除该计划下所有 待执行(0) 的任务，再按当前计划配置重新生成整个周期的任务；
+     * 已完成/已跳过(status=1/2)的历史打卡记录保留不动
+     *
+     * @param planId 计划id
+     */
+    void regenerateTasksForPlan(Long planId);
 }

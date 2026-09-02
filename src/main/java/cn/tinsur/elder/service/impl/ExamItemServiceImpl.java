@@ -1,7 +1,9 @@
 package cn.tinsur.elder.service.impl;
 
 import cn.tinsur.elder.mapper.ExamItemMapper;
+import cn.tinsur.elder.mapper.ExamPackageItemMapper;
 import cn.tinsur.elder.pojo.entity.ExamItem;
+import cn.tinsur.elder.pojo.entity.ExamPackageItem;
 import cn.tinsur.elder.pojo.query.ExamItemQuery;
 import cn.tinsur.elder.service.IExamItemService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -27,6 +29,9 @@ public class ExamItemServiceImpl extends ServiceImpl<ExamItemMapper, ExamItem> i
     @Autowired
     private ExamItemMapper examItemMapper;
 
+    @Autowired
+    private ExamPackageItemMapper examPackageItemMapper;
+
     @Override
     public IPage<ExamItem> list(ExamItemQuery examItemQuery) {
         IPage<ExamItem> page = new Page<>(examItemQuery.getPage(), examItemQuery.getLimit());
@@ -51,6 +56,7 @@ public class ExamItemServiceImpl extends ServiceImpl<ExamItemMapper, ExamItem> i
 
     @Override
     public Long countInPackage(List<Long> ids) {
-        return examItemMapper.countInPackage(ids);
+        return examPackageItemMapper.selectCount(new LambdaQueryWrapper<ExamPackageItem>()
+                .in(ExamPackageItem::getExamItemId, ids));
     }
 }

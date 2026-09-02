@@ -24,7 +24,7 @@ import java.util.List;
  * @since 2026-09-01
  */
 @RestController
-@RequestMapping("/family")
+@RequestMapping("/families")
 public class FamilyController {
 
     @Autowired
@@ -44,7 +44,7 @@ public class FamilyController {
 
     /**
      * 根据ID查询家属
-     * GET /family/1
+     * GET /families/1
      */
     @GetMapping("/{id}")
     public Result getById(@PathVariable Long id) {
@@ -67,7 +67,7 @@ public class FamilyController {
 
     /**
      * 修改家属
-     * PUT /family/1
+     * PUT /families/1
      * 注意：密码字段传null时MyBatis-Plus不会更新该列，前端编辑时密码留空即不修改密码
      */
     @PutMapping("/{id}")
@@ -79,7 +79,7 @@ public class FamilyController {
 
     /**
      * 根据ID删除家属（逻辑删除），并同步删除elder-family中间表中的关联数据
-      * DELETE /family/1
+      * DELETE /families/1
      */
     @DeleteMapping("/{id}")
     public Result delete(@PathVariable Long id) {
@@ -108,7 +108,7 @@ public class FamilyController {
 
     /**
      * 根据真实姓名（realName）模糊查询家属，供"远程搜索"下拉框使用
-     * GET /family/searchByName?name=张
+     * GET /families/searchByName?name=张
      */
     @GetMapping("/searchByName")
     public Result<List<Family>> searchByName(@RequestParam String name) {

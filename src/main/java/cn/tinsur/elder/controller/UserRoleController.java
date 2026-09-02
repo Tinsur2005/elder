@@ -23,7 +23,7 @@ import java.util.Map;
  * @since 2026-08-27
  */
 @RestController
-@RequestMapping("/user-role")
+@RequestMapping("/user-roles")
 public class UserRoleController {
 
     @Autowired

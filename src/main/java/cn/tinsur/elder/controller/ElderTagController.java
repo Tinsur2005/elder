@@ -23,7 +23,7 @@ import java.util.Map;
  * @since 2026-08-26
  */
 @RestController
-@RequestMapping("/elder-tag")
+@RequestMapping("/elder-tags")
 public class ElderTagController {
     @Autowired
     private ITagService tagService;

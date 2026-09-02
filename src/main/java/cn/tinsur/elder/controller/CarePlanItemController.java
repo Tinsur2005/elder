@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2026-08-31
  */
 @RestController
-@RequestMapping("/care-plan-item")
+@RequestMapping("/care-plan-items")
 public class CarePlanItemController {
 
 }

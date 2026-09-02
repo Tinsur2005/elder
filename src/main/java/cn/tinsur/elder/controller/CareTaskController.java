@@ -21,7 +21,7 @@ import java.util.Arrays;
  * @since 2026-08-31
  */
 @RestController
-@RequestMapping("/care-task")
+@RequestMapping("/care-tasks")
 public class CareTaskController {
 
     @Autowired
@@ -39,7 +39,7 @@ public class CareTaskController {
 
     /**
      * 根据ID查询护理任务详情
-     * GET /care-task/1
+     * GET /care-tasks/1
      */
     @GetMapping("/{id}")
     public Result getById(@PathVariable Long id) {
@@ -48,7 +48,7 @@ public class CareTaskController {
 
     /**
      * 完成任务：记录实际完成时间、执行结果、打卡照片、备注、执行人
-     * PUT /care-task/complete
+     * PUT /care-tasks/complete
      */
     @PutMapping("/complete")
     public Result complete(@RequestBody CareTask careTask) {
@@ -57,7 +57,7 @@ public class CareTaskController {
 
     /**
      * 跳过/取消任务
-     * PUT /care-task/skip/1
+     * PUT /care-tasks/skip/1
      */
     @PutMapping("/skip/{id}")
     public Result skip(@PathVariable Long id) {
@@ -66,7 +66,7 @@ public class CareTaskController {
 
     /**
      * 根据ID删除任务
-     * DELETE /care-task/1
+     * DELETE /care-tasks/1
      */
     @DeleteMapping("/{id}")
     public Result delete(@PathVariable Long id) {

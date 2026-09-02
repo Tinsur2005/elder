@@ -17,7 +17,6 @@
     name: '',
     realName: '',
     phone: '',
-    relation: '',
     status: '',
     page: 1,
     limit: 10
@@ -149,7 +148,6 @@
       name: '',
       realName: '',
       phone: '',
-      relation: '',
       status: '',
       page: 1,
       limit: 10
@@ -371,16 +369,6 @@
       </el-form-item>
       <el-form-item label="手机号">
         <el-input v-model="familyQuery.phone" placeholder="请输入手机号" clearable style="width: 160px"/>
-      </el-form-item>
-      <el-form-item label="关系">
-        <el-select v-model="familyQuery.relation" placeholder="请选择关系" clearable style="width: 130px">
-          <el-option
-              v-for="item in relationOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-          />
-        </el-select>
       </el-form-item>
       <el-form-item label="状态">
         <el-select v-model="familyQuery.status" placeholder="请选择状态" clearable style="width: 130px">

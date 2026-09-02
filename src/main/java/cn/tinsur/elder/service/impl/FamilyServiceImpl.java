@@ -27,10 +27,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * <p>
  * 家属表 服务实现类
- * </p>
- *
  * @author Tinsur
  * @since 2026-09-01
  */
@@ -57,7 +54,6 @@ public class FamilyServiceImpl extends ServiceImpl<FamilyMapper, Family> impleme
                 .like(!ObjectUtils.isEmpty(familyQuery.getName()), Family::getName, familyQuery.getName())
                 .like(!ObjectUtils.isEmpty(familyQuery.getRealName()), Family::getRealName, familyQuery.getRealName())
                 .like(!ObjectUtils.isEmpty(familyQuery.getPhone()), Family::getPhone, familyQuery.getPhone())
-                .eq(!ObjectUtils.isEmpty(familyQuery.getRelation()), Family::getRelation, familyQuery.getRelation())
                 .eq(!ObjectUtils.isEmpty(familyQuery.getStatus()), Family::getStatus, familyQuery.getStatus())
                 .orderByDesc(Family::getCreateTime);
         IPage<Family> familyPage = familyMapper.selectPage(page, lambdaQueryWrapper);
@@ -173,8 +169,8 @@ public class FamilyServiceImpl extends ServiceImpl<FamilyMapper, Family> impleme
     /**
      * 根据家属id更新老人关联，传入的第二个参数应该是老人ID组成的Long数组
      * 这个方法的实现方法是，先根据id删除elder-family中间表中有关这个家属的所有数据，再根据id和elderId数组插入新的数据
-     * @param id
-     * @param elderIds
+     * @param id 家属id
+     * @param elderIds 老人ID组成的Long数组
      * @return
      */
     @Override
@@ -186,7 +182,7 @@ public class FamilyServiceImpl extends ServiceImpl<FamilyMapper, Family> impleme
 
     /**
      * 删除家属（逻辑删除），并同步删除elder-family中间表中该家属的所有关联数据
-     * @param id
+     * @param id 家属id
      */
     @Override
     public void deleteFamilyById(Long id) {
@@ -196,7 +192,7 @@ public class FamilyServiceImpl extends ServiceImpl<FamilyMapper, Family> impleme
 
     /**
      * 批量删除家属（逻辑删除），并同步删除elder-family中间表中这些家属的所有关联数据
-     * @param ids
+     * @param ids 家属id数组
      */
     @Override
     public void deleteFamilyBatch(Long[] ids) {

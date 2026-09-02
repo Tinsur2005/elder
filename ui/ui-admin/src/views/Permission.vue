@@ -4,6 +4,7 @@
   import {ElMessage, ElMessageBox} from "element-plus"
   import {Plus, EditPen, Delete} from '@element-plus/icons-vue'
   import IconPicker from "@/components/IconPicker.vue";
+  import hasBtnPermission from "@/utils/btnPermission.js";
 
   // ========== 变量 ==========
   //保存返回树形结构数据，List<PermissionVO>
@@ -202,7 +203,7 @@ const showUpdateDialog = (row) => {
         />
       </template>
     </el-table-column>
-    <el-table-column label="操作" align="center" width="250px" fixed="right">
+    <el-table-column label="操作" align="center" width="250px" fixed="right" v-if="hasBtnPermission('permission:operation')">
       <template #default="{row}">
         <el-button size="small" type="success" :icon="Plus" @click="showAddDialog(row)" :disabled="row.type == 2">添加</el-button>
         <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row)">修改</el-button>

@@ -218,7 +218,7 @@
       <el-table-column prop="name" label="标签名称" width="150" :show-overflow-tooltip="true"/>
       <el-table-column prop="code" label="标签编码" :show-overflow-tooltip="true"/>
       <el-table-column prop="createTime" label="创建时间" :show-overflow-tooltip="true"/>
-      <el-table-column align="center" width="200px" fixed="right" label="操作">
+      <el-table-column align="center" width="200px" fixed="right" label="操作" v-if="hasBtnPermission('tag:operation')">
         <template #default="{ row }">
           <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)" v-if="hasBtnPermission('tag:update')">编辑</el-button>
           <el-button size="small" type="danger" :icon="Delete" @click="deleteById(row.id)" v-if="hasBtnPermission('tag:delete')">删除</el-button>

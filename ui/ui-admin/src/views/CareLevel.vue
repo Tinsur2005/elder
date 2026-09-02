@@ -258,7 +258,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间" width="160"/>
-      <el-table-column align="center" width="200px" fixed="right" label="操作">
+      <el-table-column align="center" width="200px" fixed="right" label="操作" v-if="hasBtnPermission('careLevel:operation')">
         <template #default="{ row }">
           <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)" v-if="hasBtnPermission('careLevel:update')">编辑</el-button>
           <el-button size="small" type="danger" :icon="Delete" @click="deleteById(row.id)" v-if="hasBtnPermission('careLevel:deleteById')">删除</el-button>

@@ -27,6 +27,12 @@ public class CareTaskQuery {
     private Date endPlanExecuteDate;
 
     /**
+     * 查看范围：mine=仅看我的，all=查看全部。
+     * 该参数只在前端有 careTask:viewAll 权限时才会被后端采纳，否则一律强制按当前登录用户过滤
+     */
+    private String viewScope;
+
+    /**
      * 当前页码
      */
     private Integer page;

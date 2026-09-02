@@ -395,7 +395,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间"/>
-      <el-table-column align="center" width="250px" fixed="right" label="操作">
+      <el-table-column align="center" width="250px" fixed="right" label="操作" v-if="hasBtnPermission('user:operation')">
         <template #default="{ row }">
           <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)" v-if="hasBtnPermission('user:update')">编辑</el-button>
           <el-button size="small" type="success" :icon="User" @click="showRolesDialog(row.id)">角色</el-button>

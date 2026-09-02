@@ -3,7 +3,7 @@
   import elderApi from '@/api/elder.js'
   import {useUserInfoStore} from '@/store/userInfo.js'
   import {useTokenStore} from '@/store/token.js'
-  import {ref} from 'vue'
+  import {computed, ref, watch} from 'vue'
   import {ElMessage, ElMessageBox} from 'element-plus'
   import {Plus, CircleCheck, CircleClose, View, Delete} from "@element-plus/icons-vue";
   import hasBtnPermission from "@/utils/btnPermission.js";
@@ -59,12 +59,37 @@
     {label: '全部待执行', value: 'allTodo'},
   ]
 
-  //分页信息和搜索条件（按老人、状态、计划执行日期范围模糊搜索）
+  //查看范围：按按钮权限动态生成选项（后端会从token解析身份强制兜底，防止伪造参数越权）
+  //只有"仅看我的"权限（护工）→ 只显示"仅看我的"；只有"查看全部"权限 → 只显示"查看全部"且默认选中它；都有 → 默认"仅看我的"
+  const canViewMine = computed(() => hasBtnPermission('careTask:viewMine'))
+  const canViewAll = computed(() => hasBtnPermission('careTask:viewAll'))
+  const viewOptions = computed(() => [
+    ...(canViewMine.value ? [{label: '仅看我的', value: 'mine'}] : []),
+    ...(canViewAll.value ? [{label: '查看全部', value: 'all'}] : []),
+  ])
+  //默认查看范围：有"仅看我的"就默认仅看我的，否则有"查看全部"就默认查看全部，都没有兜底仅看我的
+  const defaultViewScope = computed(() => canViewMine.value ? 'mine' : (canViewAll.value ? 'all' : 'mine'))
+
+  //分页信息和搜索条件（按老人、状态、计划执行日期范围、查看范围筛选）
   const careTaskQuery = ref({
     elderId: '',
     status: '',
+    viewScope: 'mine', //权限数据是异步加载的，先按最保守的"仅看我的"起手，权限就绪后由下面的watch按规则修正
     page: 1,
     limit: 10
+  })
+
+  //用户是否手动切换过查看范围（切换过就不再自动修正默认值）
+  let viewScopeTouched = false
+  //权限数据由 Index.vue 挂载后才异步请求，btnList 就绪后（选项从无到有/变化时）修正一次默认查看范围：
+  //仅当当前选中的值不在可用选项里（如只有"查看全部"权限的用户初始值是"仅看我的"）才修正并重新查询
+  watch(viewOptions, (options) => {
+    if (viewScopeTouched || options.length === 0) return
+    if (!options.some(o => o.value === careTaskQuery.value.viewScope)) {
+      careTaskQuery.value.viewScope = defaultViewScope.value
+      careTaskQuery.value.page = 1
+      loadData()
+    }
   })
 
   //计划执行日期范围，用于搜索，初始化置为空，在日期选择框选择后被赋值
@@ -111,6 +136,13 @@
     loadData()
   }
 
+  //切换查看范围：重置页码后按新范围查询
+  const onViewScopeChange = () => {
+    viewScopeTouched = true
+    careTaskQuery.value.page = 1
+    loadData()
+  }
+
   //把快捷筛选模式翻译成 状态+计划执行日期范围 两个标准查询条件（不触发查询）
   const applyFilter = (mode) => {
     const today = todayStr()
@@ -138,6 +170,7 @@
     careTaskQuery.value = {
       elderId: '',
       status: '',
+      viewScope: defaultViewScope.value, //查看范围还原为当前权限下的默认值
       page: 1,
       limit: 10
     }
@@ -349,10 +382,16 @@
         <el-button @click="reset">重置</el-button>
       </el-form-item>
     </el-form>
-    <!--快捷筛选：选中后自动填入上方状态、计划执行日期范围两个查询条件-->
-    <el-form-item label="快捷筛选">
-      <el-segmented v-model="filterMode" :options="filterOptions" @change="onFilterChange"/>
-    </el-form-item>
+    <div class="filter-row">
+      <!--快捷筛选：选中后自动填入上方状态、计划执行日期范围两个查询条件-->
+      <el-form-item label="快捷筛选">
+        <el-segmented v-model="filterMode" :options="filterOptions" @change="onFilterChange"/>
+      </el-form-item>
+      <!--查看范围：选项按按钮权限动态生成，无任何查看权限时整个模块隐藏；后端从token解析身份强制兜底-->
+      <el-form-item label="查看范围" v-if="viewOptions.length > 0">
+        <el-segmented v-model="careTaskQuery.viewScope" :options="viewOptions" @change="onViewScopeChange"/>
+      </el-form-item>
+    </div>
     <!--表单-->
     <el-table :data="list" border style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55"/>
@@ -378,7 +417,7 @@
           <el-tag v-else type="info">已跳过</el-tag>
         </template>
       </el-table-column>
-      <el-table-column align="center" width="350px" fixed="right" label="操作">
+      <el-table-column align="center" width="350px" fixed="right" label="操作" v-if="hasBtnPermission('careTask:operation')">
         <template #default="{ row }">
           <!-- 只有待执行的任务才能执行完成/跳过 -->
           <el-button size="small" type="success" :icon="CircleCheck" @click="showCompleteDialog(row)" v-if="row.status === 0 && hasBtnPermission('careTask:complete')">完成任务</el-button>
@@ -480,6 +519,14 @@
 </template>
 
 <style scoped>
+  /*快捷筛选、查看范围同行排列，两个筛选模块之间留出间隔*/
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 30px;
+  }
+
   .header {
     display: flex;
     justify-content: space-between;

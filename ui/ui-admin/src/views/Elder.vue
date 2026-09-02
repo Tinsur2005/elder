@@ -466,10 +466,10 @@
       </el-table-column>
       <el-table-column prop="remark" label="备注" :show-overflow-tooltip="true" width="125"/>
       <el-table-column prop="createTime" label="创建时间" :show-overflow-tooltip="true" width="160"/>
-      <el-table-column align="center" width="250px" fixed="right" label="操作">
+      <el-table-column align="center" width="250px" fixed="right" label="操作" v-if="hasBtnPermission('elder:operation')">
         <template #default="{ row }">
           <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)" v-if="hasBtnPermission('elder:update')">编辑</el-button>
-          <el-button size="small" type="success" :icon="PriceTag" @click="showAssignedTagDialog(row)">标注</el-button>
+          <el-button size="small" type="success" :icon="PriceTag" @click="showAssignedTagDialog(row)" v-if="hasBtnPermission('elder:tag')">标注</el-button>
           <el-button size="small" type="danger" :icon="Delete" @click="deleteById(row.id)" v-if="hasBtnPermission('elder:deleteById')">删除</el-button>
         </template>
       </el-table-column>

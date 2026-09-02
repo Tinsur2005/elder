@@ -29,11 +29,13 @@ public class CareTaskController {
 
     /**
      * 分页查询护理任务列表
-     * GET /care-task?page=1&limit=10&elderId=1&status=0&beginPlanExecuteDate=xxx&endPlanExecuteDate=xxx
+     * GET /care-task?page=1&limit=10&elderId=1&status=0&beginPlanExecuteDate=xxx&endPlanExecuteDate=xxx&viewScope=mine|all
+     * 查看范围由后端根据 Authorization 解析当前用户并校验 careTask:viewAll 权限后兜底强制
      */
     @GetMapping
-    public Result<IPage<CareTaskVO>> pageList(CareTaskQuery careTaskQuery) {
-        IPage<CareTaskVO> page = careTaskService.list(careTaskQuery);
+    public Result<IPage<CareTaskVO>> pageList(CareTaskQuery careTaskQuery,
+                                              @RequestHeader("Authorization") String token) {
+        IPage<CareTaskVO> page = careTaskService.list(careTaskQuery, token);
         return Result.ok(page);
     }
 

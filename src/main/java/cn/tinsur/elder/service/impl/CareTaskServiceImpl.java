@@ -11,10 +11,12 @@ import cn.tinsur.elder.pojo.entity.CarePlan;
 import cn.tinsur.elder.pojo.entity.CarePlanItem;
 import cn.tinsur.elder.pojo.entity.CareTask;
 import cn.tinsur.elder.pojo.entity.Elder;
+import cn.tinsur.elder.pojo.entity.Permission;
 import cn.tinsur.elder.pojo.entity.User;
 import cn.tinsur.elder.pojo.query.CareTaskQuery;
 import cn.tinsur.elder.pojo.vo.CareTaskVO;
 import cn.tinsur.elder.service.ICareTaskService;
+import cn.tinsur.elder.util.JwtUtil;
 import cn.tinsur.elder.util.Result;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -66,17 +68,28 @@ public class CareTaskServiceImpl extends ServiceImpl<CareTaskMapper, CareTask> i
 
     /**
      * 获取护理任务列表（分页），返回 CareTaskVO，并给每个 VO 填充老人姓名、执行护理员姓名。
-     * 任务由「保存护理计划项目」时一次性生成整个计划周期，这里只做查询
+     * 任务由「保存护理计划项目」时一次性生成整个计划周期，这里只做查询。
+     * 查看范围兜底：只有 viewScope=all 且当前用户有 careTask:viewAll 权限才放开，
+     * 否则一律强制 userId=当前登录用户（护工只能查看自己的任务，防止伪造参数越权）
      *
      * @param careTaskQuery
+     * @param token 当前登录用户的 JWT
      * @return
      */
     @Override
-    public IPage<CareTaskVO> list(CareTaskQuery careTaskQuery) {
-        // 1.先查护理任务分页（按老人、状态、计划执行日期范围筛选）
+    public IPage<CareTaskVO> list(CareTaskQuery careTaskQuery, String token) {
+        // 0.解析当前登录用户，并判定其是否拥有 careTask:viewAll 按钮权限
+        Long currentUserId = ((Number) JwtUtil.parseToken(token).get("id")).longValue();
+        boolean hasViewAllPermission = userMapper.selectPermissionByUserId(currentUserId).stream()
+                .anyMatch(p -> p.getType() == 2 && "careTask:viewAll".equals(p.getPermissionValue()));
+        boolean viewAll = "all".equals(careTaskQuery.getViewScope()) && hasViewAllPermission;
+
+        // 1.先查护理任务分页（按查看范围、老人、状态、计划执行日期范围筛选）
         IPage<CareTask> page = new Page<>(careTaskQuery.getPage(), careTaskQuery.getLimit());
         LambdaQueryWrapper<CareTask> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper
+                //非"查看全部"一律只查自己的任务
+                .eq(!viewAll, CareTask::getUserId, currentUserId)
                 .eq(!ObjectUtils.isEmpty(careTaskQuery.getElderId()), CareTask::getElderId, careTaskQuery.getElderId())
                 .eq(!ObjectUtils.isEmpty(careTaskQuery.getStatus()), CareTask::getStatus, careTaskQuery.getStatus())
                 .between(!ObjectUtils.isEmpty(careTaskQuery.getBeginPlanExecuteDate())

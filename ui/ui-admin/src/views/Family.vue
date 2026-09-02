@@ -422,7 +422,7 @@
       </el-table-column>
       <el-table-column prop="remark" label="备注" :show-overflow-tooltip="true" width="125"/>
       <el-table-column prop="createTime" label="创建时间" :show-overflow-tooltip="true" width="160"/>
-      <el-table-column align="center" width="300px" fixed="right" label="操作">
+      <el-table-column align="center" width="300px" fixed="right" label="操作" v-if="hasBtnPermission('family:operation')">
         <template #default="{ row }">
           <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)" v-if="hasBtnPermission('family:update')">编辑</el-button>
           <el-button size="small" type="success" :icon="View" @click="showDetailDrawer(row)" v-if="hasBtnPermission('family:view')">查看</el-button>
@@ -567,7 +567,8 @@
         </template>
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间" :show-overflow-tooltip="true" width="170"/>
-      <el-table-column label="操作" align="center" width="150">
+      <!--该列里是"查看合同"按钮，跟随合同模块的操作栏权限，避免无权限时出现空操作列-->
+      <el-table-column label="操作" align="center" width="150" v-if="hasBtnPermission('contract:operation')">
         <template #default="{row}">
           <el-button size="small" type="success" :icon="Document" @click="goContract(row)"
                      v-if="hasBtnPermission('contract:get')">查看合同</el-button>

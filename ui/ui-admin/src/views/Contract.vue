@@ -359,7 +359,7 @@
       </el-table-column>
       <el-table-column prop="remark" label="备注" :show-overflow-tooltip="true"/>
       <el-table-column prop="createTime" label="创建时间" width="160"/>
-      <el-table-column align="center" width="280" fixed="right" label="操作">
+      <el-table-column align="center" width="280" fixed="right" label="操作" v-if="hasBtnPermission('contract:operation')">
         <template #default="{ row }">
           <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)" v-if="hasBtnPermission('contract:update')">编辑</el-button>
           <el-button size="small" type="success" :icon="Document" @click="viewContract(row)" v-if="hasBtnPermission('contract:get')">查看合同</el-button>

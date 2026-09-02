@@ -267,7 +267,7 @@
       <el-table-column prop="code" label="角色编码" :show-overflow-tooltip="true"/>
       <el-table-column prop="description" label="角色描述" :show-overflow-tooltip="true"/>
       <el-table-column prop="createTime" label="创建时间" :show-overflow-tooltip="true"/>
-      <el-table-column align="center" width="280px" fixed="right" label="操作">
+      <el-table-column align="center" width="280px" fixed="right" label="操作" v-if="hasBtnPermission('role:operation')">
         <template #default="{ row }">
           <el-button size="small" type="primary" :icon="EditPen" @click="showUpdateDialog(row.id)" v-if="hasBtnPermission('role:update')">编辑</el-button>
           <el-button size="small" type="success" :icon="Stamp" @click="showAssignedPermissionDialog(row)">权限分配</el-button>

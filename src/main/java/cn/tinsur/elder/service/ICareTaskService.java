@@ -23,11 +23,13 @@ public interface ICareTaskService extends IService<CareTask> {
 
     /**
      * 分页查询护理任务列表，返回带老人姓名、执行护理员姓名的 CareTaskVO
+     * 查看范围由后端兜底强制：用户没有 careTask:viewAll 权限时，无论 viewScope 传什么都只返回自己的任务
      *
-     * @param careTaskQuery 查询条件（老人、状态、计划执行日期范围、分页）
+     * @param careTaskQuery 查询条件（老人、状态、计划执行日期范围、查看范围、分页）
+     * @param token         当前登录用户的 JWT（用于解析身份、校验查看全部权限）
      * @return 分页结果
      */
-    IPage<CareTaskVO> list(CareTaskQuery careTaskQuery);
+    IPage<CareTaskVO> list(CareTaskQuery careTaskQuery, String token);
 
     /**
      * 查询任务详情，返回带老人姓名、执行护理员姓名的 CareTaskVO

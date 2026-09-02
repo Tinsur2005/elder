@@ -1,9 +1,8 @@
-package cn.tinsur.elder.controller;
+package cn.tinsur.elder.controller.admin;
 
 
 import cn.tinsur.elder.pojo.entity.Role;
 import cn.tinsur.elder.pojo.query.RoleQuery;
-import cn.tinsur.elder.pojo.vo.PermissionVO;
 import cn.tinsur.elder.service.IRoleService;
 import cn.tinsur.elder.util.Result;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -21,7 +20,7 @@ import java.util.List;
  * @since 2026-08-27
  */
 @RestController
-@RequestMapping("/roles")
+@RequestMapping("/admin/roles")
 public class RoleController {
     @Autowired
     private IRoleService roleService;

@@ -1,4 +1,4 @@
-package cn.tinsur.elder.controller;
+package cn.tinsur.elder.controller.admin;
 
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2026-08-28
  */
 @RestController
-@RequestMapping("/role-permissions")
+@RequestMapping("/admin/role-permissions")
 public class RolePermissionController {
 
 }

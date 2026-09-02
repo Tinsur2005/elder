@@ -425,7 +425,7 @@
       <el-form-item label="合同文件" :label-width="80">
         <div class="contract-file-field">
           <el-upload
-              action="/api/upload?dir=contract"
+              action="/admin/api/upload?dir=contract"
               :show-file-list="false"
               :on-success="handleFileSuccess"
               :before-upload="beforeFileUpload"

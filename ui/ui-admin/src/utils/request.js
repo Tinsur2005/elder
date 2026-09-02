@@ -2,7 +2,7 @@ import axios from 'axios'
 import {ElMessage} from 'element-plus'
 import router from '@/router'
 
-const baseURL = '/api'
+const baseURL = '/admin/api'
 const request = axios.create({baseURL})
 
 import {useTokenStore} from "@/store/token.js";

@@ -322,7 +322,7 @@
               class="inline-block"
               multiple=""
               method="post"
-              action="/api/users/importExcel"
+              action="/admin/api/users/importExcel"
               style="display:inline-block;margin-left: 12px"
               accept=".xlsx,.xls"
               :show-file-list="false"
@@ -421,7 +421,7 @@
       <el-form-item label="头像" :label-width="60">
         <el-upload
             class="avatar-uploader"
-            action="/api/upload?dir=avatar"
+            action="/admin/api/upload?dir=avatar"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"

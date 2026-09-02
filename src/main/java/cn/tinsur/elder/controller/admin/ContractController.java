@@ -1,4 +1,4 @@
-package cn.tinsur.elder.controller;
+package cn.tinsur.elder.controller.admin;
 
 
 import cn.tinsur.elder.pojo.entity.Contract;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 2026-08-28
  */
 @RestController
-@RequestMapping("/contracts")
+@RequestMapping("/admin/contracts")
 public class ContractController {
 
     @Autowired

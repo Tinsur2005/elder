@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.tinsur.elder.mapper.ExamItemMapper">
+
+    <!-- 统计体检项目被体检套餐引用的数量（用于删除前校验） -->
+    <select id="countInPackage" resultType="java.lang.Long">
+        select count(*) from exam_package_item where exam_item_id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

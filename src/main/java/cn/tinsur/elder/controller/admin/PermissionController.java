@@ -1,4 +1,4 @@
-package cn.tinsur.elder.controller;
+package cn.tinsur.elder.controller.admin;
 
 
 import cn.tinsur.elder.pojo.entity.Permission;
@@ -19,7 +19,7 @@ import java.util.List;
  * @since 2026-08-28
  */
 @RestController
-@RequestMapping("/permissions")
+@RequestMapping("/admin/permissions")
 public class PermissionController {
 
     @Autowired

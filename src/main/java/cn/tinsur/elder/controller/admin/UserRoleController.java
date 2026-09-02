@@ -1,4 +1,4 @@
-package cn.tinsur.elder.controller;
+package cn.tinsur.elder.controller.admin;
 
 
 import cn.tinsur.elder.service.IRoleService;
@@ -23,7 +23,7 @@ import java.util.Map;
  * @since 2026-08-27
  */
 @RestController
-@RequestMapping("/user-roles")
+@RequestMapping("/admin/user-roles")
 public class UserRoleController {
 
     @Autowired

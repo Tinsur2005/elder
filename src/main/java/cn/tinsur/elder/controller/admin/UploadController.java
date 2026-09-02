@@ -1,4 +1,4 @@
-package cn.tinsur.elder.controller;
+package cn.tinsur.elder.controller.admin;
 
 import cn.tinsur.elder.util.AliOSSUtil;
 import cn.tinsur.elder.util.Result;
@@ -16,7 +16,7 @@ public class UploadController {
     @Autowired
     private AliOSSUtil aliOSSUtil;
 
-    @PostMapping("/upload")
+    @PostMapping("/admin/upload")
     public Result<String> update (MultipartFile file, String dir){
         String uuid = UUID.randomUUID().toString().replace("-","");
         String fileName = file.getOriginalFilename();
@@ -31,7 +31,7 @@ public class UploadController {
         return Result.ok("上传成功", url);
     }
 
-    @DeleteMapping("/deleteAvatar")
+    @DeleteMapping("/admin/deleteAvatar")
     public Result<String> delete (String url){
         aliOSSUtil.deleteFile(url);
         return Result.ok("删除成功");

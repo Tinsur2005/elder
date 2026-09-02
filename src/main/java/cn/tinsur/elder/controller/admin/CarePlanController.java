@@ -1,4 +1,4 @@
-package cn.tinsur.elder.controller;
+package cn.tinsur.elder.controller.admin;
 
 
 import cn.tinsur.elder.pojo.entity.CarePlan;
@@ -24,7 +24,7 @@ import java.util.List;
  * @since 2026-08-31
  */
 @RestController
-@RequestMapping("/care-plans")
+@RequestMapping("/admin/care-plans")
 public class CarePlanController {
     @Autowired
     private ICarePlanService carePlanService;

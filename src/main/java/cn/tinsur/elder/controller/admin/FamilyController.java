@@ -1,4 +1,4 @@
-package cn.tinsur.elder.controller;
+package cn.tinsur.elder.controller.admin;
 
 
 import cn.tinsur.elder.mapper.FamilyMapper;
@@ -24,7 +24,7 @@ import java.util.List;
  * @since 2026-09-01
  */
 @RestController
-@RequestMapping("/families")
+@RequestMapping("/admin/families")
 public class FamilyController {
 
     @Autowired

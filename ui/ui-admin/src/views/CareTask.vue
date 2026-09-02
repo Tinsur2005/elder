@@ -452,7 +452,7 @@
       <el-form-item label="打卡照片">
         <!-- 现场打卡照片上传，返回URL收集进imgList，多张以逗号拼接存入execute_img -->
         <el-upload
-            action="/api/upload?dir=careTask"
+            action="/admin/api/upload?dir=careTask"
             list-type="picture-card"
             accept="image/*"
             multiple

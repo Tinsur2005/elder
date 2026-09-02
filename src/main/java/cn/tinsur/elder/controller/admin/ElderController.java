@@ -1,4 +1,4 @@
-package cn.tinsur.elder.controller;
+package cn.tinsur.elder.controller.admin;
 
 
 import cn.tinsur.elder.mapper.ElderMapper;
@@ -26,7 +26,7 @@ import java.util.List;
  * @since 2026-08-25
  */
 @RestController
-@RequestMapping("/elders")
+@RequestMapping("/admin/elders")
 public class ElderController {
 
     @Autowired

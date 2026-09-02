@@ -1,4 +1,4 @@
-package cn.tinsur.elder.controller;
+package cn.tinsur.elder.controller.admin;
 
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2026-08-31
  */
 @RestController
-@RequestMapping("/care-plan-items")
+@RequestMapping("/admin/care-plan-items")
 public class CarePlanItemController {
 
 }

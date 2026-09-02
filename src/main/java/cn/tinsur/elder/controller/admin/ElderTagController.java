@@ -1,4 +1,4 @@
-package cn.tinsur.elder.controller;
+package cn.tinsur.elder.controller.admin;
 
 
 import cn.tinsur.elder.service.IElderService;
@@ -23,7 +23,7 @@ import java.util.Map;
  * @since 2026-08-26
  */
 @RestController
-@RequestMapping("/elder-tags")
+@RequestMapping("/admin/elder-tags")
 public class ElderTagController {
     @Autowired
     private ITagService tagService;

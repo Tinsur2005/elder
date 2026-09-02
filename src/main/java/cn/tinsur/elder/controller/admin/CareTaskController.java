@@ -1,4 +1,4 @@
-package cn.tinsur.elder.controller;
+package cn.tinsur.elder.controller.admin;
 
 
 import cn.tinsur.elder.pojo.entity.CareTask;
@@ -21,7 +21,7 @@ import java.util.Arrays;
  * @since 2026-08-31
  */
 @RestController
-@RequestMapping("/care-tasks")
+@RequestMapping("/admin/care-tasks")
 public class CareTaskController {
 
     @Autowired

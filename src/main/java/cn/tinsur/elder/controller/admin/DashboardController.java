@@ -1,4 +1,4 @@
-package cn.tinsur.elder.controller;
+package cn.tinsur.elder.controller.admin;
 
 import cn.tinsur.elder.pojo.vo.DashboardVO;
 import cn.tinsur.elder.service.IDashboardService;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2026-08-31
  */
 @RestController
-@RequestMapping("/dashboard")
+@RequestMapping("/admin/dashboard")
 public class DashboardController {
 
     @Autowired

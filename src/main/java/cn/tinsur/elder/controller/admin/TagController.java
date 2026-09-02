@@ -1,14 +1,11 @@
-package cn.tinsur.elder.controller;
+package cn.tinsur.elder.controller.admin;
 
 
-import cn.tinsur.elder.exception.ServiceException;
 import cn.tinsur.elder.pojo.entity.Tag;
 import cn.tinsur.elder.pojo.query.TagQuery;
 import cn.tinsur.elder.service.ITagService;
-import cn.tinsur.elder.service.impl.TagServiceImpl;
 import cn.tinsur.elder.util.Result;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +20,7 @@ import java.util.List;
  * @since 2026-08-26
  */
 @RestController
-@RequestMapping("/tags")
+@RequestMapping("/admin/tags")
 public class TagController {
     @Autowired
     private ITagService tagService;

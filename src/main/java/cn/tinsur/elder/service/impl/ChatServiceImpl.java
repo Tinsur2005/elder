@@ -38,7 +38,7 @@ public class ChatServiceImpl implements IChatService {
 
     private static final String STREAM_END_MARK = "[END]";
     private static final String EMPTY_INPUT_REPLY = "请输入您想咨询的问题";
-    private static final String ERROR_REPLY = "抱歉，小智暂时无法回复，请稍后再试。";
+    private static final String ERROR_REPLY = "抱歉，小邻暂时无法回复，请稍后再试。";
 
     @Autowired
     private ChatClient chatClient;
@@ -75,6 +75,8 @@ public class ChatServiceImpl implements IChatService {
                 .user(message)
                 // 会话记忆按 conversationId（老人id）隔离，避免不同用户上下文串扰
                 .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+                // 注册AI工具：老人问自己的信息时，模型会自主调用查库
+                .tools(new ElderTools(conversationId, elderService))
                 .stream()
                 .content()
                 // 模型调用失败时也要发出提示和结束标记，避免前端一直处于等待状态

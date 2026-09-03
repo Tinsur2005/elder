@@ -54,7 +54,7 @@
     }
     return [
       {title: '体检预约', icon: 'calendar-o', color: '#1989FA', path: '/examBooking'},
-      {title: '体检记录', icon: 'records', color: '#07C160', path: '/exam'},
+      {title: 'AI对话', icon: 'chat-o', color: '#07C160', path: '/aiChat'},
       {title: '护理计划', icon: 'orders-o', color: '#FF976A', path: '/carePlan'},
       {title: '护理任务', icon: 'todo-list-o', color: '#EE0A24', path: '/careTask'},
       {title: '我的合同', icon: 'bill-o', color: '#1989FA', path: '/contract'},
@@ -62,7 +62,7 @@
     ]
   })
 
-  // ================== 对象（公告） ==================
+  // ================== 公告  ==================
 
   // 最近公告列表（首页通知条取第一条，弹层展示全部4条）
   const noticeList = ref([])

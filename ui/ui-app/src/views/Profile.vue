@@ -46,10 +46,12 @@
 
 <template>
   <div class="profile">
+    <van-nav-bar title="我的" :fixed="true" placeholder/>
+
     <!-- 用户信息卡 -->
     <div class="profile-header">
       <div class="profile-avatar">
-        <van-icon name="user-o" size="26" color="#1989FA"/>
+        <van-icon name="manager" size="34" color="#FFFFFF"/>
       </div>
       <div class="profile-user-info">
         <h3>{{ user.realName }}</h3>
@@ -58,8 +60,7 @@
     </div>
 
     <!-- 家属：绑定老人列表 -->
-    <van-cell-group inset class="profile-group" v-if="isFamily && userInfoStore.elders.length > 0">
-      <van-cell title="绑定老人" :border="false"/>
+    <div class="profile-card" v-if="isFamily && userInfoStore.elders.length > 0">
       <van-cell
           v-for="elder in userInfoStore.elders"
           :key="elder.id"
@@ -69,10 +70,10 @@
           is-link
           @click="router.push({path: '/elderInfo'})"
       />
-    </van-cell-group>
+    </div>
 
     <!-- 功能菜单 -->
-    <van-cell-group inset class="profile-group">
+    <div class="profile-card">
       <van-cell
           v-for="menu in menus"
           :key="menu.path"
@@ -81,11 +82,11 @@
           is-link
           :to="menu.path"
       />
-    </van-cell-group>
+    </div>
 
     <!-- 退出登录 -->
     <div class="profile-logout">
-      <van-button round block plain type="primary" @click="logout">退出登录</van-button>
+      <van-button round block plain color="#EE0A24" @click="logout">退出登录</van-button>
     </div>
   </div>
 </template>
@@ -93,22 +94,23 @@
 <style scoped>
   .profile {
     min-height: 100vh;
-    padding: 12px 0 20px;
+    padding: 0 0 20px;
   }
 
+  /* 用户信息卡（蓝色渐变，与首页头部同款配色） */
   .profile-header {
-    background-color: #FFFFFF;
+    background: linear-gradient(135deg, #1989FA 0%, #5BA5FA 100%);
     border-radius: 12px;
-    margin: 0 12px;
-    padding: 24px 16px;
+    margin: 12px 12px 0;
+    padding: 26px 20px;
     display: flex;
     align-items: center;
   }
 
   .profile-avatar {
-    width: 60px;
-    height: 60px;
-    background-color: #E8F3FF;
+    width: 62px;
+    height: 62px;
+    border: 2px solid rgba(255, 255, 255, 0.8);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -117,25 +119,42 @@
   }
 
   .profile-user-info {
-    margin-left: 14px;
-    color: #323233;
+    margin-left: 16px;
+    color: #FFFFFF;
   }
 
   .profile-user-info h3 {
-    font-size: 18px;
+    font-size: 20px;
+    font-weight: bold;
   }
 
   .profile-user-info p {
-    margin-top: 4px;
+    margin-top: 6px;
     font-size: 13px;
-    color: #999;
+    color: rgba(255, 255, 255, 0.85);
   }
 
-  .profile-group {
-    margin-top: 12px;
+  /* 白卡列表（菜单/绑定老人） */
+  .profile-card {
+    background-color: #FFFFFF;
+    border-radius: 12px;
+    margin: 12px 12px 0;
+    overflow: hidden;
   }
 
+  .profile-card :deep(.van-cell) {
+    font-size: 15px;
+    padding: 16px;
+  }
+
+  .profile-card :deep(.van-cell__left-icon) {
+    font-size: 18px;
+    color: #666;
+    margin-right: 10px;
+  }
+
+  /* 退出登录（红色描边胶囊按钮） */
   .profile-logout {
-    margin: 24px 16px 0;
+    margin: 28px 16px 0;
   }
 </style>

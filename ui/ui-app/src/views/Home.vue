@@ -1,7 +1,8 @@
 <script setup>
-  import {computed} from 'vue'
+  import {computed, ref} from 'vue'
   import {useRouter} from 'vue-router'
   import {useUserInfoStore} from '@/store/userInfo.js'
+  import announcementApi from '@/api/announcement.js'
 
   const userInfoStore = useUserInfoStore()
   const router = useRouter()
@@ -43,6 +44,23 @@
     ]
   })
 
+  // ================== 对象（公告） ==================
+
+  // 最近公告列表（首页通知条取第一条，弹层展示全部4条）
+  const noticeList = ref([])
+  // 是否显示最近公告弹层
+  const showNotice = ref(false)
+
+  // ================== 下拉数据 ==================
+
+  // 加载最近公告（已发布，最新4条）
+  const loadNoticeList = () => {
+    announcementApi.list({page: 1, limit: 4}).then(result => {
+      noticeList.value = result.data.records
+    })
+  }
+  loadNoticeList()
+
   // ================== 方法 ==================
 
   //根据出生日期计算年龄
@@ -68,6 +86,28 @@
   //跳转到功能页面
   const goPage = (path) => {
     router.push(path)
+  }
+
+  //公告展示日期（createTime 截取 MM-DD）
+  const getNoticeDate = (createTime) => {
+    return createTime ? createTime.slice(5, 10) : ''
+  }
+
+  //打开最近公告弹层
+  const openNotice = () => {
+    showNotice.value = true
+  }
+
+  //跳转公告列表页（全部公告）
+  const goNoticeList = () => {
+    showNotice.value = false
+    router.push('/announcement')
+  }
+
+  //跳转公告详情页
+  const goNoticeDetail = (row) => {
+    showNotice.value = false
+    router.push({path: '/announcementDetail', query: {id: row.id}})
   }
 </script>
 
@@ -115,12 +155,33 @@
         </van-grid>
       </div>
 
-      <!-- 温馨提示 -->
-      <div class="home-notice">
+      <!-- 公告通知条 -->
+      <div class="home-notice" v-if="noticeList.length > 0" @click="openNotice">
         <van-icon name="volume-o" size="16"/>
-        <span>保持规律作息，适度锻炼；按时服药，定期体检。如需帮助请联系您的护理人员。</span>
+        <span class="home-notice-text">{{ noticeList[0].title }}</span>
+        <van-icon name="arrow" size="14"/>
       </div>
     </div>
+
+    <!-- 最近公告弹层（最多4条，右上角可进入全部公告列表） -->
+    <van-popup v-model:show="showNotice" position="bottom" round>
+      <div class="notice-popup">
+        <div class="notice-popup-header">
+          <span class="notice-popup-title">最近公告</span>
+          <span class="notice-popup-more" @click="goNoticeList">查看更多 <van-icon name="arrow"/></span>
+        </div>
+        <van-empty description="暂无公告" v-if="noticeList.length === 0"/>
+        <div
+            class="notice-item"
+            v-for="row in noticeList"
+            :key="row.id"
+            @click="goNoticeDetail(row)"
+        >
+          <p class="notice-item-title">{{ row.title }}</p>
+          <p class="notice-item-date">{{ getNoticeDate(row.createTime) }}</p>
+        </div>
+      </div>
+    </van-popup>
   </div>
 </template>
 
@@ -245,22 +306,80 @@
     color: #323233;
   }
 
-  /* 温馨提示（浅蓝通知条） */
+  /* 公告通知条 */
   .home-notice {
     margin-top: 12px;
     background-color: #E8F3FF;
     border-radius: 8px;
     padding: 10px 12px;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 8px;
     font-size: 13px;
     color: #1989FA;
-    line-height: 20px;
   }
 
-  .home-notice .van-icon {
-    margin-top: 2px;
+  .home-notice-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .home-notice > .van-icon:last-child {
     flex-shrink: 0;
+  }
+
+  /* 最近公告弹层 */
+  .notice-popup {
+    padding: 20px 16px 24px;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .notice-popup-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 4px;
+  }
+
+  .notice-popup-title {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .notice-popup-more {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 13px;
+    color: #1989FA;
+  }
+
+  .notice-item {
+    padding: 14px 0;
+    border-bottom: 1px solid #F0F0F0;
+  }
+
+  .notice-item:last-child {
+    border-bottom: none;
+  }
+
+  .notice-item-title {
+    font-size: 15px;
+    color: #323233;
+    line-height: 22px;
+  }
+
+  .notice-item-date {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #999;
   }
 </style>

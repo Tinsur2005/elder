@@ -19,6 +19,7 @@ import CareTask from '@/views/CareTask.vue'
 import ExamItem from '@/views/ExamItem.vue'
 import ExamPackage from '@/views/ExamPackage.vue'
 import ExamAppointment from '@/views/ExamAppointment.vue'
+import Announcement from '@/views/Announcement.vue'
 
 //创建路由器
 const router = createRouter({
@@ -43,7 +44,8 @@ const router = createRouter({
                 {path: '/careTask', component: CareTask},
                 {path: '/examItem', component: ExamItem},
                 {path: '/examPackage', component: ExamPackage},
-                {path: '/examAppointment', component: ExamAppointment}
+                {path: '/examAppointment', component: ExamAppointment},
+                {path: '/announcement', component: Announcement}
             ]
         }
     ]

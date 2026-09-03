@@ -16,6 +16,8 @@ import CareTaskList from '@/views/CareTaskList.vue'
 import CareTaskDetail from '@/views/CareTaskDetail.vue'
 import ContractList from '@/views/ContractList.vue'
 import ContractDetail from '@/views/ContractDetail.vue'
+import AnnouncementList from '@/views/AnnouncementList.vue'
+import AnnouncementDetail from '@/views/AnnouncementDetail.vue'
 
 //创建路由器
 const router = createRouter({
@@ -38,7 +40,9 @@ const router = createRouter({
                 {path: '/careTask', component: CareTaskList},
                 {path: '/careTaskDetail', component: CareTaskDetail},
                 {path: '/contract', component: ContractList},
-                {path: '/contractDetail', component: ContractDetail}
+                {path: '/contractDetail', component: ContractDetail},
+                {path: '/announcement', component: AnnouncementList},
+                {path: '/announcementDetail', component: AnnouncementDetail}
             ]
         }
     ]

@@ -138,7 +138,9 @@
           :key="index"
       >
         <div class="message-avatar" :class="msg.role === 'user' ? 'message-avatar-user' : 'message-avatar-ai'">
-          <van-icon :name="msg.role === 'user' ? 'user-o' : 'chat-o'" size="20"/>
+          <!-- 用户消息显示头像（无头像回退默认icon），AI侧仍用icon -->
+          <van-image v-if="msg.role === 'user' && userInfoStore.user.avatar" round width="38" height="38" fit="cover" :src="userInfoStore.user.avatar"/>
+          <van-icon v-else :name="msg.role === 'user' ? 'user-o' : 'chat-o'" size="20"/>
         </div>
         <div class="message-bubble" :class="msg.role === 'user' ? 'message-bubble-user' : 'message-bubble-ai'">
           <span v-if="msg.content">{{ msg.content }}</span>

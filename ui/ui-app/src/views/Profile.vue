@@ -104,7 +104,8 @@
     <!-- 用户信息卡 -->
     <div class="profile-header">
       <div class="profile-avatar">
-        <van-icon name="manager" size="34" color="#FFFFFF"/>
+        <van-image v-if="user.avatar" round width="62" height="62" fit="cover" :src="user.avatar"/>
+        <van-icon v-else name="manager" size="34" color="#FFFFFF"/>
       </div>
       <div class="profile-user-info">
         <h3>{{ user.realName }}</h3>
@@ -151,7 +152,11 @@
             :key="elder.id"
             @click="selectElder(elder)"
         >
-          <van-icon name="user-o" size="20" :color="elder.id === userInfoStore.currentElderId ? '#1989FA' : '#999'"/>
+          <!-- 有头像显示头像，无头像回退默认icon -->
+          <van-image v-if="elder.avatar" class="elder-item-avatar" round width="40" height="40" fit="cover" :src="elder.avatar"/>
+          <div v-else class="elder-item-avatar elder-item-avatar-fallback">
+            <van-icon name="user-o" size="20" color="#999"/>
+          </div>
           <div class="elder-item-info">
             <p class="elder-item-name">{{ elder.realName }}（{{ getAge(elder.birthday) }}岁）</p>
             <p class="elder-item-phone">{{ elder.phone }}</p>
@@ -182,7 +187,6 @@
   .profile-avatar {
     width: 62px;
     height: 62px;
-    border: 2px solid rgba(255, 255, 255, 0.8);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -260,6 +264,20 @@
     background-color: #E8F3FF;
     border-radius: 8px;
     border-bottom-color: transparent;
+  }
+
+  .elder-item-avatar {
+    flex-shrink: 0;
+  }
+
+  .elder-item-avatar-fallback {
+    width: 40px;
+    height: 40px;
+    background-color: #F5F6FA;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .elder-item-info {

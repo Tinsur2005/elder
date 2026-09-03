@@ -87,7 +87,8 @@
     <!-- 头像卡片 -->
     <div class="info-header">
       <div class="info-avatar">
-        <van-icon name="user-o" size="30" color="#1989FA"/>
+        <van-image v-if="currentElder.avatar" round width="60" height="60" fit="cover" :src="currentElder.avatar"/>
+        <van-icon v-else name="user-o" size="30" color="#1989FA"/>
       </div>
       <div class="info-header-name">
         <h3>{{ currentElder.realName }}</h3>

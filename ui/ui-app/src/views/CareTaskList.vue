@@ -42,6 +42,8 @@
   const list = ref([])
   //当前选中的状态Tab（与任务状态一一对应）
   const activeStatus = ref(0)
+  //查看范围：today仅看今天 / all查看全部
+  const viewScope = ref('today')
 
   // ================== 选项 ==================
 
@@ -52,20 +54,39 @@
     {value: 2, label: '已跳过', color: '#999999'},
   ]
 
+  // 查看范围选项
+  const viewOptions = [
+    {text: '仅看今天', value: 'today'},
+    {text: '查看全部', value: 'all'}
+  ]
+
   // ================== 方法 ==================
 
-  //加载数据（按状态Tab过滤）
+  //拼出今天的yyyy-MM-dd
+  const getToday = () => {
+    const d = new Date()
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  }
+
+  //加载数据（按状态Tab + 查看范围过滤）
   const loadData = () => {
     // 老人端查自己的护理任务，家属端查当前选中老人的护理任务
     const elderId = isFamily.value ? userInfoStore.currentElderId : userInfoStore.user.id
-    careTaskApi.list({elderId, status: activeStatus.value}).then(result => {
+    // 仅看今天时传计划执行日期范围，查看全部不传
+    const query = {elderId, status: activeStatus.value}
+    if (viewScope.value === 'today') {
+      const today = getToday()
+      query.beginPlanExecuteDate = `${today} 00:00:00`
+      query.endPlanExecuteDate = `${today} 23:59:59`
+    }
+    careTaskApi.list(query).then(result => {
       list.value = result.data.records
     })
   }
 
   loadData()
 
-  //切换状态Tab
+  //切换状态Tab或查看范围
   const onTabChange = () => {
     loadData()
   }
@@ -85,11 +106,14 @@
   <div class="task-list">
     <van-nav-bar :title="isFamily ? currentElder.realName + '的护理任务' : '护理任务'" left-arrow :fixed="true" placeholder @click-left="router.back()"/>
 
-    <!-- 状态Tab（白底，与页面灰底区分） -->
+    <!-- 状态Tab + 查看范围下拉 -->
     <div class="task-tabs">
       <van-tabs v-model:active="activeStatus" @change="onTabChange" shrink>
         <van-tab v-for="tab in statusTabs" :key="tab.value" :title="tab.label" :name="tab.value"/>
       </van-tabs>
+      <van-dropdown-menu class="task-scope">
+        <van-dropdown-item v-model="viewScope" :options="viewOptions" @change="onTabChange"/>
+      </van-dropdown-menu>
     </div>
 
     <!-- 空状态 -->
@@ -125,9 +149,27 @@
     padding-bottom: 20px;
   }
 
-  /* 状态Tab */
+  /* 状态Tab + 查看范围下拉 */
   .task-tabs {
     background-color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .task-scope {
+    flex-shrink: 0;
+  }
+
+  /* 去掉下拉菜单自带的投影和内边距，与状态Tab融为同一行 */
+  .task-scope :deep(.van-dropdown-menu__bar) {
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  .task-scope :deep(.van-dropdown-menu__title) {
+    font-size: 13px;
+    padding: 0 12px 0 0;
   }
 
   .task-cards {

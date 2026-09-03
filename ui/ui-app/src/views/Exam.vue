@@ -110,7 +110,7 @@
 <template>
   <div class="exam">
     <!-- 页面标题 -->
-    <van-nav-bar :title="isFamily ? currentElder.realName + '的体检' : '我的体检'" :fixed="true" placeholder/>
+    <van-nav-bar :title="isFamily ? currentElder.realName + '的体检' : '我的体检'" :fixed="true" placeholder left-arrow @click-left="router.back()"/>
 
     <!-- 预约体检入口 -->
     <div class="exam-booking-entry" @click="goBooking">

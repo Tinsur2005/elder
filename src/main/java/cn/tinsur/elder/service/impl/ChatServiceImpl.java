@@ -22,6 +22,7 @@
 package cn.tinsur.elder.service.impl;
 
 import cn.tinsur.elder.service.IChatService;
+import cn.tinsur.elder.service.IExamAppointmentService;
 import cn.tinsur.elder.service.IElderService;
 import cn.tinsur.elder.tools.ElderTools;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,9 @@ public class ChatServiceImpl implements IChatService {
     @Autowired
     private IElderService elderService;
 
+    @Autowired
+    private IExamAppointmentService examAppointmentService;
+
     @Override
     public String chat(String message, Integer conversationId) {
         if (ObjectUtils.isEmpty(message)) {
@@ -56,8 +60,8 @@ public class ChatServiceImpl implements IChatService {
                     .user(message)
                     // 会话记忆按 conversationId（老人id）隔离，避免不同用户上下文串扰
                     .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
-                    // 注册AI工具：老人问自己的信息时，模型会自主调用查库
-                    .tools(new ElderTools(conversationId, elderService))
+                    // 注册AI工具：老人问自己的信息/体检记录时，模型会自主调用查库
+                    .tools(new ElderTools(conversationId, elderService, examAppointmentService))
                     .call()
                     .content();
         } catch (Exception e) {
@@ -75,8 +79,8 @@ public class ChatServiceImpl implements IChatService {
                 .user(message)
                 // 会话记忆按 conversationId（老人id）隔离，避免不同用户上下文串扰
                 .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
-                // 注册AI工具：老人问自己的信息时，模型会自主调用查库
-                .tools(new ElderTools(conversationId, elderService))
+                // 注册AI工具：老人问自己的信息/体检记录时，模型会自主调用查库
+                .tools(new ElderTools(conversationId, elderService, examAppointmentService))
                 .stream()
                 .content()
                 // 模型调用失败时也要发出提示和结束标记，避免前端一直处于等待状态

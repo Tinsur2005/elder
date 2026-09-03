@@ -21,6 +21,8 @@ package cn.tinsur.elder.pojo.vo;
 import cn.tinsur.elder.pojo.entity.ExamAppointment;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ExamAppointmentVO extends ExamAppointment {
     /**
@@ -32,4 +34,9 @@ public class ExamAppointmentVO extends ExamAppointment {
      * 体检套餐名称（联表查询后填充，便于前端展示）
      */
     private String packageName;
+
+    /**
+     * 该次体检的项目明细列表（AI工具查询体检记录时填充）
+     */
+    private List<ExamAppointmentItemVO> items;
 }

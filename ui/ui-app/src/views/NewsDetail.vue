@@ -72,6 +72,7 @@
     font-size: 12px;
     color: #999;
     display: flex;
+    align-items: baseline;
     flex-wrap: wrap;
     gap: 12px;
   }

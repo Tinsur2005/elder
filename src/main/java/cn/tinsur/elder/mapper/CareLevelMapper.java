@@ -1,18 +1,3 @@
-package cn.tinsur.elder.mapper;
-
-import cn.tinsur.elder.pojo.entity.CareLevel;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-
-/**
- * 护理等级表 Mapper 接口
- *
- * @author Tinsur
- * @since 2026-08-31
- */
-public interface CareLevelMapper extends BaseMapper<CareLevel> {
-
-}
-
 /*
  * ============================================================
  *
@@ -45,3 +30,17 @@ public interface CareLevelMapper extends BaseMapper<CareLevel> {
  *
  * ============================================================
  */
+package cn.tinsur.elder.mapper;
+
+import cn.tinsur.elder.pojo.entity.CareLevel;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+/**
+ * 护理等级表 Mapper 接口
+ *
+ * @author Tinsur
+ * @since 2026-08-31
+ */
+public interface CareLevelMapper extends BaseMapper<CareLevel> {
+
+}

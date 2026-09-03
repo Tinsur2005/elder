@@ -1,17 +1,3 @@
-package cn.tinsur.elder.mapper;
-
-import cn.tinsur.elder.pojo.entity.Announcement;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-
-/**
- * 公告表 Mapper 接口
- *
- * @author Tinsur
- * @since 2026-09-03
- */
-public interface AnnouncementMapper extends BaseMapper<Announcement> {
-
-}
 /*
  * ============================================================
  *
@@ -44,3 +30,17 @@ public interface AnnouncementMapper extends BaseMapper<Announcement> {
  *
  * ============================================================
  */
+package cn.tinsur.elder.mapper;
+
+import cn.tinsur.elder.pojo.entity.Announcement;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+/**
+ * 公告表 Mapper 接口
+ *
+ * @author Tinsur
+ * @since 2026-09-03
+ */
+public interface AnnouncementMapper extends BaseMapper<Announcement> {
+
+}

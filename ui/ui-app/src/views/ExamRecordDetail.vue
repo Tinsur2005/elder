@@ -30,6 +30,8 @@
   const appointment = ref({})
   //体检记录明细列表（含体检项目的参考范围）
   const resultItemList = ref([])
+  //是否正在加载（显示加载动画）
+  const loading = ref(true)
 
   // ================== 选项 ==================
 
@@ -53,7 +55,7 @@
 
   //加载体检预约信息
   const loadAppointment = () => {
-    examAppointmentApi.selectById(route.query.id).then(result => {
+    return examAppointmentApi.selectById(route.query.id).then(result => {
       if (result.code === 1) {
         appointment.value = result.data
       }
@@ -62,13 +64,15 @@
 
   //加载体检记录明细列表（含体检项目的参考范围）
   const loadResultItemList = () => {
-    examAppointmentApi.getAppointmentItemsById(route.query.id).then(result => {
+    return examAppointmentApi.getAppointmentItemsById(route.query.id).then(result => {
       resultItemList.value = result.data || []
     })
   }
 
-  loadAppointment()
-  loadResultItemList()
+  //两个请求都返回后再关闭加载动画
+  Promise.all([loadAppointment(), loadResultItemList()]).finally(() => {
+    loading.value = false
+  })
 
   // ================== 方法 ==================
 
@@ -96,6 +100,12 @@
   <div class="detail">
     <van-nav-bar title="体检记录详情" left-arrow :fixed="true" placeholder @click-left="router.back()"/>
 
+    <!-- 加载中 -->
+    <div class="page-loading" v-if="loading">
+      <van-loading size="24" vertical>加载中...</van-loading>
+    </div>
+
+    <template v-else>
     <!-- 体检预约基本信息 -->
     <div class="detail-card">
       <div class="detail-top">
@@ -140,6 +150,7 @@
       </div>
     </div>
     <van-empty description="暂无体检结果" v-else-if="appointment.status === 0 || appointment.status === 1 || appointment.status === 3 || appointment.status === 4"/>
+    </template>
   </div>
 </template>
 
@@ -147,6 +158,13 @@
   .detail {
     min-height: 100vh;
     padding: 12px 12px 20px;
+  }
+
+  /* 加载中 */
+  .page-loading {
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
   }
 
   .detail-card {

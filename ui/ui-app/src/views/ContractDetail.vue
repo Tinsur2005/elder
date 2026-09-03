@@ -29,6 +29,8 @@
 
   //合同对象
   const contract = ref({})
+  //是否正在加载（显示加载动画）
+  const loading = ref(true)
 
   // ================== 选项 ==================
 
@@ -55,6 +57,7 @@
       if (result.code === 1) {
         contract.value = result.data
       }
+      loading.value = false
     })
   }
 
@@ -96,6 +99,12 @@
   <div class="contract-detail">
     <van-nav-bar title="合同详情" left-arrow :fixed="true" placeholder @click-left="router.back()"/>
 
+    <!-- 加载中 -->
+    <div class="page-loading" v-if="loading">
+      <van-loading size="24" vertical>加载中...</van-loading>
+    </div>
+
+    <template v-else>
     <!-- 合同基本信息 -->
     <div class="detail-card">
       <div class="detail-top">
@@ -124,6 +133,7 @@
       </div>
       <p class="file-tips">点击查看合同文件（PDF）</p>
     </div>
+    </template>
   </div>
 </template>
 
@@ -131,6 +141,13 @@
   .contract-detail {
     min-height: 100vh;
     padding: 12px 12px 20px;
+  }
+
+  /* 加载中 */
+  .page-loading {
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
   }
 
   .detail-card {

@@ -11,7 +11,7 @@
   // ================== 对象 ==================
 
   // 欢迎语（仅无聊天记录时展示，不存入历史记录）
-  const WELCOME = '您好，我是您的智能助手小邻，很高兴为您服务。\n您可以和我聊天解闷，也可以问我一些健康方面的小问题。'
+  const WELCOME = '您好，我是您的养老智能助手小邻，很高兴为您服务。\n您可以和我聊天解闷，也可以问我一些健康方面的小问题。'
 
   // 聊天记录列表（role: user-用户发送 / ai-小邻回复）
   const messageList = ref([])
@@ -123,7 +123,7 @@
 
     <!-- 消息列表 -->
     <div class="chat-area" ref="messageAreaRef">
-      <!-- 欢迎语（无聊天记录时展示） -->
+      <!-- 欢迎语 -->
       <div class="message-row" v-if="messageList.length === 0">
         <div class="message-avatar message-avatar-ai">
           <van-icon name="chat-o" size="20"/>
@@ -138,7 +138,7 @@
           :key="index"
       >
         <div class="message-avatar" :class="msg.role === 'user' ? 'message-avatar-user' : 'message-avatar-ai'">
-          <!-- 用户消息显示头像（无头像回退默认icon），AI侧仍用icon -->
+          <!-- 用户消息显示头像 -->
           <van-image v-if="msg.role === 'user' && userInfoStore.user.avatar" round width="38" height="38" fit="cover" :src="userInfoStore.user.avatar"/>
           <van-icon v-else :name="msg.role === 'user' ? 'user-o' : 'chat-o'" size="20"/>
         </div>

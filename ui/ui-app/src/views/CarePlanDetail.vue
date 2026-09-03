@@ -34,6 +34,8 @@
   const carePlan = ref({})
   //计划包含的护理项目明细
   const carePlanItems = ref([])
+  //是否正在加载（显示加载动画）
+  const loading = ref(true)
 
   // ================== 选项 ==================
 
@@ -67,7 +69,7 @@
   const loadCarePlan = () => {
     // 老人端查自己的护理计划，家属端查当前选中老人的护理计划
     const elderId = isFamily.value ? userInfoStore.currentElderId : userInfoStore.user.id
-    carePlanApi.list({elderId}).then(result => {
+    return carePlanApi.list({elderId}).then(result => {
       // 从计划列表中找到本次查看的计划
       const found = result.data.records.find(item => item.id == route.query.id)
       if (found) {
@@ -78,13 +80,15 @@
 
   //加载计划包含的护理项目明细
   const loadCarePlanItems = () => {
-    carePlanApi.getCareItemsById(route.query.id).then(result => {
+    return carePlanApi.getCareItemsById(route.query.id).then(result => {
       carePlanItems.value = result.data || []
     })
   }
 
-  loadCarePlan()
-  loadCarePlanItems()
+  //两个请求都返回后再关闭加载动画
+  Promise.all([loadCarePlan(), loadCarePlanItems()]).finally(() => {
+    loading.value = false
+  })
 
   // ================== 方法 ==================
 
@@ -110,6 +114,12 @@
   <div class="plan-detail">
     <van-nav-bar title="护理计划详情" left-arrow :fixed="true" placeholder @click-left="router.back()"/>
 
+    <!-- 加载中 -->
+    <div class="page-loading" v-if="loading">
+      <van-loading size="24" vertical>加载中...</van-loading>
+    </div>
+
+    <template v-else>
     <!-- 护理计划基本信息 -->
     <div class="detail-card">
       <div class="detail-top">
@@ -136,6 +146,7 @@
         <p class="plan-item-remark" v-if="row.remark">{{ row.remark }}</p>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -143,6 +154,13 @@
   .plan-detail {
     min-height: 100vh;
     padding: 12px 12px 20px;
+  }
+
+  /* 加载中 */
+  .page-loading {
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
   }
 
   .detail-card {

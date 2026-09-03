@@ -32,6 +32,8 @@
   const isFamily = computed(() => userInfoStore.userType === 'family')
   //护理任务对象
   const careTask = ref({})
+  //是否正在加载（显示加载动画）
+  const loading = ref(true)
 
   // ================== 选项 ==================
 
@@ -50,6 +52,7 @@
       if (result.code === 1) {
         careTask.value = result.data
       }
+      loading.value = false
     })
   }
 
@@ -67,6 +70,12 @@
   <div class="task-detail">
     <van-nav-bar title="护理任务详情" left-arrow :fixed="true" placeholder @click-left="router.back()"/>
 
+    <!-- 加载中 -->
+    <div class="page-loading" v-if="loading">
+      <van-loading size="24" vertical>加载中...</van-loading>
+    </div>
+
+    <template v-else>
     <!-- 任务执行状态 -->
     <div class="detail-card">
       <div class="detail-top">
@@ -88,6 +97,7 @@
     <van-notice-bar left-icon="info-o" :scrollable="false" v-if="isFamily">
       护理任务由护理人员执行并打卡，如有疑问请联系负责护理员
     </van-notice-bar>
+    </template>
   </div>
 </template>
 
@@ -95,6 +105,13 @@
   .task-detail {
     min-height: 100vh;
     padding: 12px 12px 20px;
+  }
+
+  /* 加载中 */
+  .page-loading {
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
   }
 
   .detail-card {

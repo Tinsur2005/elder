@@ -22,7 +22,7 @@
 
   const userInfoStore = useUserInfoStore()
 
-  // 底部导航栏（老人端3个Tab：首页/体检/我的；家属端2个Tab：首页/我的）
+  // 底部导航栏（老人端4个Tab：首页/体检/AI对话/我的；家属端2个Tab：首页/我的）
   const tabbarItems = computed(() => {
     if (userInfoStore.userType === 'family') {
       return [
@@ -33,6 +33,7 @@
     return [
       {path: '/home', title: '首页', icon: 'wap-home-o'},
       {path: '/exam', title: '体检', icon: 'notes-o'},
+      {path: '/aiChat', title: 'AI对话', icon: 'chat-o'},
       {path: '/profile', title: '我的', icon: 'user-o'}
     ]
   })

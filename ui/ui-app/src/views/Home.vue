@@ -74,6 +74,8 @@
 
   // 最新资讯列表（首页最多展示5条，查看更多进资讯列表页）
   const newsList = ref([])
+  // 资讯是否正在加载（加载中显示骨架屏占位）
+  const newsLoading = ref(true)
 
   // ================== 下拉数据 ==================
 
@@ -89,6 +91,7 @@
   const loadNewsList = () => {
     newsApi.list({page: 1, limit: 5}).then(result => {
       newsList.value = result.data.records
+      newsLoading.value = false
     })
   }
   loadNewsList()
@@ -184,13 +187,20 @@
         <van-icon name="arrow" size="14"/>
       </div>
 
-      <!-- 最新资讯 -->
-      <div class="home-news" v-if="newsList.length > 0">
+      <!-- 最新资讯（加载中显示骨架屏占位） -->
+      <div class="home-news" v-if="newsLoading || newsList.length > 0">
         <div class="section-header">
           <div class="section-title"><span class="section-bar"></span>最新资讯</div>
           <span class="section-more" @click="goNewsList">查看更多 <van-icon name="arrow"/></span>
         </div>
-        <div class="news-card" v-for="item in newsList" :key="item.id" @click="goNewsDetail(item)">
+        <!-- 骨架屏（与资讯卡片同款外观：左图右文） -->
+        <template v-if="newsLoading">
+          <div class="news-skeleton" v-for="i in 3" :key="i">
+            <van-skeleton title avatar avatar-shape="square" avatar-size="64px" :row="2" :row-width="['100%', '50%']"/>
+          </div>
+        </template>
+        <template v-else>
+          <div class="news-card" v-for="item in newsList" :key="item.id" @click="goNewsDetail(item)">
           <van-image class="news-cover" width="86" height="64" radius="8" fit="cover" :src="item.coverImage">
             <template #loading>
               <div class="news-cover-placeholder"><van-icon name="photo-o" size="22" color="#CCCCCC"/></div>
@@ -205,6 +215,7 @@
             <p class="news-meta">{{ item.categoryName }} · {{ getNewsDate(item.createTime) }}</p>
           </div>
         </div>
+        </template>
       </div>
     </div>
 
@@ -340,6 +351,18 @@
     gap: 2px;
     font-size: 13px;
     color: #1989FA;
+  }
+
+  /* 资讯骨架屏（与资讯卡片同款白卡外观） */
+  .news-skeleton {
+    background-color: #FFFFFF;
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  .news-skeleton :deep(.van-skeleton__row) {
+    margin-top: 8px;
   }
 
   /* 资讯图文卡片 */

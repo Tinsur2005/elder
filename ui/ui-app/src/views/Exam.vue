@@ -41,6 +41,8 @@
 
   //体检记录列表
   const list = ref([])
+  //是否正在加载（显示加载动画）
+  const loading = ref(true)
 
   // ================== 选项 ==================
 
@@ -61,6 +63,7 @@
     const elderId = isFamily.value ? userInfoStore.currentElderId : userInfoStore.user.id
     examAppointmentApi.list({elderId}).then(result => {
       list.value = result.data.records
+      loading.value = false
     })
   }
 
@@ -127,14 +130,20 @@
     <!-- 体检记录列表 -->
     <div class="exam-records">
       <div class="exam-records-title">体检记录</div>
-      <!-- 空状态 -->
-      <van-empty description="暂无体检记录" v-if="list.length === 0"/>
-      <div
-          class="record-card"
-          v-for="row in list"
-          :key="row.id"
-          @click="goDetail(row)"
-      >
+      <!-- 加载中 -->
+      <div class="page-loading" v-if="loading">
+        <van-loading size="24" vertical>加载中...</van-loading>
+      </div>
+
+      <template v-else>
+        <!-- 空状态 -->
+        <van-empty description="暂无体检记录" v-if="list.length === 0"/>
+        <div
+            class="record-card"
+            v-for="row in list"
+            :key="row.id"
+            @click="goDetail(row)"
+        >
         <!-- 类别标签 + 套餐名称 + 右侧状态文字 -->
         <div class="record-top">
           <van-tag type="primary">体检</van-tag>
@@ -159,6 +168,7 @@
           >取消预约</van-button>
         </div>
       </div>
+      </template>
     </div>
   </div>
 </template>
@@ -207,6 +217,13 @@
     font-size: 15px;
     font-weight: bold;
     margin-bottom: 8px;
+  }
+
+  /* 加载中 */
+  .page-loading {
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
   }
 
   /* 体检记录卡片：类别标签 + 名称 + 状态文字 + 图标信息行 + 价格/按钮 */

@@ -40,6 +40,8 @@
 
   //护理任务列表
   const list = ref([])
+  //是否正在加载（显示加载动画）
+  const loading = ref(true)
   //当前选中的状态Tab（与任务状态一一对应）
   const activeStatus = ref(0)
   //查看范围：today仅看今天 / all查看全部
@@ -70,6 +72,7 @@
 
   //加载数据（按状态Tab + 查看范围过滤）
   const loadData = () => {
+    loading.value = true
     // 老人端查自己的护理任务，家属端查当前选中老人的护理任务
     const elderId = isFamily.value ? userInfoStore.currentElderId : userInfoStore.user.id
     // 仅看今天时传计划执行日期范围，查看全部不传
@@ -81,6 +84,7 @@
     }
     careTaskApi.list(query).then(result => {
       list.value = result.data.records
+      loading.value = false
     })
   }
 
@@ -116,11 +120,17 @@
       </van-dropdown-menu>
     </div>
 
-    <!-- 空状态 -->
-    <van-empty description="暂无护理任务" v-if="list.length === 0"/>
+    <!-- 加载中 -->
+    <div class="page-loading" v-if="loading">
+      <van-loading size="24" vertical>加载中...</van-loading>
+    </div>
 
-    <!-- 护理任务列表 -->
-    <div class="task-cards">
+    <template v-else>
+      <!-- 空状态 -->
+      <van-empty description="暂无护理任务" v-if="list.length === 0"/>
+
+      <!-- 护理任务列表 -->
+      <div class="task-cards">
       <div
           class="task-card"
           v-for="row in list"
@@ -140,6 +150,7 @@
         </div>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -170,6 +181,13 @@
   .task-scope :deep(.van-dropdown-menu__title) {
     font-size: 13px;
     padding: 0 12px 0 0;
+  }
+
+  /* 加载中 */
+  .page-loading {
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
   }
 
   .task-cards {

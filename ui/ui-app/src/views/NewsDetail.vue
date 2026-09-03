@@ -11,6 +11,8 @@
 
   //资讯对象
   const news = ref({})
+  //显示加载动画
+  const loading = ref(true)
 
   // ================== 下拉数据 ==================
 
@@ -22,6 +24,7 @@
       } else {
         showToast(result.msg)
       }
+      loading.value = false
     })
   }
 
@@ -32,8 +35,13 @@
   <div class="news-detail">
     <van-nav-bar title="资讯详情" left-arrow :fixed="true" placeholder @click-left="router.back()"/>
 
+    <!-- 加载中 -->
+    <div class="page-loading" v-if="loading">
+      <van-loading size="24" vertical>加载中...</van-loading>
+    </div>
+
     <!-- 资讯内容 -->
-    <div class="detail-card">
+    <div class="detail-card" v-else>
       <h3 class="detail-title">{{ news.title }}</h3>
       <p class="detail-meta">
         <span v-if="news.categoryName">{{ news.categoryName }}</span>
@@ -52,6 +60,13 @@
   .news-detail {
     min-height: 100vh;
     padding: 12px 12px 20px;
+  }
+
+  /* 加载中 */
+  .page-loading {
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
   }
 
   .detail-card {

@@ -40,6 +40,8 @@
 
   //合同列表
   const list = ref([])
+  //是否正在加载（显示加载动画）
+  const loading = ref(true)
 
   // ================== 选项 ==================
 
@@ -58,6 +60,7 @@
     const elderId = isFamily.value ? userInfoStore.currentElderId : userInfoStore.user.id
     contractApi.list({elderId}).then(result => {
       list.value = result.data.records
+      loading.value = false
     })
   }
 
@@ -94,16 +97,22 @@
   <div class="contract-list">
     <van-nav-bar :title="isFamily ? currentElder.realName + '的合同' : '我的合同'" left-arrow :fixed="true" placeholder @click-left="router.back()"/>
 
-    <!-- 空状态 -->
-    <van-empty description="暂无合同" v-if="list.length === 0"/>
+    <!-- 加载中 -->
+    <div class="page-loading" v-if="loading">
+      <van-loading size="24" vertical>加载中...</van-loading>
+    </div>
 
-    <!-- 合同列表 -->
-    <div
-        class="contract-card"
-        v-for="row in list"
-        :key="row.id"
-        @click="goDetail(row)"
-    >
+    <template v-else>
+      <!-- 空状态 -->
+      <van-empty description="暂无合同" v-if="list.length === 0"/>
+
+      <!-- 合同列表 -->
+      <div
+          class="contract-card"
+          v-for="row in list"
+          :key="row.id"
+          @click="goDetail(row)"
+      >
       <!-- 类别标签 + 合同名称 + 右侧状态文字 -->
       <div class="contract-top">
         <van-tag type="primary">合同</van-tag>
@@ -122,6 +131,7 @@
         <van-icon name="arrow" color="#1989FA"/>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -129,6 +139,13 @@
   .contract-list {
     min-height: 100vh;
     padding: 12px 12px 20px;
+  }
+
+  /* 加载中 */
+  .page-loading {
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
   }
 
   /* 合同卡片：类别标签 + 名称 + 状态文字 + 图标信息行 */

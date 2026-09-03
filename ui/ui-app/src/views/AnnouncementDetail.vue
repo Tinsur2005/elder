@@ -28,6 +28,8 @@
 
   //公告对象
   const announcement = ref({})
+  //显示加载动画
+  const loading = ref(true)
 
   // ================== 下拉数据 ==================
 
@@ -37,6 +39,7 @@
       if (result.code === 1) {
         announcement.value = result.data
       }
+      loading.value = false
     })
   }
 
@@ -47,8 +50,13 @@
   <div class="announcement-detail">
     <van-nav-bar title="公告详情" left-arrow :fixed="true" placeholder @click-left="router.back()"/>
 
+    <!-- 加载中 -->
+    <div class="page-loading" v-if="loading">
+      <van-loading size="24" vertical>加载中...</van-loading>
+    </div>
+
     <!-- 公告内容 -->
-    <div class="detail-card">
+    <div class="detail-card" v-else>
       <h3 class="detail-title">{{ announcement.title }}</h3>
       <p class="detail-date">发布时间：{{ announcement.createTime ? announcement.createTime.slice(0, 10) : '-' }}</p>
       <div class="detail-divider"></div>
@@ -61,6 +69,13 @@
   .announcement-detail {
     min-height: 100vh;
     padding: 12px 12px 20px;
+  }
+
+  /* 加载中 */
+  .page-loading {
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
   }
 
   .detail-card {

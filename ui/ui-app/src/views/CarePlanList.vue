@@ -40,6 +40,8 @@
 
   //护理计划列表
   const list = ref([])
+  //是否正在加载（显示加载动画）
+  const loading = ref(true)
 
   // ================== 选项 ==================
 
@@ -57,6 +59,7 @@
     const elderId = isFamily.value ? userInfoStore.currentElderId : userInfoStore.user.id
     carePlanApi.list({elderId}).then(result => {
       list.value = result.data.records
+      loading.value = false
     })
   }
 
@@ -77,16 +80,22 @@
   <div class="plan-list">
     <van-nav-bar :title="isFamily ? currentElder.realName + '的护理计划' : '护理计划'" left-arrow :fixed="true" placeholder @click-left="router.back()"/>
 
-    <!-- 空状态 -->
-    <van-empty description="暂无护理计划" v-if="list.length === 0"/>
+    <!-- 加载中 -->
+    <div class="page-loading" v-if="loading">
+      <van-loading size="24" vertical>加载中...</van-loading>
+    </div>
 
-    <!-- 护理计划列表 -->
-    <div
-        class="plan-card"
-        v-for="row in list"
-        :key="row.id"
-        @click="goDetail(row)"
-    >
+    <template v-else>
+      <!-- 空状态 -->
+      <van-empty description="暂无护理计划" v-if="list.length === 0"/>
+
+      <!-- 护理计划列表 -->
+      <div
+          class="plan-card"
+          v-for="row in list"
+          :key="row.id"
+          @click="goDetail(row)"
+      >
       <!-- 类别标签 + 计划名称 + 右侧状态文字 -->
       <div class="plan-top">
         <van-tag type="primary">护理</van-tag>
@@ -105,6 +114,7 @@
         <van-icon name="arrow" color="#1989FA"/>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -112,6 +122,13 @@
   .plan-list {
     min-height: 100vh;
     padding: 12px 12px 20px;
+  }
+
+  /* 加载中 */
+  .page-loading {
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
   }
 
   /* 护理计划卡片：类别标签 + 名称 + 状态文字 + 图标信息行 */

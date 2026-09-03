@@ -62,7 +62,8 @@ public class ElderTools {
      * 模型会自动调用这个方法，而不是凭空编造答案。
      * 返回值会被序列化成 JSON 回传给模型。
      */
-    @Tool(description = "查询当前老人自己的档案信息，包括姓名、年龄、手机号、出生日期、家庭住址")
+    @Tool(description = "查询当前老人自己的档案信息，包括姓名、年龄、手机号、出生日期、家庭住址。" +
+            "gender字段含义：0表示女、1表示男，回答性别相关问题时根据该字段判断，不要凭姓名猜测")
     public Elder getElderInfo() {
         return elderService.getById(elderId);
     }

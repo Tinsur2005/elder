@@ -42,6 +42,8 @@
 
   //体检套餐列表
   const packageList = ref([])
+  //是否正在加载（显示加载动画）
+  const loading = ref(true)
   //选中的套餐id
   const packageId = ref(null)
   //选中的预约日期
@@ -65,20 +67,23 @@
 
   // 体检套餐选项：进入页面一次加载全部上架状态套餐
   const loadPackageOptions = () => {
-    examPackageApi.listAll().then(result => {
+    return examPackageApi.listAll().then(result => {
       packageList.value = result.data
     })
   }
-  loadPackageOptions()
 
   // 体检项目列表：一次加载全部，用于把套餐包含的项目id映射成名称展示
   const examItemList = ref([])
   const loadExamItems = () => {
-    examItemApi.listAll().then(result => {
+    return examItemApi.listAll().then(result => {
       examItemList.value = result.data
     })
   }
-  loadExamItems()
+
+  //两个请求都返回后再关闭加载动画
+  Promise.all([loadPackageOptions(), loadExamItems()]).finally(() => {
+    loading.value = false
+  })
 
   // 套餐包含的体检项目（点选套餐后加载展示，项目名称由体检项目列表映射）
   const packageItems = ref([])
@@ -171,6 +176,12 @@
       正在为老人【{{ currentElder.realName }}】代约体检，如需更换请返回首页切换老人
     </van-notice-bar>
 
+    <!-- 加载中 -->
+    <div class="page-loading" v-if="loading">
+      <van-loading size="24" vertical>加载中...</van-loading>
+    </div>
+
+    <template v-else>
     <!-- 选择体检套餐 -->
     <div class="booking-section">
       <div class="booking-section-title">选择体检套餐</div>
@@ -209,6 +220,7 @@
     <div class="booking-submit">
       <van-button round block type="primary" @click="submit">提交预约</van-button>
     </div>
+    </template>
 
     <!-- 日期选择弹窗 -->
     <van-calendar
@@ -235,6 +247,13 @@
   .booking {
     min-height: 100vh;
     padding: 12px 0 20px;
+  }
+
+  /* 加载中 */
+  .page-loading {
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
   }
 
   .booking-section {

@@ -21,6 +21,7 @@
   import {useRouter} from 'vue-router'
   import {useUserInfoStore} from '@/store/userInfo.js'
   import announcementApi from '@/api/announcement.js'
+  import newsApi from '@/api/news.js'
 
   const userInfoStore = useUserInfoStore()
   const router = useRouter()
@@ -69,6 +70,11 @@
   // 是否显示最近公告弹层
   const showNotice = ref(false)
 
+  // ================== 对象（资讯） ==================
+
+  // 最新资讯列表（首页最多展示5条，查看更多进资讯列表页）
+  const newsList = ref([])
+
   // ================== 下拉数据 ==================
 
   // 加载最近公告（已发布，最新4条）
@@ -78,6 +84,14 @@
     })
   }
   loadNoticeList()
+
+  // 加载最新资讯（已发布，按发布时间倒序，最多5条）
+  const loadNewsList = () => {
+    newsApi.list({page: 1, limit: 5}).then(result => {
+      newsList.value = result.data.records
+    })
+  }
+  loadNewsList()
 
   // ================== 方法 ==================
 
@@ -94,11 +108,6 @@
       age = age - 1
     }
     return age
-  }
-
-  //切换家属当前查看的老人
-  const switchElder = (id) => {
-    userInfoStore.setCurrentElderId(id)
   }
 
   //跳转到功能页面
@@ -127,6 +136,21 @@
     showNotice.value = false
     router.push({path: '/announcementDetail', query: {id: row.id}})
   }
+
+  //资讯展示日期（createTime 截取 MM-DD）
+  const getNewsDate = (createTime) => {
+    return createTime ? createTime.slice(5, 10) : ''
+  }
+
+  //跳转资讯列表页
+  const goNewsList = () => {
+    router.push('/news')
+  }
+
+  //跳转资讯详情页
+  const goNewsDetail = (row) => {
+    router.push({path: '/newsDetail', query: {id: row.id}})
+  }
 </script>
 
 <template>
@@ -153,31 +177,34 @@
         </van-grid>
       </div>
 
-      <!-- 家属：绑定老人卡片切换 -->
-      <div class="elder-switch" v-if="isFamily && userInfoStore.elders.length > 0">
-        <div class="section-title"><span class="section-bar"></span>切换查看老人</div>
-        <div class="elder-cards">
-          <div
-              class="elder-card"
-              :class="{'elder-card-active': elder.id === userInfoStore.currentElderId}"
-              v-for="elder in userInfoStore.elders"
-              :key="elder.id"
-              @click="switchElder(elder.id)"
-          >
-            <div class="elder-card-avatar">
-              <van-icon name="user-o" size="22" :color="elder.id === userInfoStore.currentElderId ? '#1989FA' : '#999'"/>
-            </div>
-            <p class="elder-card-name">{{ elder.realName }}</p>
-            <p class="elder-card-age">{{ getAge(elder.birthday) }}岁</p>
-          </div>
-        </div>
-      </div>
-
       <!-- 公告通知条 -->
       <div class="home-notice" v-if="noticeList.length > 0" @click="openNotice">
         <van-icon name="volume-o" size="16"/>
         <span class="home-notice-text">{{ noticeList[0].title }}</span>
         <van-icon name="arrow" size="14"/>
+      </div>
+
+      <!-- 最新资讯 -->
+      <div class="home-news" v-if="newsList.length > 0">
+        <div class="section-header">
+          <div class="section-title"><span class="section-bar"></span>最新资讯</div>
+          <span class="section-more" @click="goNewsList">查看更多 <van-icon name="arrow"/></span>
+        </div>
+        <div class="news-card" v-for="item in newsList" :key="item.id" @click="goNewsDetail(item)">
+          <van-image class="news-cover" width="86" height="64" radius="8" fit="cover" :src="item.coverImage">
+            <template #loading>
+              <div class="news-cover-placeholder"><van-icon name="photo-o" size="22" color="#CCCCCC"/></div>
+            </template>
+            <template #error>
+              <div class="news-cover-placeholder"><van-icon name="photo-o" size="22" color="#CCCCCC"/></div>
+            </template>
+          </van-image>
+          <div class="news-info">
+            <p class="news-title">{{ item.title }}</p>
+            <p class="news-summary" v-if="item.summary">{{ item.summary }}</p>
+            <p class="news-meta">{{ item.categoryName }} · {{ getNewsDate(item.createTime) }}</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -209,10 +236,10 @@
     padding-bottom: 20px;
   }
 
-  /* 顶部蓝色问候区 */
+  /* 顶部蓝色问候区（底部渐变到页面底色，与白色区域平滑过渡） */
   .home-header {
-    background: linear-gradient(180deg, #1989FA 0%, #5BA5FA 100%);
-    padding: 28px 16px 56px;
+    background: linear-gradient(180deg, #1989FA 0%, #5BA5FA 55%, #F5F6FA 100%);
+    padding: 28px 16px 76px;
     color: #FFFFFF;
   }
 
@@ -257,61 +284,6 @@
     margin-right: 6px;
   }
 
-  /* 家属：老人卡片切换 */
-  .elder-switch {
-    margin-top: 12px;
-    margin-bottom: 12px;
-  }
-
-  .elder-cards {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-  }
-
-  .elder-card {
-    background-color: #FFFFFF;
-    border: 1px solid #EBEEF0;
-    border-radius: 12px;
-    padding: 14px 20px;
-    text-align: center;
-    flex-shrink: 0;
-    min-width: 96px;
-  }
-
-  .elder-card-active {
-    border: 1px solid #1989FA;
-    background-color: #E8F3FF;
-  }
-
-  .elder-card-avatar {
-    width: 40px;
-    height: 40px;
-    margin: 0 auto;
-    background-color: #F5F6FA;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .elder-card-active .elder-card-avatar {
-    background-color: #FFFFFF;
-  }
-
-  .elder-card-name {
-    margin-top: 8px;
-    font-size: 14px;
-    font-weight: bold;
-  }
-
-  .elder-card-age {
-    margin-top: 2px;
-    font-size: 12px;
-    color: #999;
-  }
-
   /* 功能入口 */
   .home-grid-card {
     background-color: #FFFFFF;
@@ -347,6 +319,84 @@
 
   .home-notice > .van-icon:last-child {
     flex-shrink: 0;
+  }
+
+  /* 最新资讯板块 */
+  .home-news {
+    margin-top: 12px;
+  }
+
+  /* 小节标题行（左标题 + 右查看更多） */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .section-more {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 13px;
+    color: #1989FA;
+  }
+
+  /* 资讯图文卡片 */
+  .news-card {
+    background-color: #FFFFFF;
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .news-cover {
+    flex-shrink: 0;
+  }
+
+  .news-cover-placeholder {
+    width: 86px;
+    height: 64px;
+    background-color: #F5F6FA;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .news-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .news-title {
+    font-size: 15px;
+    font-weight: bold;
+    color: #323233;
+    line-height: 21px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+
+  .news-summary {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #999;
+    line-height: 17px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+  }
+
+  .news-meta {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #999;
   }
 
   /* 最近公告弹层 */

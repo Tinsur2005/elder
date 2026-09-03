@@ -27,7 +27,7 @@ export const useUserInfoStore = defineStore('userInfo', {
             userType: '',
             // 家属绑定的老人列表（家属登录后由接口返回，老人登录时为空数组）
             elders: [],
-            // 家属当前正在查看的绑定老人id，切换老人卡片时更新
+            // 家属当前正在查看的绑定老人id，切换老人弹层选择时更新
             currentElderId: null
         }
     },

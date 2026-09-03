@@ -17,7 +17,7 @@
  * ============================================================
 -->
 <script setup>
-  import {computed} from 'vue'
+  import {computed, ref} from 'vue'
   import {showConfirmDialog, showToast} from 'vant'
   import {useRouter} from 'vue-router'
   import {useTokenStore} from '@/store/token.js'
@@ -33,6 +33,14 @@
   const user = computed(() => userInfoStore.user)
   const isFamily = computed(() => userInfoStore.userType === 'family')
 
+  // 当前查看的老人（家属端为选中的绑定老人）
+  const currentElder = computed(() => {
+    return userInfoStore.elders.find(item => item.id === userInfoStore.currentElderId) || {}
+  })
+
+  // 是否显示切换老人弹层
+  const showElderPicker = ref(false)
+
   // 我的页面菜单
   const menus = [
     {title: '个人信息', icon: 'user-circle-o', path: '/elderInfo'},
@@ -40,6 +48,33 @@
   ]
 
   // ================== 方法 ==================
+
+  //根据出生日期计算年龄
+  const getAge = (birthday) => {
+    if (!birthday) {
+      return ''
+    }
+    const birth = new Date(birthday)
+    const now = new Date()
+    let age = now.getFullYear() - birth.getFullYear()
+    // 未过生日时年龄减一
+    if (now.getMonth() < birth.getMonth() || (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate())) {
+      age = age - 1
+    }
+    return age
+  }
+
+  //打开切换老人弹层
+  const openElderPicker = () => {
+    showElderPicker.value = true
+  }
+
+  //选择当前查看的老人并关闭弹层
+  const selectElder = (elder) => {
+    userInfoStore.setCurrentElderId(elder.id)
+    showElderPicker.value = false
+    showToast(`已切换到 ${elder.realName}`)
+  }
 
   //退出登录
   const logout = () => {
@@ -77,16 +112,14 @@
       </div>
     </div>
 
-    <!-- 家属：绑定老人列表 -->
+    <!-- 家属：切换老人入口（底部抽屉选择） -->
     <div class="profile-card" v-if="isFamily && userInfoStore.elders.length > 0">
       <van-cell
-          v-for="elder in userInfoStore.elders"
-          :key="elder.id"
-          :title="elder.realName"
-          :label="elder.phone"
-          icon="user-o"
+          title="切换老人"
+          icon="exchange"
           is-link
-          @click="router.push({path: '/elderInfo'})"
+          :value="currentElder.realName"
+          @click="openElderPicker"
       />
     </div>
 
@@ -106,6 +139,27 @@
     <div class="profile-logout">
       <van-button round block plain color="#EE0A24" @click="logout">退出登录</van-button>
     </div>
+
+    <!-- 切换老人弹出框 -->
+    <van-popup v-model:show="showElderPicker" position="bottom" round>
+      <div class="elder-popup">
+        <div class="elder-popup-title">切换老人</div>
+        <div
+            class="elder-item"
+            :class="{'elder-item-active': elder.id === userInfoStore.currentElderId}"
+            v-for="elder in userInfoStore.elders"
+            :key="elder.id"
+            @click="selectElder(elder)"
+        >
+          <van-icon name="user-o" size="20" :color="elder.id === userInfoStore.currentElderId ? '#1989FA' : '#999'"/>
+          <div class="elder-item-info">
+            <p class="elder-item-name">{{ elder.realName }}（{{ getAge(elder.birthday) }}岁）</p>
+            <p class="elder-item-phone">{{ elder.phone }}</p>
+          </div>
+          <van-icon v-if="elder.id === userInfoStore.currentElderId" name="success" size="18" color="#1989FA"/>
+        </div>
+      </div>
+    </van-popup>
   </div>
 </template>
 
@@ -174,5 +228,54 @@
   /* 退出登录（红色描边胶囊按钮） */
   .profile-logout {
     margin: 28px 16px 0;
+  }
+
+  /* 切换老人弹层 */
+  .elder-popup {
+    padding: 20px 16px 24px;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .elder-popup-title {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .elder-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 8px;
+    border-bottom: 1px solid #F0F0F0;
+  }
+
+  .elder-item:last-child {
+    border-bottom: none;
+  }
+
+  .elder-item-active {
+    background-color: #E8F3FF;
+    border-radius: 8px;
+    border-bottom-color: transparent;
+  }
+
+  .elder-item-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .elder-item-name {
+    font-size: 15px;
+    font-weight: bold;
+    color: #323233;
+  }
+
+  .elder-item-phone {
+    margin-top: 2px;
+    font-size: 12px;
+    color: #999;
   }
 </style>

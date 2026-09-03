@@ -37,6 +37,8 @@ import ContractDetail from '@/views/ContractDetail.vue'
 import AnnouncementList from '@/views/AnnouncementList.vue'
 import AnnouncementDetail from '@/views/AnnouncementDetail.vue'
 import AIChat from '@/views/AIChat.vue'
+import NewsList from '@/views/NewsList.vue'
+import NewsDetail from '@/views/NewsDetail.vue'
 
 //创建路由器
 const router = createRouter({
@@ -62,7 +64,9 @@ const router = createRouter({
                 {path: '/contractDetail', component: ContractDetail},
                 {path: '/announcement', component: AnnouncementList},
                 {path: '/announcementDetail', component: AnnouncementDetail},
-                {path: '/aiChat', component: AIChat}
+                {path: '/aiChat', component: AIChat},
+                {path: '/news', component: NewsList},
+                {path: '/newsDetail', component: NewsDetail}
             ]
         }
     ]

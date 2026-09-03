@@ -237,7 +237,7 @@
   })
 
   const toolbarConfig = {}
-  const editorConfig = {placeholder: '请输入资讯内容...'}
+  const editorConfig = {placeholder: '请输入资讯内容...', MENU_CONF: {}}
   //富文本里上传图片：复用项目统一的上传接口（走axios封装，自动携带token）
   editorConfig.MENU_CONF['uploadImage'] = {
     async customUpload(file, insertFn) {
@@ -408,6 +408,12 @@
       <el-form-item label="资讯摘要" :label-width="80">
         <el-input v-model="news.summary" autocomplete="off" type="textarea" :rows="3" maxlength="500" show-word-limit/>
       </el-form-item>
+      <el-form-item label="状态" :label-width="80">
+        <el-radio-group v-model="news.status">
+          <el-radio :value="1">发布</el-radio>
+          <el-radio :value="0">下架</el-radio>
+        </el-radio-group>
+      </el-form-item>
       <el-form-item prop="content" label="资讯内容" :label-width="80">
         <div class="editor-container">
           <Toolbar
@@ -424,12 +430,6 @@
               @onCreated="handleCreated"
           />
         </div>
-      </el-form-item>
-      <el-form-item label="状态" :label-width="80">
-        <el-radio-group v-model="news.status">
-          <el-radio :value="1">发布</el-radio>
-          <el-radio :value="0">下架</el-radio>
-        </el-radio-group>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -456,19 +456,23 @@
     color: #999;          /* 灰色 */
   }
 
-  /* 富文本编辑器：工具栏和编辑区拼接成一个整体 */
+  /* 富文本编辑器 */
   .editor-container {
     width: 100%;
+    height: 600px;
+    display: flex;
+    flex-direction: column;
     border: 1px solid #ccc;
     z-index: 100;
   }
 
   .editor-toolbar {
+    flex-shrink: 0; /* 工具栏不被压缩 */
     border-bottom: 1px solid #ccc;
   }
 
   .editor-content {
-    height: 350px;
+    flex: 1; /* 占满容器剩余高度 */
     overflow-y: hidden;
   }
 </style>

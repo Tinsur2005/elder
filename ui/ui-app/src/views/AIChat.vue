@@ -72,6 +72,12 @@
     })
   }
 
+  //进入页面加载完历史记录后，直接定位到最新一条聊天
+  //等DOM和布局都稳定后再滚
+  nextTick(() => {
+    nextTick(scrollToBottom)
+  })
+
   //发送消息并接收AI流式回复
   const send = () => {
     const message = inputText.value.trim()

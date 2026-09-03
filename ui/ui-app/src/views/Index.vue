@@ -1,0 +1,37 @@
+<script setup>
+  import {computed} from 'vue'
+  import {useUserInfoStore} from '@/store/userInfo.js'
+
+  const userInfoStore = useUserInfoStore()
+
+  // 底部导航栏（老人端3个Tab：首页/体检/我的；家属端2个Tab：首页/我的）
+  const tabbarItems = computed(() => {
+    if (userInfoStore.userType === 'family') {
+      return [
+        {path: '/home', title: '首页', icon: 'wap-home-o'},
+        {path: '/profile', title: '我的', icon: 'user-o'}
+      ]
+    }
+    return [
+      {path: '/home', title: '首页', icon: 'wap-home-o'},
+      {path: '/exam', title: '体检', icon: 'notes-o'},
+      {path: '/profile', title: '我的', icon: 'user-o'}
+    ]
+  })
+</script>
+
+<template>
+  <!-- 顶层路由内容区 + 底部导航栏 -->
+  <router-view></router-view>
+  <van-tabbar route safe-area-inset-bottom placeholder>
+    <van-tabbar-item
+        v-for="item in tabbarItems"
+        :key="item.path"
+        :to="item.path"
+        :icon="item.icon"
+    >{{ item.title }}</van-tabbar-item>
+  </van-tabbar>
+</template>
+
+<style scoped>
+</style>

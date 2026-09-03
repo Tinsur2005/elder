@@ -118,6 +118,46 @@ public class CareTaskServiceImpl extends ServiceImpl<CareTaskMapper, CareTask> i
     }
 
     /**
+     * 分页查询某个老人的护理任务列表（前台手机端专用），返回带老人姓名、执行护理员姓名的 CareTaskVO
+     * 与 list 不同：不解析后台登录用户的权限，只按老人、状态、计划执行日期范围筛选
+     *
+     * @param careTaskQuery 查询条件（老人、状态、计划执行日期范围、分页）
+     * @return
+     */
+    @Override
+    public IPage<CareTaskVO> listByElder(CareTaskQuery careTaskQuery) {
+        // 1.先查该老人的护理任务分页（按老人、状态、计划执行日期范围筛选）
+        IPage<CareTask> page = new Page<>(careTaskQuery.getPage(), careTaskQuery.getLimit());
+        LambdaQueryWrapper<CareTask> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper
+                .eq(!ObjectUtils.isEmpty(careTaskQuery.getElderId()), CareTask::getElderId, careTaskQuery.getElderId())
+                .eq(!ObjectUtils.isEmpty(careTaskQuery.getStatus()), CareTask::getStatus, careTaskQuery.getStatus())
+                .between(!ObjectUtils.isEmpty(careTaskQuery.getBeginPlanExecuteDate())
+                                && !ObjectUtils.isEmpty(careTaskQuery.getEndPlanExecuteDate()),
+                        CareTask::getPlanExecuteDate, careTaskQuery.getBeginPlanExecuteDate(),
+                        careTaskQuery.getEndPlanExecuteDate())
+                .orderByDesc(CareTask::getPlanExecuteDate);
+        IPage<CareTask> careTaskPage = careTaskMapper.selectPage(page, lambdaQueryWrapper);
+
+        // 2.把查到的当前页的CareTask转成CareTaskVO
+        List<CareTaskVO> careTaskVOList = careTaskPage.getRecords().stream()
+                .map(careTask -> {
+                    CareTaskVO vo = new CareTaskVO();
+                    BeanUtils.copyProperties(careTask, vo);
+                    return vo;
+                })
+                .toList();
+
+        // 3.给每个VO填上老人姓名、执行护理员姓名
+        fillNames(careTaskVOList);
+
+        // 4.返回CareTaskVO类型的分页
+        IPage<CareTaskVO> voPage = new Page<>(careTaskPage.getCurrent(), careTaskPage.getSize(), careTaskPage.getTotal());
+        voPage.setRecords(careTaskVOList);
+        return voPage;
+    }
+
+    /**
      * 查询任务详情，返回带老人姓名、执行护理员姓名的 CareTaskVO
      *
      * @param id 任务id

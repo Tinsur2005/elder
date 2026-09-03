@@ -32,6 +32,15 @@ public interface ICareTaskService extends IService<CareTask> {
     IPage<CareTaskVO> list(CareTaskQuery careTaskQuery, String token);
 
     /**
+     * 分页查询某个老人的护理任务列表，前台手机端专用，返回带老人姓名、执行护理员姓名的CareTaskVO
+     * 与list不同的是：不解析后台登录用户的权限，只按老人、状态、计划执行日期范围筛选
+     *
+     * @param careTaskQuery 查询条件（老人、状态、计划执行日期范围、分页）
+     * @return 分页结果
+     */
+    IPage<CareTaskVO> listByElder(CareTaskQuery careTaskQuery);
+
+    /**
      * 查询任务详情，返回带老人姓名、执行护理员姓名的 CareTaskVO
      *
      * @param id 任务id

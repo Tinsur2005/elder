@@ -10,7 +10,7 @@ target/
 .factorypath
 .project
 .settings
-.springBeans
+.springBeans.
 .sts4-cache
 
 ### IntelliJ IDEA ###
@@ -29,6 +29,7 @@ build/
 .claude/
 !**/src/main/**/build/
 !**/src/test/**/build/
+**/node_modules/
 
 ### VS Code ###
 .vscode/
@@ -36,3 +37,4 @@ logs
 docs
 tmp
 plan
+sql

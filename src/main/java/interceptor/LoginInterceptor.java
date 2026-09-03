@@ -20,6 +20,17 @@ public class LoginInterceptor implements HandlerInterceptor {
         try {
             //解析token
             Map<String, Object> claims = JwtUtil.parseToken(token);
+            //前后台token隔离：老人/家属的token（带userType）不能访问后台管理接口，后台用户的token不能访问前台接口
+            String userType = (String) claims.get("userType");
+            String uri = request.getRequestURI();
+            if (uri.startsWith("/admin") && userType != null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return false;
+            }
+            if (uri.startsWith("/app") && userType == null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return false;
+            }
             return true;//放行
         }catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

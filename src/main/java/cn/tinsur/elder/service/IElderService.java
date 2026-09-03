@@ -27,6 +27,13 @@ public interface IElderService extends IService<Elder> {
     IPage<ElderVO> list(ElderQuery elderrQuery);
 
     /**
+     * 根据id获取老人详情（ElderVO，带标签列表tags），供前台手机端个人信息页使用
+     * @param id 老人id
+     * @return
+     */
+    ElderVO getVOById(Long id);
+
+    /**
      * 根据老人id获取这个老人所有的标签，返回一个由Tag对象组成的List列表
      * @param id
      * @return

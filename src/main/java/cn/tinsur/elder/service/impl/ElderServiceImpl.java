@@ -89,6 +89,23 @@ public class ElderServiceImpl extends ServiceImpl<ElderMapper, Elder> implements
     }
 
     /**
+     * 根据id获取老人详情，ElderVO，带标签列表tags，供前台手机端个人信息页使用
+     * @param id 老人id
+     * @return
+     */
+    @Override
+    public ElderVO getVOById(Long id) {
+        Elder elder = elderMapper.selectById(id);
+        if (ObjectUtils.isEmpty(elder)) {
+            return null;
+        }
+        ElderVO vo = new ElderVO();
+        BeanUtils.copyProperties(elder, vo);
+        fillTags(List.of(vo));
+        return vo;
+    }
+
+    /**
      * 批量给ElderVO填标签
      */
     private void fillTags(List<ElderVO> elderVOList) {

@@ -11,18 +11,12 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
-  mail:
-    host: smtp.qq.com
-    port: 465
-    username: 2545653474@qq.com
-    password: nkpwigquwctudhhb
-    default-encoding: UTF-8
-    properties:
-      mail:
-        smtp:
-          auth: true
-          ssl:
-            enable: true
+  ai:
+    dashscope:
+      api-key: ${DASHSCOPE_API_KEY:}
+      chat:
+        options:
+          model: ${AI_MODEL:qwen-plus}
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #mybatis官方提供的控制台打印日志

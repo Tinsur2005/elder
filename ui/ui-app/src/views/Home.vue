@@ -157,6 +157,16 @@
     </div>
 
     <div class="home-body">
+      <!-- 功能入口 -->
+      <div class="home-grid-card">
+        <van-grid :column-num="3" :border="false">
+          <van-grid-item v-for="item in gridItems" :key="item.path" @click="goPage(item.path)">
+            <van-icon :name="item.icon" size="28" :color="item.color"/>
+            <span class="grid-title">{{ item.title }}</span>
+          </van-grid-item>
+        </van-grid>
+      </div>
+
       <!-- 家属：绑定老人卡片切换 -->
       <div class="elder-switch" v-if="isFamily && userInfoStore.elders.length > 0">
         <div class="section-title"><span class="section-bar"></span>切换查看老人</div>
@@ -175,16 +185,6 @@
             <p class="elder-card-age">{{ getAge(elder.birthday) }}岁</p>
           </div>
         </div>
-      </div>
-
-      <!-- 功能入口 -->
-      <div class="home-grid-card">
-        <van-grid :column-num="3" :border="false">
-          <van-grid-item v-for="item in gridItems" :key="item.path" @click="goPage(item.path)">
-            <van-icon :name="item.icon" size="28" :color="item.color"/>
-            <span class="grid-title">{{ item.title }}</span>
-          </van-grid-item>
-        </van-grid>
       </div>
 
       <!-- 公告通知条 -->
@@ -273,6 +273,7 @@
 
   /* 家属：老人卡片切换 */
   .elder-switch {
+    margin-top: 12px;
     margin-bottom: 12px;
   }
 

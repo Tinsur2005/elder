@@ -46,7 +46,7 @@
     if (isFamily.value) {
       return [
         {title: '查看资料', icon: 'user-circle-o', color: '#1989FA', path: '/elderInfo'},
-        {title: '代约体检', icon: 'calendar-o', color: '#07C160', path: '/examBooking'},
+        {title: '代约体检', icon: 'calendar-o', color: '#07C160', path: '/examPackageList'},
         {title: '体检记录', icon: 'records', color: '#FF976A', path: '/exam'},
         {title: '护理计划', icon: 'orders-o', color: '#EE0A24', path: '/carePlan'},
         {title: '护理任务', icon: 'todo-list-o', color: '#1989FA', path: '/careTask'},
@@ -54,7 +54,7 @@
       ]
     }
     return [
-      {title: '体检预约', icon: 'calendar-o', color: '#1989FA', path: '/examBooking'},
+      {title: '体检预约', icon: 'calendar-o', color: '#1989FA', path: '/examPackageList'},
       {title: 'AI对话', icon: 'chat-o', color: '#07C160', path: '/aiChat'},
       {title: '护理计划', icon: 'orders-o', color: '#FF976A', path: '/carePlan'},
       {title: '护理任务', icon: 'todo-list-o', color: '#EE0A24', path: '/careTask'},

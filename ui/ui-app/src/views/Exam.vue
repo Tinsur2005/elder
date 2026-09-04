@@ -80,7 +80,7 @@
       showToast('请先在首页选择要体检的老人')
       return
     }
-    router.push('/examBooking')
+    router.push('/examPackageList')
   }
 
   //跳转到体检记录详情

@@ -26,7 +26,8 @@ import Exam from '@/views/Exam.vue'
 import Profile from '@/views/Profile.vue'
 import Login from '@/views/Login.vue'
 import ElderInfo from '@/views/ElderInfo.vue'
-import ExamBooking from '@/views/ExamBooking.vue'
+import ExamPackageList from '@/views/ExamPackageList.vue'
+import ExamPackageDetail from '@/views/ExamPackageDetail.vue'
 import ExamRecordDetail from '@/views/ExamRecordDetail.vue'
 import CarePlanList from '@/views/CarePlanList.vue'
 import CarePlanDetail from '@/views/CarePlanDetail.vue'
@@ -54,7 +55,8 @@ const router = createRouter({
                 {path: '/exam', component: Exam},
                 {path: '/profile', component: Profile},
                 {path: '/elderInfo', component: ElderInfo},
-                {path: '/examBooking', component: ExamBooking},
+                {path: '/examPackageList', component: ExamPackageList},
+                {path: '/examPackageDetail', component: ExamPackageDetail},
                 {path: '/examRecordDetail', component: ExamRecordDetail},
                 {path: '/carePlan', component: CarePlanList},
                 {path: '/carePlanDetail', component: CarePlanDetail},

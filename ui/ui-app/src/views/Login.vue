@@ -23,6 +23,8 @@
   import userApi from '@/api/user.js'
   import {useTokenStore} from '@/store/token.js'
   import {useUserInfoStore} from '@/store/userInfo.js'
+  //系统logo
+  import logo from '@/assets/logo.png'
 
   const tokenStore = useTokenStore()
   const userInfoStore = useUserInfoStore()
@@ -82,103 +84,191 @@
 </script>
 
 <template>
-  <div class="login-bg">
-    <!-- 平台标题 -->
-    <div class="login-title">
-      <div class="login-title-icon">
-        <van-icon name="wap-nav" size="30" color="#1989FA"/>
-      </div>
-      <h1>智慧养老服务平台</h1>
-      <p>让每一位老人都被温柔以待</p>
-    </div>
-    <!-- 登录表单 -->
-    <!-- van-form 的校验规则配置在每个 van-field 上，通过 formRef.validate() 整体校验 -->
-    <van-form class="form-login" ref="formRef" autocomplete="off">
-      <van-tabs v-model:active="userType" shrink>
-        <van-tab title="老人登录" name="elder"></van-tab>
-        <van-tab title="家属登录" name="family"></van-tab>
-      </van-tabs>
-      <van-cell-group inset>
-        <van-field
-            v-model="user.name"
-            name="name"
-            label="用户名"
-            left-icon="contact"
-            placeholder="请输入用户名"
-            :rules="rules.name"
-        />
-        <van-field
-            v-model="user.password"
-            name="password"
-            label="密码"
-            left-icon="lock"
-            type="password"
-            placeholder="请输入密码"
-            :rules="rules.password"
-        />
-      </van-cell-group>
-      <!-- 登录按钮 -->
-      <div class="login-button">
-        <van-button round block type="primary" native-type="button" @click="login">登录</van-button>
-      </div>
+  <div class="login-page">
+    <!-- 页面背景装饰 -->
+    <div class="bg-decoration bg-circle-one"></div>
+    <div class="bg-decoration bg-circle-two"></div>
+    <div class="bg-decoration bg-ring"></div>
+    <div class="bg-decoration bg-dots bg-dots-one"></div>
+    <div class="bg-decoration bg-dots bg-dots-two"></div>
+
+    <!-- 登录卡片 -->
+    <div class="login-card">
+      <!-- 系统logo -->
+      <img class="brand-logo" :src="logo" alt="智慧养老系统"/>
+      <p class="brand-slogan">让每一位老人都能安享幸福晚年</p>
+
+      <!-- 登录表单 -->
+      <!-- van-form 的校验规则配置在每个 van-field 上，通过 formRef.validate() 整体校验 -->
+      <van-form ref="formRef" autocomplete="off">
+        <van-tabs v-model:active="userType" shrink>
+          <van-tab title="老人登录" name="elder"></van-tab>
+          <van-tab title="家属登录" name="family"></van-tab>
+        </van-tabs>
+        <div class="field-list">
+          <van-field
+              v-model="user.name"
+              name="name"
+              left-icon="contact"
+              placeholder="请输入用户名"
+              :rules="rules.name"
+          />
+          <van-field
+              v-model="user.password"
+              name="password"
+              left-icon="lock"
+              type="password"
+              placeholder="请输入密码"
+              :rules="rules.password"
+          />
+        </div>
+        <!-- 登录按钮 -->
+        <div class="login-button">
+          <van-button round block type="primary" native-type="button" @click="login">登 录</van-button>
+        </div>
+      </van-form>
+
       <!-- 温馨提示 -->
       <div class="demo-tips">
         <p>请使用社区为您开通的账号登录</p>
         <p>老人与家属请分别选择对应登录入口</p>
       </div>
-    </van-form>
+    </div>
   </div>
 </template>
 
 <style scoped>
-  .login-bg {
+  /* 整页浅色背景加居中登录卡片布局，仿照后台登录页风格 */
+  .login-page {
     min-height: 100vh;
-    background-color: #F5F6FA;
-    padding-top: 60px;
-  }
-
-  .login-title {
-    text-align: center;
-    margin-bottom: 40px;
-  }
-
-  .login-title-icon {
-    width: 64px;
-    height: 64px;
-    margin: 0 auto 16px;
-    background-color: #FFFFFF;
-    border-radius: 50%;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 24px;
+    background-color: #EEF3FB;
+    position: relative;
+    overflow: hidden;
   }
 
-  .login-title h1 {
-    font-size: 22px;
+  /* ================== 页面背景装饰 ================== */
+
+  .bg-decoration {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  /* 左下角和右上角的大圆 */
+  .bg-circle-one {
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background-color: #DEEDFD;
+    left: -100px;
+    bottom: -110px;
+  }
+
+  .bg-circle-two {
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background-color: #DEEDFD;
+    right: -90px;
+    top: -100px;
+  }
+
+  /* 空心圆环 */
+  .bg-ring {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 14px solid #DEEDFD;
+    right: 60px;
+    top: 120px;
+  }
+
+  /* 圆点群，用径向渐变画出一组小圆点 */
+  .bg-dots {
+    width: 100px;
+    height: 100px;
+    background-image: radial-gradient(#C9DEF8 3px, transparent 3px);
+    background-size: 26px 26px;
+  }
+
+  .bg-dots-one {
+    left: 40px;
+    top: 50px;
+  }
+
+  .bg-dots-two {
+    right: 50px;
+    bottom: 60px;
+  }
+
+  /* ================== 登录卡片 ================== */
+
+  .login-card {
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+    padding: 32px 24px 24px;
+    border-radius: 20px;
+    background-color: #FFFFFF;
+    box-shadow: 0 12px 40px rgba(25, 137, 250, 0.12);
+    position: relative;
+  }
+
+  /* 顶部系统logo，与后台登录页同一张图 */
+  .brand-logo {
+    display: block;
+    width: 190px;
+    height: auto;
+    margin: 0 auto 10px;
+  }
+
+  .brand-slogan {
+    text-align: center;
+    font-size: 13px;
+    color: #999;
+    letter-spacing: 1px;
+    margin: 0 0 20px;
+  }
+
+  /* 老人/家属切换Tab */
+  .login-card :deep(.van-tabs) {
+    margin: 0 8px;
+  }
+
+  .login-card :deep(.van-tab--active) {
     color: #1989FA;
   }
 
-  .login-title p {
-    margin-top: 8px;
-    font-size: 13px;
-    color: #999;
+  /* 圆角浅灰填充风格的输入框 */
+  .field-list {
+    margin: 16px 8px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
 
-  .form-login {
-    margin: 0 20px;
-    padding: 16px 0 20px;
-    background-color: #FFFFFF;
-    border-radius: 12px;
+  .field-list :deep(.van-field) {
+    background-color: #F5F6FA;
+    border-radius: 22px;
+    padding: 9px 14px;
+    overflow: hidden;
   }
 
-  .form-login :deep(.van-tabs) {
-    margin: 0 12px 16px;
+  .field-list :deep(.van-field__left-icon) {
+    color: #1989FA;
+    margin-right: 8px;
   }
 
+  /* 登录按钮 */
   .login-button {
-    margin: 24px 16px 0;
+    margin: 24px 8px 0;
   }
 
+  /* 温馨提示 */
   .demo-tips {
     margin-top: 16px;
     text-align: center;

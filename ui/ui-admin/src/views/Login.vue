@@ -18,7 +18,7 @@
 -->
 <script setup>
   import {ref} from "vue";
-  import {User, Lock} from "@element-plus/icons-vue";
+  import {User, Lock, House, FirstAidKit, AlarmClock} from "@element-plus/icons-vue";
   import {ElMessage} from "element-plus";
   import {useRouter} from "vue-router";
   import userApi from "@/api/user.js";
@@ -26,6 +26,9 @@
 
   const tokenStore = useTokenStore();
   const router = useRouter()
+
+  //系统logo
+  import logo from '@/assets/logo.png'
 
   //表单校验模型
   const rules = {
@@ -45,6 +48,13 @@
     password: ''
   })
 
+  //左侧品牌展示区的社区服务亮点
+  const brandFeatures = [
+    {icon: AlarmClock, text: '全天候健康守护，异常情况及时预警'},
+    {icon: FirstAidKit, text: '专业护理服务，护理计划一键安排'},
+    {icon: House, text: '智慧社区养老，让陪伴更有温度'}
+  ]
+
   const login = () => {
 
     userApi.login(user.value).then(result => {
@@ -61,53 +71,276 @@
 </script>
 
 <template>
-  <div class="login-bg">
-    <!-- 登录表单 -->
-    <el-form class="form-login" ref="form" size="large" autocomplete="off" :model="user" :rules="rules">
-      <el-form-item>
-        <h1 style="width: 100%; text-align: center">登录到后台</h1>
-      </el-form-item>
-      <el-form-item prop="name">
-        <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="user.name"></el-input>
-      </el-form-item>
-      <el-form-item prop="password">
-        <el-input name="password" :prefix-icon="Lock" type="password" placeholder="请输入密码"
-                  v-model="user.password" show-password="true"></el-input>
-      </el-form-item>
-      <el-form-item class="flex">
-        <div class="flex">
-          <el-checkbox>记住我</el-checkbox>
-<!--          <el-link type="primary" :underline="false">忘记密码？</el-link>-->
+  <div class="login-page">
+    <!-- 页面背景装饰 -->
+    <div class="bg-decoration bg-circle-one"></div>
+    <div class="bg-decoration bg-circle-two"></div>
+    <div class="bg-decoration bg-ring"></div>
+    <div class="bg-decoration bg-dots bg-dots-one"></div>
+    <div class="bg-decoration bg-dots bg-dots-two"></div>
+
+    <!-- 居中登录大卡片 -->
+    <div class="login-card">
+      <!-- 卡片左侧品牌展示区 -->
+      <div class="card-left">
+        <h2 class="welcome-title">睦邻NCare</h2>
+        <p class="welcome-sub">智慧社区养老后台管理系统</p>
+        <!-- 社区slogan -->
+        <div class="brand-slogan">
+          <h3 class="slogan-title">用心服务<br/>用爱陪伴</h3>
+          <p class="slogan-sub">让每一位老人都能安享幸福晚年</p>
         </div>
-      </el-form-item>
-      <!-- 登录按钮 -->
-      <el-form-item>
-        <el-button class="button" type="primary" auto-insert-space @click="login">登录</el-button>
-      </el-form-item>
-    </el-form>
+        <!-- 服务亮点 -->
+        <div class="brand-features">
+          <div class="feature-item" v-for="feature in brandFeatures" :key="feature.text">
+            <el-icon class="feature-icon" :size="18"><component :is="feature.icon"/></el-icon>
+            <span>{{ feature.text }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片右侧登录表单区 -->
+      <div class="card-right">
+        <!-- 系统logo -->
+        <div class="brand-header">
+          <img class="brand-logo-img" :src="logo" alt="智慧养老系统"/>
+        </div>
+        <el-form ref="form" size="large" autocomplete="off" :model="user" :rules="rules">
+          <div class="field-label">用户名 / user name</div>
+          <el-form-item prop="name">
+            <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="user.name"></el-input>
+          </el-form-item>
+          <div class="field-label">密码 / password</div>
+          <el-form-item prop="password">
+            <el-input name="password" :prefix-icon="Lock" type="password" placeholder="请输入密码"
+                      v-model="user.password" show-password></el-input>
+          </el-form-item>
+          <el-form-item class="flex">
+            <div class="flex">
+              <el-checkbox>记住我</el-checkbox>
+            </div>
+          </el-form-item>
+          <!-- 登录按钮 -->
+          <el-form-item>
+            <el-button class="button" type="primary" auto-insert-space @click="login">登 录</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </div>
   </div>
 
 </template>
 
 <style scoped>
-
-  .login-bg {
+  /* 整页浅色背景加居中大卡片布局 */
+  .login-page {
     height: 100vh;
-    background-image: url('@/assets/login-background.png');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-attachment: fixed;
-    background-size: cover;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #EEF3FB;
+    position: relative;
+    overflow: hidden;
   }
 
-  .form-login {
-    width: 280px;
-    padding: 20px;
+  /* ================== 页面背景装饰 ================== */
+
+  .bg-decoration {
     position: absolute;
-    top: 50%;
-    right: 10%;
-    transform: translateY(-50%);
-    background-color: #FFF;
-    box-shadow: 10px 10px 30px #000;
+    pointer-events: none;
+  }
+
+  /* 左下角和右上角的大圆 */
+  .bg-circle-one {
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    background-color: #E0EAF8;
+    left: -140px;
+    bottom: -160px;
+  }
+
+  .bg-circle-two {
+    width: 360px;
+    height: 360px;
+    border-radius: 50%;
+    background-color: #E0EAF8;
+    right: -120px;
+    top: -140px;
+  }
+
+  /* 空心圆环 */
+  .bg-ring {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 22px solid #E0EAF8;
+    right: 180px;
+    top: 60px;
+  }
+
+  /* 圆点群，用径向渐变画出一组小圆点 */
+  .bg-dots {
+    width: 130px;
+    height: 130px;
+    background-image: radial-gradient(#C7D8F0 4px, transparent 4px);
+    background-size: 34px 34px;
+  }
+
+  .bg-dots-one {
+    left: 90px;
+    top: 90px;
+  }
+
+  .bg-dots-two {
+    right: 120px;
+    bottom: 100px;
+  }
+
+  /* ================== 居中登录大卡片 ================== */
+
+  .login-card {
+    width: 1060px;
+    max-width: 92vw;
+    height: 640px;
+    display: flex;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(64, 158, 255, 0.15);
+    position: relative;
+  }
+
+  /* ---------- 卡片左侧品牌展示区 ---------- */
+
+  .card-left {
+    flex: 1;
+    box-sizing: border-box;
+    padding: 56px 60px;
+    display: flex;
+    flex-direction: column;
+    color: #FFFFFF;
+    /* 与首页统计卡的蓝色渐变保持一致 */
+    background: linear-gradient(120deg, #409eff 0%, #53a8ff 55%, #409eff 100%);
+  }
+
+  .welcome-title {
+    font-size: 40px;
+    letter-spacing: 4px;
+    margin: 0 0 10px;
+  }
+
+  .welcome-sub {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.85);
+    letter-spacing: 2px;
+    margin: 0;
+  }
+
+  /* 中部slogan */
+  .brand-slogan {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .slogan-title {
+    font-size: 38px;
+    line-height: 1.6;
+    letter-spacing: 6px;
+    margin: 0 0 14px;
+  }
+
+  .slogan-sub {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.85);
+    letter-spacing: 2px;
+    margin: 0;
+  }
+
+  /* 底部服务亮点 */
+  .brand-features {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .feature-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .feature-icon {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 6px;
+  }
+
+  /* ---------- 卡片右侧登录表单区 ---------- */
+
+  .card-right {
+    width: 420px;
+    flex-shrink: 0;
+    background-color: #FFFFFF;
+    box-sizing: border-box;
+    padding: 56px 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* 顶部系统logo，与后台侧边栏顶部同一张图 */
+  .brand-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+  }
+
+  .brand-logo-img {
+    width: 240px;
+    height: auto;
+  }
+
+  /* 输入框上方的字段说明文字 */
+  .field-label {
+    font-size: 14px;
+    color: #909399;
+    margin-bottom: 8px;
+  }
+
+  /* 圆角浅灰填充风格的输入框 */
+  .card-right :deep(.el-input__wrapper) {
+    border-radius: 20px;
+    background-color: #F5F7FA;
+    box-shadow: 0 0 0 1px #F5F7FA inset;
+  }
+
+  .card-right :deep(.el-input__wrapper.is-focus) {
+    background-color: #FFFFFF;
+    box-shadow: 0 0 0 1px #409eff inset;
+  }
+
+  /* 圆角登录按钮 */
+  .card-right .button {
+    width: 100%;
+    border-radius: 20px;
+    letter-spacing: 4px;
+  }
+
+  /* 窄屏时隐藏左侧品牌区，只保留登录表单 */
+  @media (max-width: 900px) {
+    .card-left {
+      display: none;
+    }
+
+    .login-card {
+      width: 480px;
+      height: auto;
+    }
   }
 </style>

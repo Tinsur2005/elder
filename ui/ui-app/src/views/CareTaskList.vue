@@ -156,7 +156,7 @@
 
 <style scoped>
   .task-list {
-    min-height: 100vh;
+    min-height: 100%;
     padding-bottom: 20px;
   }
 

@@ -122,7 +122,7 @@
 
 <style scoped>
   .elder-info {
-    min-height: 100vh;
+    min-height: 100%;
     padding: 12px 0 20px;
   }
 

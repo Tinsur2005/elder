@@ -40,17 +40,34 @@
 </script>
 
 <template>
-  <!-- 顶层路由内容区 + 底部导航栏 -->
-  <router-view></router-view>
-  <van-tabbar route safe-area-inset-bottom placeholder>
-    <van-tabbar-item
-        v-for="item in tabbarItems"
-        :key="item.path"
-        :to="item.path"
-        :icon="item.icon"
-    >{{ item.title }}</van-tabbar-item>
-  </van-tabbar>
+  <div class="app-shell">
+    <div class="app-content">
+      <router-view></router-view>
+    </div>
+    <van-tabbar route safe-area-inset-bottom :fixed="false">
+      <van-tabbar-item
+          v-for="item in tabbarItems"
+          :key="item.path"
+          :to="item.path"
+          :icon="item.icon"
+      >{{ item.title }}</van-tabbar-item>
+    </van-tabbar>
+  </div>
 </template>
 
 <style scoped>
+  .app-shell {
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .app-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    background-color: #F5F6FA;
+  }
 </style>

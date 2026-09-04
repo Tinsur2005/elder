@@ -166,10 +166,8 @@
 </template>
 
 <style scoped>
-  /* 页面高度扣除底部导航栏，消息区滚动、输入栏固定在页面底部 */
   .ai-chat {
-    height: calc(100vh - 50px - constant(safe-area-inset-bottom));
-    height: calc(100vh - 50px - env(safe-area-inset-bottom));
+    height: 100%;
     display: flex;
     flex-direction: column;
     background-color: #F5F6FA;

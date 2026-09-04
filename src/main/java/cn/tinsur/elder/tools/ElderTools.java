@@ -22,9 +22,12 @@
 package cn.tinsur.elder.tools;
 
 import cn.tinsur.elder.pojo.entity.Elder;
+import cn.tinsur.elder.pojo.query.CarePlanQuery;
 import cn.tinsur.elder.pojo.query.ExamAppointmentQuery;
+import cn.tinsur.elder.pojo.vo.CarePlanVO;
 import cn.tinsur.elder.pojo.vo.ExamAppointmentItemVO;
 import cn.tinsur.elder.pojo.vo.ExamAppointmentVO;
+import cn.tinsur.elder.service.ICarePlanService;
 import cn.tinsur.elder.service.IExamAppointmentService;
 import cn.tinsur.elder.service.IElderService;
 import org.springframework.ai.tool.annotation.Tool;
@@ -42,18 +45,21 @@ import java.util.List;
  *
  * 整个过程对用户透明：用户只问“我今年多大”，模型自己去查库再回答。
  *
- * 使用方式：chatClient.prompt().tools(new ElderTools(elderId, elderService, examAppointmentService))
+ * 使用方式：chatClient.prompt().tools(new ElderTools(elderId, elderService, examAppointmentService, carePlanService))
  */
 public class ElderTools {
 
     private Integer elderId;
     private IElderService elderService;
     private IExamAppointmentService examAppointmentService;
+    private ICarePlanService carePlanService;
 
-    public ElderTools(Integer elderId, IElderService elderService, IExamAppointmentService examAppointmentService) {
+    public ElderTools(Integer elderId, IElderService elderService, IExamAppointmentService examAppointmentService,
+                      ICarePlanService carePlanService) {
         this.elderId = elderId;
         this.elderService = elderService;
         this.examAppointmentService = examAppointmentService;
+        this.carePlanService = carePlanService;
     }
 
     /**
@@ -95,5 +101,28 @@ public class ElderTools {
         return examAppointmentList;
     }
 
+    /**
+     * 查询当前老人的全部护理计划，包括计划名称、护理等级、负责护理人员、起止日期，
+     * 以及计划里每个护理项目的执行周期、执行时间和执行日。
+     * 当用户问“我的护理计划是什么”“我每天要做哪些护理”等问题时，
+     * 模型会自动调用这个方法查库，而不是凭空编造答案。
+     * 返回值会被序列化成 JSON 回传给模型。
+     */
+    @Tool(description = "查询当前老人的所有护理计划和每个计划包含的护理项目。" +
+            "计划的status含义：0已结束、1进行中；" +
+            "项目的executeCycle含义：0每天、1每周、2每月，executeDay为执行日：周期为每周时存周几（1到7，1代表周一），周期为每月时存几号（1到31），每天时为空")
+    public List<CarePlanVO> getCarePlans() {
+        // 1.复用护理计划的分页查询，按当前老人id过滤，一次取100条足够AI回答使用
+        CarePlanQuery carePlanQuery = new CarePlanQuery();
+        carePlanQuery.setElderId(elderId.longValue());
+        carePlanQuery.setPage(1);
+        carePlanQuery.setLimit(100);
+        List<CarePlanVO> carePlanList = carePlanService.list(carePlanQuery).getRecords();
 
+        // 2.给每条护理计划附上护理项目明细（含执行周期和执行时间）
+        carePlanList.forEach(carePlan -> {
+            carePlan.setItems(carePlanService.getCareItemsById(carePlan.getId()).getData());
+        });
+        return carePlanList;
+    }
 }

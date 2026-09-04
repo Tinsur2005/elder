@@ -116,6 +116,10 @@
 
 <template>
   <div class="home">
+    <!-- 演示系统提示 -->
+    <el-alert class="demo-alert" type="warning" show-icon :closable="false" center
+              title="请注意：本系统为演示系统，仅供作品演示使用，不具有任何服务性质，请勿在系统填写敏感信息！"/>
+
     <!-- ① 顶部欢迎横幅 -->
     <el-card class="welcome banner" shadow="never">
       <div class="welcome-body">
@@ -207,6 +211,11 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+  }
+
+  /* 演示提示条与卡片同圆角 */
+  .demo-alert {
+    border-radius: 10px;
   }
 
   /* ---------- ① 欢迎横幅 ---------- */

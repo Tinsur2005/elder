@@ -79,6 +79,10 @@
     <div class="bg-decoration bg-dots bg-dots-one"></div>
     <div class="bg-decoration bg-dots bg-dots-two"></div>
 
+    <!-- 演示系统提示 -->
+    <el-alert class="demo-alert" type="warning" show-icon :closable="false" center
+              title="请注意：本系统为演示系统，仅供作品演示使用，不具有任何服务性质，请勿在系统填写敏感信息！"/>
+
     <!-- 居中登录大卡片 -->
     <div class="login-card">
       <!-- 卡片左侧品牌展示区 -->
@@ -125,6 +129,12 @@
             <el-button class="button" type="primary" auto-insert-space @click="login">登 录</el-button>
           </el-form-item>
         </el-form>
+
+        <!-- 温馨提示 -->
+        <div class="demo-tips">
+          <p>管理员演示账号：admin/123456</p>
+          <p>前台手机端演示请点击：<a href="https://ncare.tinsur.cn">手机端</a></p>
+        </div>
       </div>
     </div>
   </div>
@@ -137,11 +147,19 @@
     height: 100vh;
     box-sizing: border-box;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 16px;
     background-color: #EEF3FB;
     position: relative;
     overflow: hidden;
+  }
+
+  /* 演示提示条与登录卡片同宽 */
+  .demo-alert {
+    width: 1060px;
+    max-width: 92vw;
   }
 
   /* ================== 页面背景装饰 ================== */
@@ -330,6 +348,20 @@
     width: 100%;
     border-radius: 20px;
     letter-spacing: 4px;
+  }
+
+  /* 温馨提示 */
+  .demo-tips {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 12px;
+    color: #999;
+    line-height: 20px;
+  }
+
+  .demo-tips a {
+    color: #409eff;
+    text-decoration: none;
   }
 
   /* 窄屏时隐藏左侧品牌区，只保留登录表单 */

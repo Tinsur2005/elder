@@ -19,7 +19,10 @@
 package cn.tinsur.elder.pojo.vo;
 
 import cn.tinsur.elder.pojo.entity.CarePlan;
+import cn.tinsur.elder.pojo.entity.CarePlanItem;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class CarePlanVO extends CarePlan {
@@ -37,4 +40,9 @@ public class CarePlanVO extends CarePlan {
      * 护理等级名称（联表查询后填充，便于前端展示）
      */
     private String careLevelName;
+
+    /**
+     * 该计划包含的护理项目列表（AI工具查询护理计划时填充，前端暂不使用）
+     */
+    private List<CarePlanItem> items;
 }

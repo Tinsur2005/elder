@@ -1,5 +1,5 @@
 <script setup>
-  import {computed, nextTick, ref} from 'vue'
+  import {computed, nextTick, reactive, ref} from 'vue'
   import {showConfirmDialog, showToast} from 'vant'
   import {useRouter} from 'vue-router'
   import chatApi from '@/api/chat.js'
@@ -93,7 +93,7 @@
     generating.value = true
     messageList.value.push({role: 'user', content: message})
     //AI回复占位消息，流式内容往里追加
-    const reply = {role: 'ai', content: ''}
+    const reply = reactive({role: 'ai', content: ''})
     messageList.value.push(reply)
     scrollToBottom()
     chatApi.chatStream(message, content => {

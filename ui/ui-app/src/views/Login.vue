@@ -92,6 +92,11 @@
     <div class="bg-decoration bg-dots bg-dots-one"></div>
     <div class="bg-decoration bg-dots bg-dots-two"></div>
 
+    <!-- 演示系统提示 -->
+    <van-notice-bar class="demo-notice" left-icon="info-o" wrapable :scrollable="false">
+      请注意：本系统为演示系统，仅供作品演示使用，不具有任何服务性质，请勿在系统填写敏感信息！
+    </van-notice-bar>
+
     <!-- 登录卡片 -->
     <div class="login-card">
       <!-- 系统logo -->
@@ -130,8 +135,9 @@
 
       <!-- 温馨提示 -->
       <div class="demo-tips">
-        <p>请使用社区为您开通的账号登录</p>
-        <p>老人与家属请分别选择对应登录入口</p>
+        <p>老人演示账号：yaozhenfu/123456</p>
+        <p>家属演示账号：zhangsan/123456</p>
+        <p>后端管理页面演示请点击：<a href="https://ncare.tinsur.cn/admin">管理后台</a></p>
       </div>
     </div>
   </div>
@@ -143,11 +149,21 @@
     min-height: 100vh;
     box-sizing: border-box;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 16px;
     padding: 24px;
     background-color: #EEF3FB;
     position: relative;
+    overflow: hidden;
+  }
+
+  /* 演示系统提示条与登录卡片同宽 */
+  .demo-notice {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 8px;
     overflow: hidden;
   }
 

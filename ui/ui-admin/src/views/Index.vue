@@ -499,7 +499,7 @@
         <router-view></router-view>
       </el-main>
       <!-- 底部区域 -->
-      <el-footer>©2026 智慧社区养老管理系统</el-footer>
+      <el-footer>Copyright©2020-2026 Tinsur All rights reserved</el-footer>
     </el-container>
   </el-container>
 

@@ -43,7 +43,7 @@ import News from '@/views/News.vue'
 
 //创建路由器
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
             path: '/login', component: Login

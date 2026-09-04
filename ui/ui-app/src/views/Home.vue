@@ -170,6 +170,11 @@
     </div>
 
     <div class="home-body">
+      <!-- 演示系统提示 -->
+      <van-notice-bar class="demo-notice" left-icon="info-o" wrapable :scrollable="false">
+        请注意：本系统为演示系统，仅供作品演示使用，不具有任何服务性质，请勿在系统填写敏感信息！
+      </van-notice-bar>
+
       <!-- 功能入口 -->
       <div class="home-grid-card">
         <van-grid :column-num="3" :border="false">
@@ -293,6 +298,13 @@
     background-color: #1989FA;
     border-radius: 2px;
     margin-right: 6px;
+  }
+
+  /* 演示系统提示条 */
+  .demo-notice {
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 12px;
   }
 
   /* 功能入口 */

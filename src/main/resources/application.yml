@@ -17,6 +17,20 @@ spring:
       chat:
         options:
           model: ${AI_MODEL:qwen-plus}
+  mail:
+    host: smtp.exmail.qq.com        #SMTP服务器地址
+    port: 465
+    username: tinsur@tinsur.cn
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true                        #465端口使用SSL加密
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #mybatis官方提供的控制台打印日志

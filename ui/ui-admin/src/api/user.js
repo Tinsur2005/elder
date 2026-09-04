@@ -48,6 +48,26 @@ const userApi = {
     resetPassword(userPasswordDTO) {
         return request.put(`/users/resetPassword`, userPasswordDTO)
     },
+    //给当前登录用户发送邮箱验证码（scene区分场景，绑定邮箱场景需传email）
+    sendEmailCode(emailCodeDTO) {
+        return request.post(`/email-codes/send`, emailCodeDTO)
+    },
+    //校验邮箱验证码但不作废（更换邮箱第一步校验旧邮箱验证码时使用）
+    checkEmailCode(emailCodeDTO) {
+        return request.post(`/email-codes/verify`, emailCodeDTO)
+    },
+    //通过邮箱验证码修改密码
+    updatePasswordByEmail(emailPasswordDTO) {
+        return request.put(`/users/updatePasswordByEmail`, emailPasswordDTO)
+    },
+    //绑定邮箱（当前未绑定邮箱时使用）
+    bindEmail(emailCodeDTO) {
+        return request.put(`/users/bindEmail`, emailCodeDTO)
+    },
+    //更换绑定邮箱（验证码发到旧邮箱）
+    updateEmail(emailCodeDTO) {
+        return request.put(`/users/updateEmail`, emailCodeDTO)
+    },
     exportExcel() {
         return request({
             url: `/users/exportExcel`,

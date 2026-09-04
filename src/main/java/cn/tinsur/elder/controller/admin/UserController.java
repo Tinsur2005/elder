@@ -21,9 +21,12 @@ package cn.tinsur.elder.controller.admin;
 
 import cn.tinsur.elder.pojo.entity.Role;
 import cn.tinsur.elder.pojo.dto.UserPasswordDTO;
+import cn.tinsur.elder.pojo.dto.EmailCodeDTO;
+import cn.tinsur.elder.pojo.dto.EmailPasswordDTO;
 import cn.tinsur.elder.pojo.entity.User;
 import cn.tinsur.elder.pojo.query.UserQuery;
 import cn.tinsur.elder.pojo.vo.UserVO;
+import cn.tinsur.elder.service.IEmailCodeService;
 import cn.tinsur.elder.service.IUserService;
 import cn.tinsur.elder.util.JwtUtil;
 import cn.tinsur.elder.util.Result;
@@ -52,6 +55,9 @@ public class UserController {
 
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    private IEmailCodeService emailCodeService;
 
     /**
      * 登录
@@ -180,6 +186,124 @@ public class UserController {
         updateUser.setPassword(userPasswordDTO.getNewPassword());
         userService.updateById(updateUser);
         return Result.ok("密码重置成功");
+    }
+
+    /**
+     * 通过邮箱验证码修改密码：验证码发到当前用户绑定的邮箱，校验通过后设置新密码
+     * @param token
+     * @param emailPasswordDTO
+     * @return
+     */
+    @PutMapping("/updatePasswordByEmail")
+    public Result updatePasswordByEmail(@RequestHeader String Authorization,
+                                        @RequestBody EmailPasswordDTO emailPasswordDTO) {
+        User user = userService.getById(((Number) JwtUtil.parseToken(Authorization).get("id")).longValue());
+        if (user == null || user.getEmail() == null || user.getEmail().isEmpty()) {
+            return Result.error("您尚未绑定邮箱，请先绑定邮箱");
+        }
+        // 1.校验邮箱验证码（校验通过后验证码自动作废）
+        Result verifyResult = emailCodeService.verifyCode(user.getEmail(), IEmailCodeService.SCENE_CHANGE_PASSWORD, emailPasswordDTO.getCode());
+        if (verifyResult.getCode() != Result.OK) {
+            return verifyResult;
+        }
+        // 2.校验新密码与原密码不同，与原重置密码接口保持一致
+        if (user.getPassword().equals(emailPasswordDTO.getNewPassword())) {
+            return Result.error("新密码不能与原密码相同");
+        }
+        // 3.更新密码
+        User updateUser = new User();
+        updateUser.setId(user.getId());
+        updateUser.setPassword(emailPasswordDTO.getNewPassword());
+        userService.updateById(updateUser);
+        return Result.ok("密码修改成功，请重新登录");
+    }
+
+    /**
+     * 绑定邮箱（当前用户尚未绑定邮箱时使用）：验证码发到待绑定的新邮箱，校验通过后完成绑定
+     * @param token
+     * @param emailCodeDTO
+     * @return
+     */
+    @PutMapping("/bindEmail")
+    public Result bindEmail(@RequestHeader(name = "Authorization") String token,
+                            @RequestBody EmailCodeDTO emailCodeDTO) {
+        Long id = ((Number) JwtUtil.parseToken(token).get("id")).longValue();
+        User user = userService.getById(id);
+        if (user == null) {
+            return Result.error("用户不存在");
+        }
+        // 1.已绑定过邮箱时引导走更换邮箱流程，避免混淆
+        if (user.getEmail() != null && !user.getEmail().isEmpty()) {
+            return Result.error("您已绑定邮箱，如需更换请使用更换邮箱功能");
+        }
+        // 2.校验发到新邮箱的验证码（校验通过后验证码自动作废）
+        Result verifyResult = emailCodeService.verifyCode(emailCodeDTO.getEmail(), IEmailCodeService.SCENE_BIND_EMAIL, emailCodeDTO.getCode());
+        if (verifyResult.getCode() != Result.OK) {
+            return verifyResult;
+        }
+        // 3.再次校验邮箱未被其他账号占用（发送验证码后到提交前存在时间差，可能被别人抢先绑定）
+        Long count = userService.lambdaQuery()
+                .eq(User::getEmail, emailCodeDTO.getEmail())
+                .ne(User::getId, id)
+                .count();
+        if (count > 0) {
+            return Result.error("该邮箱已被其他账号绑定");
+        }
+        // 4.完成绑定
+        User updateUser = new User();
+        updateUser.setId(user.getId());
+        updateUser.setEmail(emailCodeDTO.getEmail());
+        userService.updateById(updateUser);
+        return Result.ok("邮箱绑定成功");
+    }
+
+    /**
+     * 更换绑定邮箱：旧邮箱和新邮箱都要验证，旧邮箱的验证码确认是本人在操作，
+     * 新邮箱的验证码确认新邮箱真实有效且归本人所有，两个都校验通过后更新为新邮箱
+     * @param token
+     * @param emailCodeDTO
+     * @return
+     */
+    @PutMapping("/updateEmail")
+    public Result updateEmail(@RequestHeader(name = "Authorization") String token,
+                              @RequestBody EmailCodeDTO emailCodeDTO) {
+        Long id = ((Number) JwtUtil.parseToken(token).get("id")).longValue();
+        User user = userService.getById(id);
+        if (user == null) {
+            return Result.error("用户不存在");
+        }
+        // 1.必须已绑定过邮箱才能更换
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            return Result.error("您尚未绑定邮箱，请先绑定邮箱");
+        }
+        // 2.新邮箱不能和旧邮箱相同
+        if (user.getEmail().equals(emailCodeDTO.getEmail())) {
+            return Result.error("新邮箱不能与当前邮箱相同");
+        }
+        // 3.校验发到旧邮箱的验证码（校验通过后验证码自动作废）
+        Result verifyResult = emailCodeService.verifyCode(user.getEmail(), IEmailCodeService.SCENE_CHANGE_EMAIL, emailCodeDTO.getCode());
+        if (verifyResult.getCode() != Result.OK) {
+            return verifyResult;
+        }
+        // 4.校验发到新邮箱的验证码（校验通过后验证码自动作废）
+        Result verifyNewResult = emailCodeService.verifyCode(emailCodeDTO.getEmail(), IEmailCodeService.SCENE_CHANGE_EMAIL_NEW, emailCodeDTO.getNewCode());
+        if (verifyNewResult.getCode() != Result.OK) {
+            return verifyNewResult;
+        }
+        // 5.再次校验新邮箱未被其他账号占用
+        Long count = userService.lambdaQuery()
+                .eq(User::getEmail, emailCodeDTO.getEmail())
+                .ne(User::getId, id)
+                .count();
+        if (count > 0) {
+            return Result.error("该邮箱已被其他账号绑定");
+        }
+        // 6.更新为新邮箱
+        User updateUser = new User();
+        updateUser.setId(user.getId());
+        updateUser.setEmail(emailCodeDTO.getEmail());
+        userService.updateById(updateUser);
+        return Result.ok("邮箱更换成功");
     }
 
     //导出Excel

@@ -37,11 +37,17 @@
 
   // ================== 选项 ==================
 
-  // 状态选项（状态：0结束 1开始）
-  const statusOptions = [
-    {value: 1, label: '进行中'},
-    {value: 0, label: '已结束'},
-  ]
+  //根据起止日期计算护理计划状态，早于开始日期为待执行，处于起止日期之间为执行中，晚于结束日期为已到期
+  const getPlanStatus = (startDate, endDate) => {
+    const now = new Date()
+    //取当天0点作为比较基准，避免时分秒影响日期比较
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const start = startDate ? new Date(startDate.replace(/-/g, '/')) : null
+    const end = endDate ? new Date(endDate.replace(/-/g, '/')) : null
+    if (start && today < start) return {label: '待执行', type: 'warning'}
+    if (end && today > end) return {label: '已到期', type: 'info'}
+    return {label: '执行中', type: 'success'}
+  }
 
   // 执行周期选项（执行周期：0天 1周 2月）
   const executeCycleOptions = [
@@ -125,11 +131,10 @@
 
   // ================== 变量 ==================
 
-  //分页信息和搜索条件（按计划名称、老人、状态模糊搜索）
+  //分页信息和搜索条件（按计划名称、老人模糊搜索）
   const carePlanQuery = ref({
     name: '',
     elderId: '',
-    status: '',
     page: 1,
     limit: 10
   })
@@ -170,7 +175,6 @@
     carePlanQuery.value = {
       name: '',
       elderId: '',
-      status: '',
       page: 1,
       limit: 10
     }
@@ -238,7 +242,7 @@
   const showAddDialog = () => {
     drawerCarePlanVisible.value = true
     title.value = '添加'
-    carePlan.value = {status: 1} //状态默认开始
+    carePlan.value = {}
     elderOptions.value = [] //清空老人搜索结果
     caregiverOptions.value = [] //清空护工搜索结果
     planItemList.value = [] //新增时护理项目子表默认为空，由用户点"添加项目"新增
@@ -436,16 +440,6 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="状态">
-        <el-select v-model="carePlanQuery.status" placeholder="全部" clearable style="width: 130px">
-          <el-option
-              v-for="item in statusOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-          />
-        </el-select>
-      </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker
             v-model="createTimeRange"
@@ -477,9 +471,7 @@
       </el-table-column>
       <el-table-column label="状态" width="100" align="center">
         <template #default="{row}">
-          <!-- 状态只有2种，直接内联判断 -->
-          <el-tag v-if="row.status === 1" type="success">进行中</el-tag>
-          <el-tag v-else type="info">已结束</el-tag>
+          <el-tag :type="getPlanStatus(row.startDate, row.endDate).type">{{ getPlanStatus(row.startDate, row.endDate).label }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间" width="160"/>
@@ -561,16 +553,6 @@
       </el-form-item>
       <el-form-item prop="endDate" label="结束日期" :label-width="80">
         <el-date-picker v-model="carePlan.endDate" type="date" value-format="YYYY-MM-DD" placeholder="选择结束日期" style="width: 220px"/>
-      </el-form-item>
-      <el-form-item prop="status" label="状态" :label-width="80">
-        <el-select v-model="carePlan.status" placeholder="请选择状态" style="width: 220px">
-          <el-option
-              v-for="item in statusOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-          />
-        </el-select>
       </el-form-item>
     </el-form>
 

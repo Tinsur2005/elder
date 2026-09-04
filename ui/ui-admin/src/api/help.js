@@ -1,4 +1,4 @@
-<!--
+/*
  * ============================================================
  *
  *   ████████╗██╗███╗   ██╗███████╗██╗   ██╗██████╗
@@ -15,18 +15,30 @@
  *  开源协议 : GPL 3.0
  *
  * ============================================================
--->
-<!DOCTYPE html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>智慧养老服务平台</title>
-    <script type="module" crossorigin src="/assets/index-C_Q0MiSd.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BgMV2nQu.css">
-  </head>
-  <body>
-    <div id="app"></div>
-  </body>
-</html>
+ */
+import request from "@/utils/request.js";
+
+const helpApi = {
+    // 分页查询求助列表
+    list(helpQuery) {
+        return request.get("/help-requests", {params: helpQuery});
+    },
+    // 提交处理，填写处理结果后将该求助置为已处理
+    handle(id, result) {
+        return request.put(`/help-requests/handle/${id}`, {result})
+    },
+    // 忽略求助，将该求助置为已忽略
+    ignore(id) {
+        return request.put(`/help-requests/ignore/${id}`)
+    },
+    // 根据ID删除求助
+    deleteById(id) {
+        return request.delete(`/help-requests/${id}`);
+    },
+    // 批量删除求助
+    deleteAll(ids) {
+        // axios 的 delete 第2个参数是 config，请求体必须放在 data 字段里
+        return request.delete("/help-requests", {data: ids});
+    }
+}
+export default helpApi

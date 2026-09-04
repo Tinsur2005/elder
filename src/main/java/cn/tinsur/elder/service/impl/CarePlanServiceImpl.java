@@ -89,7 +89,6 @@ public class CarePlanServiceImpl extends ServiceImpl<CarePlanMapper, CarePlan> i
         lambdaQueryWrapper
                 .like(!ObjectUtils.isEmpty(carePlanQuery.getName()), CarePlan::getName, carePlanQuery.getName())
                 .eq(!ObjectUtils.isEmpty(carePlanQuery.getElderId()), CarePlan::getElderId, carePlanQuery.getElderId())
-                .eq(!ObjectUtils.isEmpty(carePlanQuery.getStatus()), CarePlan::getStatus, carePlanQuery.getStatus())
                 .between(!ObjectUtils.isEmpty(carePlanQuery.getBeginCreateTime())
                                 && !ObjectUtils.isEmpty(carePlanQuery.getEndCreateTime()),
                         CarePlan::getCreateTime, carePlanQuery.getBeginCreateTime(),

@@ -39,11 +39,17 @@
 
   // ================== 选项 ==================
 
-  // 状态选项（状态：0结束 1开始），color为状态文字的颜色
-  const statusOptions = [
-    {value: 1, label: '进行中', color: '#1989FA'},
-    {value: 0, label: '已结束', color: '#999999'},
-  ]
+  //根据起止日期计算护理计划状态，早于开始日期为待执行，处于起止日期之间为执行中，晚于结束日期为已到期，color为状态文字的颜色
+  const getPlanStatus = (startDate, endDate) => {
+    const now = new Date()
+    //取当天0点作为比较基准，避免时分秒影响日期比较
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const start = startDate ? new Date(startDate.replace(/-/g, '/')) : null
+    const end = endDate ? new Date(endDate.replace(/-/g, '/')) : null
+    if (start && today < start) return {label: '待执行', color: '#FF976A'}
+    if (end && today > end) return {label: '已到期', color: '#999999'}
+    return {label: '执行中', color: '#1989FA'}
+  }
 
   // 执行周期选项（周期：0天 1周 2月）
   const executeCycleOptions = [
@@ -92,11 +98,6 @@
 
   // ================== 方法 ==================
 
-  //根据状态获取展示信息
-  const getStatus = (value) => {
-    return statusOptions.find(option => option.value === value) || statusOptions[1]
-  }
-
   //拼接执行周期描述（如：每天 07:30:00 / 每周二 09:00:00 / 每月15号 15:00:00）
   const formatExecute = (row) => {
     const cycle = executeCycleOptions.find(option => option.value === row.executeCycle)?.label || ''
@@ -125,7 +126,7 @@
       <div class="detail-top">
         <van-tag type="primary">护理</van-tag>
         <span class="detail-name">{{ carePlan.name }}</span>
-        <span class="detail-status" :style="{color: getStatus(carePlan.status).color}">{{ getStatus(carePlan.status).label }}</span>
+        <span class="detail-status" :style="{color: getPlanStatus(carePlan.startDate, carePlan.endDate).color}">{{ getPlanStatus(carePlan.startDate, carePlan.endDate).label }}</span>
       </div>
       <div class="detail-info">
         <p><van-icon name="manager-o"/><span>老人：{{ carePlan.elderName }}</span></p>

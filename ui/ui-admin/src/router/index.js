@@ -40,6 +40,7 @@ import ExamAppointment from '@/views/ExamAppointment.vue'
 import Announcement from '@/views/Announcement.vue'
 import NewsCategory from '@/views/NewsCategory.vue'
 import News from '@/views/News.vue'
+import Help from '@/views/Help.vue'
 
 //创建路由器
 const router = createRouter({
@@ -67,7 +68,8 @@ const router = createRouter({
                 {path: '/examAppointment', component: ExamAppointment},
                 {path: '/announcement', component: Announcement},
                 {path: '/newsCategory', component: NewsCategory},
-                {path: '/news', component: News}
+                {path: '/news', component: News},
+                {path: '/help', component: Help}
             ]
         }
     ]

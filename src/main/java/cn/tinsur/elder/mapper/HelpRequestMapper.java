@@ -1,4 +1,4 @@
-<!--
+/*
  * ============================================================
  *
  *   ████████╗██╗███╗   ██╗███████╗██╗   ██╗██████╗
@@ -15,18 +15,18 @@
  *  开源协议 : GPL 3.0
  *
  * ============================================================
--->
-<!DOCTYPE html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>智慧养老服务平台</title>
-    <script type="module" crossorigin src="/assets/index-C_Q0MiSd.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BgMV2nQu.css">
-  </head>
-  <body>
-    <div id="app"></div>
-  </body>
-</html>
+ */
+package cn.tinsur.elder.mapper;
+
+import cn.tinsur.elder.pojo.entity.HelpRequest;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+/**
+ * 求助记录表 Mapper 接口
+ *
+ * @author Tinsur
+ * @since 2026-09-04
+ */
+public interface HelpRequestMapper extends BaseMapper<HelpRequest> {
+
+}

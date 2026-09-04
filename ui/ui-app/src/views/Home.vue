@@ -45,7 +45,7 @@
   const gridItems = computed(() => {
     if (isFamily.value) {
       return [
-        {title: '查看资料', icon: 'user-circle-o', color: '#1989FA', path: '/elderInfo'},
+        {title: '代发求助', icon: 'warn-o', color: '#1989FA', path: '/help'},
         {title: '代约体检', icon: 'calendar-o', color: '#07C160', path: '/examPackageList'},
         {title: '体检记录', icon: 'records', color: '#FF976A', path: '/exam'},
         {title: '护理计划', icon: 'orders-o', color: '#EE0A24', path: '/carePlan'},
@@ -59,7 +59,7 @@
       {title: '护理计划', icon: 'orders-o', color: '#FF976A', path: '/carePlan'},
       {title: '护理任务', icon: 'todo-list-o', color: '#EE0A24', path: '/careTask'},
       {title: '我的合同', icon: 'bill-o', color: '#1989FA', path: '/contract'},
-      {title: '个人信息', icon: 'user-circle-o', color: '#07C160', path: '/elderInfo'}
+      {title: '求助', icon: 'warn-o', color: '#07C160', path: '/help'}
     ]
   })
 

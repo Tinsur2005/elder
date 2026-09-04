@@ -18,7 +18,7 @@
  */
 package cn.tinsur.elder.config;
 
-import interceptor.LoginInterceptor;
+import cn.tinsur.elder.interceptor.LoginInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.FormatterRegistry;

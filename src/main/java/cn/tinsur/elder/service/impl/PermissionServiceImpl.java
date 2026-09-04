@@ -95,8 +95,9 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
      * @return
      */
     private List<PermissionVO> buildChildrenTree(PermissionVO parentPermissionVO, List<PermissionVO> permissionVOList){
+        // 这里必须用equals比较：id和parentId是Long包装类型，超过127后==比较的是对象引用而不是值
         return permissionVOList.stream()
-                .filter(permissionVO -> permissionVO.getParentId() == parentPermissionVO.getId())
+                .filter(permissionVO -> parentPermissionVO.getId().equals(permissionVO.getParentId()))
                 .map(permissionVO -> {
                     permissionVO.setChildren(buildChildrenTree(permissionVO, permissionVOList)); //继续递归children
                     return permissionVO;

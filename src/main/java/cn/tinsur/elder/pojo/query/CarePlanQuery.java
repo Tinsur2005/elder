@@ -26,7 +26,6 @@ import java.util.Date;
 public class CarePlanQuery {
     private String name;
     private Long elderId;
-    private Integer status;
     private Date beginCreateTime;
     private Date endCreateTime;
     private Integer page;

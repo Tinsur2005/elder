@@ -1,4 +1,4 @@
-<!--
+/*
  * ============================================================
  *
  *   ████████╗██╗███╗   ██╗███████╗██╗   ██╗██████╗
@@ -15,18 +15,18 @@
  *  开源协议 : GPL 3.0
  *
  * ============================================================
--->
-<!DOCTYPE html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>智慧养老服务平台</title>
-    <script type="module" crossorigin src="/assets/index-C_Q0MiSd.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BgMV2nQu.css">
-  </head>
-  <body>
-    <div id="app"></div>
-  </body>
-</html>
+ */
+import request from '@/utils/request.js'
+
+const helpApi = {
+    // 查询指定老人的求助列表（附带 elderName、handlerName 供展示）
+    // 手机端列表一次加载，不传分页参数时后端默认取第一页100条（后续如需分页可加 van-list）
+    list(helpQuery) {
+        return request.get("/help-requests", {params: helpQuery})
+    },
+    // 发起求助（后端默认置为未处理，老人为自己发起、家属代当前绑定老人发起）
+    add(helpRequest) {
+        return request.post("/help-requests", helpRequest)
+    }
+}
+export default helpApi

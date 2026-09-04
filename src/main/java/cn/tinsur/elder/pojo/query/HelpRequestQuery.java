@@ -1,4 +1,4 @@
-<!--
+/*
  * ============================================================
  *
  *   ████████╗██╗███╗   ██╗███████╗██╗   ██╗██████╗
@@ -15,18 +15,21 @@
  *  开源协议 : GPL 3.0
  *
  * ============================================================
--->
-<!DOCTYPE html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>智慧养老服务平台</title>
-    <script type="module" crossorigin src="/assets/index-C_Q0MiSd.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BgMV2nQu.css">
-  </head>
-  <body>
-    <div id="app"></div>
-  </body>
-</html>
+ */
+package cn.tinsur.elder.pojo.query;
+
+import lombok.Data;
+
+import java.util.Date;
+
+@Data
+public class HelpRequestQuery {
+    private Long elderId;
+    private Integer type;
+    private Integer urgency;
+    private Integer status;
+    private Date beginCreateTime;
+    private Date endCreateTime;
+    private Integer page;
+    private Integer limit;
+}

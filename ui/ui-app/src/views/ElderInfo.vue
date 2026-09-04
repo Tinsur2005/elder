@@ -105,7 +105,7 @@
     <van-cell-group inset title="基础信息" class="info-group">
       <van-cell title="姓名" :value="currentElder.realName"/>
       <van-cell title="性别" :value="getGender(currentElder.gender)"/>
-      <van-cell title="出生日期" :value="currentElder.birthday"/>
+      <van-cell title="出生日期" :value="currentElder.birthday ? currentElder.birthday.slice(0, 10) : '-'"/>
       <van-cell title="年龄" :value="`${getAge(currentElder.birthday)}岁`"/>
       <van-cell title="身份证号" :value="currentElder.idCardNo"/>
       <van-cell title="联系电话" :value="currentElder.phone"/>

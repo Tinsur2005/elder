@@ -109,7 +109,7 @@ public class ElderTools {
      * 返回值会被序列化成 JSON 回传给模型。
      */
     @Tool(description = "查询当前老人的所有护理计划和每个计划包含的护理项目。" +
-            "计划的status含义：0已结束、1进行中；" +
+            "计划状态由起止日期推算：当前日期早于startDate为待执行、在startDate与endDate之间为执行中、晚于endDate为已到期；" +
             "项目的executeCycle含义：0每天、1每周、2每月，executeDay为执行日：周期为每周时存周几（1到7，1代表周一），周期为每月时存几号（1到31），每天时为空")
     public List<CarePlanVO> getCarePlans() {
         // 1.复用护理计划的分页查询，按当前老人id过滤，一次取100条足够AI回答使用

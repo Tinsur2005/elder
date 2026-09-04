@@ -40,6 +40,8 @@ import AnnouncementDetail from '@/views/AnnouncementDetail.vue'
 import AIChat from '@/views/AIChat.vue'
 import NewsList from '@/views/NewsList.vue'
 import NewsDetail from '@/views/NewsDetail.vue'
+import HelpList from '@/views/HelpList.vue'
+import HelpSubmit from '@/views/HelpSubmit.vue'
 
 //创建路由器
 const router = createRouter({
@@ -68,7 +70,9 @@ const router = createRouter({
                 {path: '/announcementDetail', component: AnnouncementDetail},
                 {path: '/aiChat', component: AIChat},
                 {path: '/news', component: NewsList},
-                {path: '/newsDetail', component: NewsDetail}
+                {path: '/newsDetail', component: NewsDetail},
+                {path: '/help', component: HelpList},
+                {path: '/helpSubmit', component: HelpSubmit}
             ]
         }
     ]

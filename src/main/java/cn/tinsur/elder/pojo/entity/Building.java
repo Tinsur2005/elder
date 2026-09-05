@@ -1,0 +1,84 @@
+/*
+ * ============================================================
+ *
+ *   ████████╗██╗███╗   ██╗███████╗██╗   ██╗██████╗
+ *   ╚══██╔══╝██║████╗  ██║██╔════╝██║   ██║██╔══██╗
+ *      ██║   ██║██╔██╗ ██║███████╗██║   ██║██████╔╝
+ *      ██║   ██║██║╚██╗██║╚════██║██║   ██║██╔══██╗
+ *      ██║   ██║██║ ╚████║███████║╚██████╔╝██║  ██║
+ *      ╚═╝   ╚═╝╚═╝  ╚═══╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝
+ *
+ *  项目名称 : 智慧社区养老系统
+ *  源码作者 : Tinsur (tinsur.cn)
+ *  作者主页 : https://www.tinsur.cn
+ *  联系方式 : me@tinsur.cn
+ *  开源协议 : GPL 3.0
+ *
+ * ============================================================
+ */
+package cn.tinsur.elder.pojo.entity;
+
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import java.io.Serializable;
+import java.util.Date;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+/**
+ * <p>
+ * 楼栋表
+ * </p>
+ *
+ * @author Tinsur
+ * @since 2026-09-04
+ */
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class Building implements Serializable {
+
+
+    /**
+     * 楼栋ID
+     */
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
+
+    /**
+     * 楼栋名称
+     */
+    private String name;
+
+    /**
+     * 排序
+     */
+    private Integer sort;
+
+    /**
+     * 备注
+     */
+    private String remark;
+
+    /**
+     * 删除标志：0正常 1已删除
+     */
+    @TableLogic
+    private Integer deleted;
+
+    /**
+     * 创建时间
+     */
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
+    private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
+    private Date updateTime;
+
+
+}

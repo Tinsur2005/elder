@@ -41,6 +41,10 @@ import Announcement from '@/views/Announcement.vue'
 import NewsCategory from '@/views/NewsCategory.vue'
 import News from '@/views/News.vue'
 import Help from '@/views/Help.vue'
+import Building from '@/views/Building.vue'
+import Floor from '@/views/Floor.vue'
+import Room from '@/views/Room.vue'
+import Bed from '@/views/Bed.vue'
 
 //创建路由器
 const router = createRouter({
@@ -69,7 +73,11 @@ const router = createRouter({
                 {path: '/announcement', component: Announcement},
                 {path: '/newsCategory', component: NewsCategory},
                 {path: '/news', component: News},
-                {path: '/help', component: Help}
+                {path: '/help', component: Help},
+                {path: '/building', component: Building},
+                {path: '/floor', component: Floor},
+                {path: '/room', component: Room},
+                {path: '/bed', component: Bed}
             ]
         }
     ]
